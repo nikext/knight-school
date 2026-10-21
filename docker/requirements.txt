@@ -1,0 +1,14 @@
+# Installed on top of the vLLM base image (docker/Dockerfile). Keep in step with pyproject.toml.
+transformers==5.17.0
+trl==1.16.0
+peft==0.21.2
+accelerate==1.15.0
+chess==1.11.2
+google-cloud-storage>=3.17.1
+numpy>=2.3
+polars>=2.0.0
+pydantic>=2.14.1
+pyyaml>=6.0.3
+requests>=2.34.2
+typer>=0.27.3
+zstandard>=0.25.0

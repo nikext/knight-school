@@ -1,0 +1,5 @@
+# Stockfish 19 at 1 node, 1 thread, hash cleared per position (E1 calibration).
+name: stockfish-1node
+backend: stockfish
+description: Stockfish 19, 1 node
+nodes: 1

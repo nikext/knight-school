@@ -1,0 +1,12 @@
+# Qwen3.5-2B (Feb 2026), VLM with hybrid Gated DeltaNet + attention layers, Apache-2.0.
+# Served text-only (vLLM --language-model-only). Non-thinking by default; the prompt asks for <think>.
+name: qwen3.5-2b
+backend: vllm
+description: Qwen3.5-2B, language model only, prompt-level <think> (enable_thinking=false)
+license: apache-2.0
+hf_repo: Qwen/Qwen3.5-2B
+revision: 15852e8c16360a2fea060d615a32b45270f8a8fc
+language_model_only: true
+max_model_len: 2560
+chat_template_kwargs: {enable_thinking: false}
+think: tags

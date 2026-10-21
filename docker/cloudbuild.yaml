@@ -1,0 +1,17 @@
+# Cloud Build: build docker/Dockerfile and push train:<sha> to Artifact Registry (TRAINING.md §8).
+# Default pool e2-standard-2: 2,500 build-minutes/month free per billing account, then $0.006/min
+# (Catalog API SKU A464-9020-6404, read 2026-10-21). Submit with `make image` (asks first).
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --build-arg=GIT_SHA=${_GIT_SHA}
+      - -f=docker/Dockerfile
+      - -t=${_IMAGE}:${_GIT_SHA}
+      - .
+images: ["${_IMAGE}:${_GIT_SHA}"]
+timeout: 3600s
+options:
+  diskSizeGb: 150
+  logging: CLOUD_LOGGING_ONLY
+tags: [knight-school]

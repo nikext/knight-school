@@ -1,0 +1,12 @@
+# Gemma 4 E2B-it (Mar 2026), Apache-2.0, multimodal (text, image, audio); 2.3B effective,
+# 5.1B with per-layer embeddings, so ~10 GB in bf16: L4 only. Thinking off (no <|think|> in the
+# system prompt); its native thinking uses <|channel> tokens, which the parser doesn't read.
+name: gemma4-e2b
+backend: vllm
+description: Gemma 4 E2B-it, language model only, prompt-level <think>
+license: apache-2.0
+hf_repo: google/gemma-4-E2B-it
+revision: 3e22461f65e89153144f8adb70e3b8c2cc9845a7
+language_model_only: true
+max_model_len: 2560
+think: tags

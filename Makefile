@@ -41,5 +41,6 @@ upload-data: ## M1: copy data/ (minus raw/, logs/, reward shards) to the bucket 
 	$(GCLOUD) storage rsync --recursive \
 		--exclude='^(raw|logs|positions/rewards)/' data/ $(BUCKET)/data/v1/
 
-eval: ## M2: run the eval harness (MODEL=... SET=dev)
-	@echo "make eval arrives in M2 (docs/tasks/M2-evals-baselines.md)"; exit 1
+SET ?= dev500
+eval: ## run the eval harness: MODEL=<profile> SET=dev500|test2000|test500|chessbench1k|probe500 [CKPT=gs://...] [ARGS=...]
+	$(KS) eval $(MODEL) --set $(SET) $(if $(CKPT),--ckpt $(CKPT),) $(ARGS)

@@ -1,0 +1,5 @@
+# Uniform random legal move, seeded per item (E1 floor).
+name: random
+backend: random
+description: uniform random legal move
+seed: 2026

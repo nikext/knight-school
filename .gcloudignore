@@ -1,0 +1,11 @@
+# Upload only what docker/Dockerfile copies.
+*
+!docker/
+!pyproject.toml
+!README.md
+!LICENSE
+!ks/
+!configs/
+!costs/
+!evals/
+**/__pycache__/

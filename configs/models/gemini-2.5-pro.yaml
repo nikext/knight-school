@@ -1,0 +1,9 @@
+# Gemini baseline (E1). Runs only from 2026-11-13 (ADR-013): pilot of 20 puzzles, ask, then batch.
+# Re-check the id is still GA and the price in prices.yaml before the first call.
+name: gemini-2.5-pro
+backend: gemini
+description: gemini-2.5-pro on Vertex AI, default sampling, thinking budget recorded
+vertex_model: gemini-2.5-pro
+max_tokens: 4096
+temperature: 0.0
+think: tags

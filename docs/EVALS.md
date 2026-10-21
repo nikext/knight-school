@@ -56,8 +56,22 @@ the difference and its CI. Put both in every results table.
   model id, chat template quirks, thinking mode, max tokens). **No model ID
   literals in code.**
 - **Cost meter:** every backend reports cost (GPU seconds × price, or tokens
-  × price) and the harness stops at the `--max-usd` cap. Every eval run
-  appends a ledger `charge` or `start`/`end` event.
+  × price) and the harness stops at the `--max-usd` cap, checked between
+  chunks of 512 prompts; a puzzle cut off mid-way is dropped, not graded on
+  part of its moves. Ledger: a cloud eval is booked by its `ks launch`
+  `start`/`end` events (the VM sets `KS_PRICE_PER_HOUR`, so the report shows
+  its share); a Gemini run appends one `charge` (`ks.eval.gemini`); laptop
+  runs cost $0 and append nothing.
+- **Gemini meter** (`ks.eval.gemini`): refuses before the vertex pool's
+  `usable_from`, with a stale credit reading, or while `prices.yaml → gemini`
+  is `verified: false`. A run's allowance is the smallest of `--max-usd`, the
+  milestone's vertex allocation left, the pool ceiling left and the credit
+  headroom. Each call first reserves its worst case (prompt + max output +
+  thinking budget at the output price) and then books `usage_metadata`.
+  Batch JSONL is built and parsed by `batch_requests` / `parse_batch_output`.
+- **Files:** `<run>.json` holds the header (profile, git SHA, prompt hash,
+  cost), the summary and every item with its completion text; it is gzipped
+  as `<run>.json.gz` when over 5 MB, for any backend.
 
 ## 4. E0 probe (`probe500`)
 
@@ -73,7 +87,11 @@ held-out eval-DB positions:
 | P4 | "Is the side to move in check?" | exact |
 
 Built in M1 (`evals/sets/probe500.csv`: `id, task, fen, question, answer,
-move`). The items come from the primer's own generators (P1 = T1 square,
+move`). **Prompt (M2):** the primer's user turn (FEN, side to move, the
+question, no legal-move list) plus one fixed format line per task, the same
+for every model, because a zero-shot model has never seen the primer's answer
+formats (`ks.eval.probe.FORMAT_HINT`). The grader reads the last `<answer>`
+block if there is one, else the text after `</think>`, else the whole reply. The items come from the primer's own generators (P1 = T1 square,
 P2 = T2 all, P3 = T3, P4 = T4 check), so the reference answers use the
 primer's frozen formats (DATA.md §7). P4 is balanced, with 63 positions in
 check and 62 not. For P4 the grader compares yes/no (the answer's first word).

@@ -9,22 +9,26 @@ in M2)_.
 
 | Checkpoint | P1 square | P2 legal count | P3 FEN after move | P4 in check | Predicted |
 |---|---|---|---|---|---|
-| base (zero-shot) | | | | | |
+| base (zero-shot) | | | | | P1 40–60%, P2 2–8%, P3 0–2%, P4 55–75% (written 2026-10-21, before any run) |
 | primer-M | | | | | |
 | primer-M → GRPO dense | | | | | |
 
 ## E1: baselines (test2000 unless noted)
 
-| Model | Solve rate | Move acc | Legal rate | Puzzle rating | $ / 1k puzzles |
-|---|---|---|---|---|---|
-| random legal | | | 100% | | 0 |
-| Stockfish 1 node | | | 100% | | 0 |
-| Stockfish 1k nodes | | | 100% | | 0 |
-| base model (zero-shot) | | | | | |
-| Gemini Flash-Lite | | | | | |
-| Gemini Flash | | | | | |
-| Gemini Pro (test500) | | | | | |
-| Chess-R1, Qwen2.5-7B dense (reported, different set) | | ~25–30% | | | — |
+Predictions written 2026-10-21, before any test2000 run. Two harness smoke
+tests had been run on dev500 by then: random on all 500 (1.0% solved) and
+Stockfish 1k nodes on 100 puzzles (87%).
+
+| Model | Predicted solve | Solve rate | Move acc | Legal rate | Puzzle rating | $ / 1k puzzles |
+|---|---|---|---|---|---|---|
+| random legal | ~1% | | | 100% | | 0 |
+| Stockfish 1 node | 30–45% (rating ~1000–1300) | | | 100% | | 0 |
+| Stockfish 1k nodes | 85–92% (rating > 2400) | | | 100% | | 0 |
+| base model (zero-shot) | 2–8%, legal 60–90%, rating below range | | | | | |
+| Gemini Flash-Lite | 5–15% | | | | | |
+| Gemini Flash | 15–35% | | | | | |
+| Gemini Pro (test500) | 30–55% | | | | | |
+| Chess-R1, Qwen2.5-7B dense (reported, different set) | | | ~25–30% | | | — |
 
 ## E2 / E3: the main comparison (test2000)
 

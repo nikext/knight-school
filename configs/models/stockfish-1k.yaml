@@ -1,0 +1,5 @@
+# Stockfish 19 at 1,000 nodes (E1 "weak engine" calibration).
+name: stockfish-1k
+backend: stockfish
+description: Stockfish 19, 1k nodes
+nodes: 1000

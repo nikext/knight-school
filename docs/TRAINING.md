@@ -40,10 +40,19 @@ user:   Position (FEN): r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w
 - The legal moves are sorted the way DATA.md §4 says. E5b drops that line.
 - Models with native thinking use it in place of `<think>`. Decide once in
   M2 (ADR) and keep it for every arm.
-- **Parser** (`ks.chess.parse`): take the last `<answer>…</answer>`, strip
-  it, and resolve it with `board.parse_san`. Tolerate a missing `+`/`#` and
-  `0-0` for `O-O`. It must be in the legal list, otherwise the move is
-  illegal. Unit-test it thoroughly; it is the most-called code in the repo.
+- **Parser** (`ks.chess.parse`, built in M2): take the last
+  `<answer>…</answer>` and normalise it: strip whitespace, `**`, backticks and
+  quotes, a leading move number (`12.`, `12...`), a trailing period and
+  `!`/`?` glyphs; tolerate a missing or extra `+`/`#` and `0-0`/`0-0-0`. The
+  result must then equal a legal move's SAN (the prompt's list), otherwise
+  the move is illegal. This is stricter than `board.parse_san`, which would
+  also take long algebraic (`e2e4`) and null moves; the prompt asks for a move
+  from the list. Format needs exactly one answer block and no stray tags,
+  plus one closed think block before it (a native-thinking template may put
+  the opening `<think>` in the prompt). Unit-tested in `tests/test_chess_parse.py`.
+- **Frozen in M2:** prompt hash `c728de49e119` (`think: tags`, legal list on)
+  and `b371401fde1c` (`think: native`). `tests/test_chess_rewards_prompt.py`
+  pins both; changing the text needs an ADR.
 
 ## 3. Rewards (`ks.chess.rewards`)
 
@@ -133,8 +142,21 @@ each component separately.
 - Stockfish is **not** in the image. Reward tables are precomputed (M1), which
   also keeps the GPL binary out of anything distributed.
 - Tag `train:<git-sha>` and push to Artifact Registry in the GPU region.
-  Build with Cloud Build if its free tier covers it (verify), otherwise
-  locally with podman and push.
+  **Built with Cloud Build** (M2, ADR-016): the default pool's e2-standard-2
+  has 2,500 free build-minutes a month per billing account, then $0.006/min
+  (Catalog SKU A464-9020-6404); a build takes ~15–25 min. Pushing ~11 GB
+  from the laptop would take far longer. Artifact Registry storage is $0.10
+  per GB-month above 0.5 GB, about $1/month for one image; it is booked in
+  the ledger as a `charge`.
+- **Pins (M2):** base `vllm/vllm-openai:v0.31.0-x86_64-cu129` by digest
+  (torch 2.13.0, CUDA 12.9, matching the DLVM image's driver 580), plus
+  transformers 5.17.0, TRL 1.16.0, PEFT 0.21.2, accelerate 1.15.0
+  (`docker/requirements.txt`, the `train` extra in pyproject.toml). TRL 1.16.0
+  declares `vllm>=0.22.0,<=0.31.0` and vLLM 0.31.0 wants transformers
+  `>=5.10.4,<5.18`.
+- Files: `docker/Dockerfile`, `docker/cloudbuild.yaml`, `.gcloudignore`
+  (uploads only what the image copies). The git SHA is baked in as
+  `KS_GIT_SHA`, since the image has no `.git`.
 
 ## 9. Run config (`configs/runs/*.yaml`)
 
