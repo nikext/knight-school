@@ -1,0 +1,16 @@
+# M0 kill-switch test target: a tiny labelled CPU spot VM that just sleeps.
+# infra/killswitch/test.sh publishes a synthetic over-threshold budget message
+# and checks that the function deletes it. Worst case ~$0.05.
+id: m0-killswitch-test
+milestone: M0
+description: "CPU-only spot VM for the kill-switch test"
+machine: e2-standard-2
+gpus: 0
+zones: [us-central1-a]
+max_hours: 1
+max_attempts: 1
+boot_disk_gb: 10
+image: host          # no container: run the command on the VM itself
+command: "sleep 3000"
+vm_image_family: debian-12
+vm_image_project: debian-cloud
