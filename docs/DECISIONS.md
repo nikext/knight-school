@@ -256,10 +256,11 @@ JIT-compiles with nvcc, which the laptop doesn't have.
   (pinned by digest), built by Cloud Build from `git archive HEAD`
   (`make image`), so an image is exactly one commit. Free tier: 2,500
   e2-standard-2 minutes a month, then $0.006/min.
-- The image keeps every package the base image ships (its `pip freeze` is
-  a constraint, except transformers/TRL/PEFT/accelerate), and the build fails
-  if `pip check` reports a conflict the base didn't have. The first build
-  had let pip upgrade numpy to 2.5 under numba's `<2.5` pin. The base ships
+- The image keeps the base image's torch, vLLM, triton, FlashInfer, numpy,
+  numba and opentelemetry versions (pip constraints), and the build fails if
+  `pip check` reports a conflict the base didn't have. The first build had
+  let pip upgrade numpy to 2.5 under numba's `<2.5` pin; freezing the whole
+  base failed instead, because its fsspec is newer than any `datasets` allows. The base ships
   google-api-core 2.40 with opentelemetry-api 1.40, which already disagree,
   so google-cloud-storage is left out of the image; jobs read GCS through
   `ks.cloud.gcs` (JSON API + google-auth).
