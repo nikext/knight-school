@@ -8,7 +8,7 @@
 | `test500` | 500 ⊂ test2000 | expensive models (Gemini Pro) |
 | `dev500` | 500 puzzles | curves during training, prompt and model screening |
 | `probe500` | 500 items | E0 diagnostics (§4) |
-| `chessbench1k` (optional) | 1,000 of Ruoss et al.'s 10k puzzles | comparability with Chess-R1; report the metric difference honestly |
+| `chessbench1k` (optional) | 1,000 of Ruoss et al.'s 10k puzzles, built in M1 | comparability with Chess-R1; report the metric difference honestly. Same conventions as Lichess puzzles, but no filters (up to 13 solver moves). ChessBench's own grader accepts a mate on any move; ours only on the last, which agrees in practice. Excludes puzzles touching v1 training data; it is **not** in the blocklist, so M5's new training sets must exclude its keys too. CC-BY 4.0: credit Ruoss et al. |
 
 **Never tune anything on `test2000`.** Screening, hyperparameters and
 checkpoint selection use `dev500`. The final checkpoint of each run (not the
@@ -71,6 +71,14 @@ held-out eval-DB positions:
 | P2 | "How many legal moves does the side to move have?" + "list them" | count exact; list F1 |
 | P3 | "FEN after <move>?" | exact piece-placement field (Chess-R1's board-state test, where every model scored 0%) |
 | P4 | "Is the side to move in check?" | exact |
+
+Built in M1 (`evals/sets/probe500.csv`: `id, task, fen, question, answer,
+move`). The items come from the primer's own generators (P1 = T1 square,
+P2 = T2 all, P3 = T3, P4 = T4 check), so the reference answers use the
+primer's frozen formats (DATA.md §7). P4 is balanced, with 63 positions in
+check and 62 not. For P4 the grader compares yes/no (the answer's first word).
+For P2 it compares the count and the list's F1. For P3 it compares the
+FEN's first field.
 
 Run E0 for every base model, every primer checkpoint and every final RL
 checkpoint. It shows whether the primer actually installed rules knowledge

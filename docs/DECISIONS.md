@@ -193,3 +193,48 @@ infra tests. Worst cases round up to 1/100 cent.
 **Consequences:** 44 gate tests. A CPU VM still goes through every money rule.
 "Exactly 1 GPU" in ADR-002 now reads "at most 1 GPU". The no-multi-GPU
 intent is unchanged.
+
+### ADR-015: M1 data conventions: orderings, splits, reward settings, primer format
+**Status:** accepted (2026-10-21)
+**Context:** DATA.md left several choices to M1 ("decide once, never
+change"), and some facts had to be checked against the real files and the
+engine.
+**Decision:**
+- **Stockfish 19**, the official universal x86-64 build (from 19 on, one
+  binary dispatches AVX2/BMI2/AVX-512 at runtime; no per-CPU build exists).
+- **Legal-move order:** code-point order of SAN (`sorted()`), which puts piece
+  moves first and pawn moves last. **Prompt FEN:** python-chess `board.fen()`.
+- **Splits:** order by `sha256("2026:" + PuzzleId)`, not a library RNG, so
+  they don't depend on polars or Python versions. Eval sets take at most one
+  puzzle per game. (After filtering, every puzzle comes from a distinct game
+  anyway.) Bin quotas give the remainder to the lower bins.
+- **rl_train:** 66k positions before the mismatch filter, drawn bin by bin,
+  with blocklisted and duplicate keys dropped. primer_pool excludes the
+  rl_train *games*, not just the puzzles.
+- **Reward tables:** `go nodes 1,000,000`, the largest timed N that fits in
+  4 h. A `ucinewgame` before each position (hash cleared) makes the tables
+  reproducible. The wp formula clamps cp to ±1000 like lila.
+- **Primer:**
+  - Weights count examples, not tokens.
+  - T1–T5 take half their positions from primer_pool puzzle positions and
+    half from the eval DB. T6 and T7 need an engine score and PV, so they
+    use the eval DB only.
+  - T5 on a puzzle position answers with the puzzle solution.
+  - Every source position is used at most once.
+  - An item is dropped if any position it shows or reveals (T3's result,
+    T5's move, T7's line) is blocklisted, or is an rl_train position. The
+    second rule keeps RL's contribution separable (H5).
+  - **T5's prompt includes the RL prompt's `Legal moves:` line.** The other
+    tasks don't, since T2 asks for that list.
+  - Answers carry no `<answer>` tags; TRAINING.md §5's format-risk rule
+    stays the fallback.
+  - Half of T4's check questions go to positions that are in check.
+  - T3 picks castling, ep or a promotion 30% of the time when one is legal.
+  - **primer-S is the first 130k examples of primer-M** (nested), so the
+    scaling curve changes only the amount of data.
+- **probe500 reuses the primer generators** (P1 = T1 square, P2 = T2 all,
+  P3 = T3, P4 = T4 check, with P4 balanced 63/62), so a primer checkpoint is
+  probed in the exact format it was taught.
+**Consequences:** All of these are frozen with data v1. Changing any of
+them means data v2 and new manifests. M2's prompt builder and grader must
+import `ks.chess.board` rather than re-implementing it.

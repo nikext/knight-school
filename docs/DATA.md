@@ -152,6 +152,27 @@ the eval DB (reservoir sample) and `primer_pool`, after the blocklist filter.
 | T6 evaluation | "Who is better?" | bucket + score, e.g. `White is winning (+3.2)` | 10% |
 | T7 best line | "Best line, 3 moves?" | first 3 plies of the PV, SAN | 10% |
 
+**Frozen formats** (`ks.data.primer`, ADR-015). Each example is a chat:
+the RL system prompt; then a user turn of `Position (FEN): …`,
+`Side to move: …` and the question; then the answer. Only T5 also shows the
+RL prompt's `Legal moves:` line.
+
+| Task | Question | Answer |
+|---|---|---|
+| T1 | `What is on e4?` · `List White's pieces.` | `white knight` / `empty` · `Ke1 Qd1 Ra1 Rh1 … a2 b2` (K Q R B N, then pawns as bare squares, each in a1…h8 order) |
+| T2 | `How many legal moves does the side to move have? List them.` · `Legal moves of the piece on f3?` | `20: Na3, Nc3, …` · `Nd4, Ne5` or `none` |
+| T3 | `FEN after Nxe5?` | full FEN (`board.fen()`) |
+| T4 | `Is the side to move in check?` · `Which White pieces attack d5?` · `List all captures.` | `no` / `yes, by Re1 and Bb5` · piece list or `none` · SAN list or `none` |
+| T5 | `Best move?` | SAN |
+| T6 | `Who is better?` | `Equal (+0.3)` (\|cp\| < 50), `White is slightly better (+1.2)` (< 150), `… is better` (< 300), `… is winning (+3.2)`, `Black mates in 2 (#-2)`; White's view |
+| T7 | `Best line, 3 moves?` | `Nf3 Nc6 Bb5` (shorter only if it ends in mate) |
+
+Sources: T1–T5 draw half their positions from primer_pool solver positions
+(T5 then answers with the puzzle solution) and half from the eval-DB sample.
+T6/T7 use the eval DB only. Each position is used once. Items that show or
+reveal a blocklisted or rl_train position are dropped. The examples carry
+`keys` so `contamination_hits` can be re-checked.
+
 **Sizes** (tokens counted with the chosen model's tokenizer, in M2):
 
 | Set | Target tokens | Built in |
@@ -162,19 +183,35 @@ the eval DB (reservoir sample) and `primer_pool`, after the blocklist filter.
 | primer-rules-M | T1–T4 only, matched to M's tokens | M5 (E5a) |
 
 M1 can't know the final tokenizer yet, so it generates by example count with
-a ~20% margin. M2 records the exact token counts per set in the manifests.
+a ~20% margin. A 3k-example sample measured **139 tokens per example** with
+Qwen3's tokenizer (T5 195, T2 151, T3 134, T1 100, T4 94, T6 95, T7 98;
+ChatML framing included). That gives **primer-M = 1.3M examples** (~180M
+tokens) and **primer-S = its first 130k** (nested). M2 records the exact
+token counts per set in the manifests.
 
 ## 8. File layout
 
 ```
 data/
-  raw/lichess_db_puzzle.csv.zst
-  puzzles/filtered.parquet  splits/*.parquet
-  positions/rl_train.parquet          # expanded + reward tables
-  primer/{S,M,L,rules-M}/shard-*.jsonl.zst
+  raw/lichess_db_puzzle.csv.zst (+ .csv)  raw/chessbench/puzzles.csv   # not uploaded
+  evaldb/sample.parquet               # 2M eval-DB positions (fen, side-to-move cp/mate, PV)
+  puzzles/filtered.parquet            # + game_id, rating_bin, order
+  splits/{rl_train_puzzles,primer_pool}.parquet
+  positions/rl_train_candidates.parquet
+  positions/rl_train.parquet          # expanded + reward tables, after the mismatch filter
+  positions/rewards/{in,out-n1000000}/shard-*.parquet   # resumable work dir, not uploaded
+  primer/{S,M}/shard-*.jsonl.zst      # L, rules-M in M5
 manifests/*.json                      # committed
-evals/sets/{test2000,dev500,probe500}.csv, test500.ids, blocklist.{epd,games}.txt   # committed
+evals/sets/{test2000,dev500,probe500,chessbench1k}.csv, test500.ids,
+  blocklist.{epd,games}.txt           # committed
 ```
+
+`make data` (= `ks data`) runs the steps `puzzles evaldb probe blocklist
+rltrain timing rewards primer chessbench`. `ks data <step> [--force]` runs
+some of them. A step is skipped when its manifest's fingerprint (input
+hashes, parameters, module source) matches and its outputs still hash to
+what the manifest says. `make upload-data` copies `data/` (minus raw, logs and
+reward shards) to `gs://$BUCKET/data/v1/`.
 
 ## 9. Data card (fill in during M1)
 

@@ -1,6 +1,6 @@
 """`make data`: the M1 chain, step by step, each skipped when its inputs and code are unchanged.
 
-puzzles -> evaldb -> probe -> blocklist -> rltrain -> timing -> rewards -> primer
+puzzles -> evaldb -> probe -> blocklist -> rltrain -> timing -> rewards -> primer -> chessbench
 """
 
 from __future__ import annotations
@@ -427,6 +427,72 @@ def step_primer(log: Log, force: bool = False) -> None:
         log(f"primer: {name} {n:,} examples, {len(paths)} shards")
 
 
+# --- chessbench1k (optional, EVALS.md §1) ------------------------------------------------------
+
+CHESSBENCH_URL = "https://storage.googleapis.com/searchless_chess/data/puzzles.csv"
+CHESSBENCH_RAW = mf.DATA / "raw" / "chessbench" / "puzzles.csv"
+CHESSBENCH_N = 1000
+
+
+def step_chessbench(log: Log, force: bool = False) -> None:
+    """1k of Ruoss et al.'s 10k puzzles, minus any that touch v1 training data.
+
+    Same convention as Lichess (FEN before the opponent's move). The set is
+    filtered against rl_train and primer-M rather than added to the
+    blocklist, which would make the blocklist depend on its own downstream
+    data. Later training sets (M5) must also exclude `chessbench1k` keys.
+    """
+    out = _sets_csv("chessbench1k")
+    if not CHESSBENCH_RAW.exists():
+        CHESSBENCH_RAW.parent.mkdir(parents=True, exist_ok=True)
+        r = requests.get(CHESSBENCH_URL, timeout=60)
+        r.raise_for_status()
+        CHESSBENCH_RAW.write_bytes(r.content)
+    inputs = {
+        "chessbench": mf.sha256_file(CHESSBENCH_RAW),
+        "rl_train_candidates": mf.output_sha("rl_train_candidates"),
+        "primer_M": mf.output_sha("primer_M"),
+    }
+    fp = mf.fingerprint(inputs, {"n": CHESSBENCH_N, "seed": puzzles.SEED}, [puzzles, kb])
+    if not force and mf.up_to_date("chessbench1k", fp, [out]):
+        log("chessbench: up to date")
+        return
+    cb = pl.read_csv(CHESSBENCH_RAW, schema_overrides={"PuzzleId": pl.String})
+    train_keys = set(pl.read_parquet(CANDIDATES)["key"].to_list())
+    for ex in pr.read_shards(sorted((PRIMER / "M").glob("shard-*.jsonl.zst"))):
+        train_keys.update(ex["keys"])
+    rl_ids = set(pl.read_parquet(RL_PUZZLES)["PuzzleId"].to_list())
+    clean = [
+        pid not in rl_ids and not train_keys.intersection(puzzles.line_keys(fen, moves))
+        for pid, fen, moves in cb.select("PuzzleId", "FEN", "Moves").iter_rows()
+    ]
+    pool = cb.filter(pl.Series(clean)).with_columns(
+        pl.col("PuzzleId")
+        .map_elements(lambda p: puzzles.order_key(puzzles.SEED, p), return_dtype=pl.String)
+        .alias("order")
+    )
+    picked = pool.sort("order").head(CHESSBENCH_N).sort("Rating", "PuzzleId")
+    picked.select("PuzzleId", "Rating", "FEN", "Moves", "Solution").write_csv(out)
+    hits = sum(
+        bool(train_keys.intersection(puzzles.line_keys(f, m)))
+        for f, m in picked.select("FEN", "Moves").iter_rows()
+    )
+    mf.write(
+        "chessbench1k",
+        fp,
+        [out],
+        source=CHESSBENCH_URL,
+        source_sha256=mf.sha256_file(CHESSBENCH_RAW),
+        license="CC0 (lichess.org) / CC-BY 4.0 (Ruoss et al. 2024, google-deepmind/searchless_chess)",
+        rows=picked.height,
+        excluded_touching_training_data=cb.height - pool.height,
+        seed=puzzles.SEED,
+        contamination_hits=hits,
+        note="filtered against rl_train and primer-M (v1); not in the blocklist",
+    )
+    log(f"chessbench: {picked.height} puzzles ({cb.height - pool.height} excluded)")
+
+
 STEPS: dict[str, Callable[[Log, bool], None]] = {
     "puzzles": step_puzzles,
     "evaldb": step_evaldb,
@@ -436,6 +502,7 @@ STEPS: dict[str, Callable[[Log, bool], None]] = {
     "timing": step_timing,
     "rewards": step_rewards,
     "primer": step_primer,
+    "chessbench": step_chessbench,
 }
 
 
