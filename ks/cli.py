@@ -259,16 +259,9 @@ def _fetch_ckpt(ckpt: str) -> str:
         return ckpt
     import tempfile
 
-    from google.cloud import storage
+    from ks.cloud.gcs import download_prefix
 
-    bucket_name, _, prefix = ckpt.removeprefix("gs://").partition("/")
-    prefix = prefix.rstrip("/") + "/"
-    dest = Path(tempfile.mkdtemp(prefix="ks-ckpt-"))
-    for blob in storage.Client().list_blobs(bucket_name, prefix=prefix):
-        target = dest / blob.name.removeprefix(prefix)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        blob.download_to_filename(str(target))
-    return str(dest)
+    return str(download_prefix(ckpt, Path(tempfile.mkdtemp(prefix="ks-ckpt-"))))
 
 
 def main() -> None:

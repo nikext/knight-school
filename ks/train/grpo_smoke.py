@@ -27,12 +27,9 @@ RL_TRAIN = "data/positions/rl_train.parquet"
 
 def load_positions(path: str, n: int) -> list[dict[str, Any]]:
     if path.startswith("gs://"):
-        from google.cloud import storage
+        from ks.cloud.gcs import download
 
-        bucket, _, name = path.removeprefix("gs://").partition("/")
-        local = Path("/tmp/rl_train.parquet")
-        storage.Client().bucket(bucket).blob(name).download_to_filename(str(local))
-        path = str(local)
+        path = str(download(path, Path("/tmp/rl_train.parquet")))
     df = pl.read_parquet(path, columns=["fen", "solution_uci", "is_last", "legal_san", "wp"])
     return df.head(n).to_dicts()
 
