@@ -1,0 +1,501 @@
+id,task,fen,question,answer,move
+P1-000,P1,rnb2k2/ppp3r1/8/4Ppq1/1bBP4/7Q/PPP1K1PP/RN5R b - - 0 1,What is on a7?,black pawn,""
+P1-001,P1,8/8/4K3/1k2P3/8/2R4r/8/8 b - - 0 1,What is on f2?,empty,""
+P1-002,P1,1k1r1b1r/1p4pp/p2p4/8/1B3n2/1K1B1P2/P6P/2R4R w - - 0 1,What is on f7?,empty,""
+P1-003,P1,1k5r/5R2/p2b4/2p5/P7/2P5/8/1K2R3 w - - 0 1,What is on g8?,empty,""
+P1-004,P1,r2q1rk1/1p1bbppp/8/2pp4/p3PP2/PnNQ1N2/1P3PBP/3R1RK1 w - - 0 1,What is on a8?,black rook,""
+P1-005,P1,8/pk3p2/5n2/1p3B2/5PP1/7R/PP6/1K1r4 w - - 0 1,What is on f6?,black knight,""
+P1-006,P1,r2q1r2/p5kp/bpnnppp1/2pp4/3P1Q1P/N1P2NP1/PP2PPB1/3RR1K1 b - - 0 1,What is on c3?,white pawn,""
+P1-007,P1,2k5/8/8/8/2P4R/1P3B2/p4Kp1/8 w - - 0 1,What is on b8?,empty,""
+P1-008,P1,r1q1nrk1/p1p2pbp/1pPp2p1/8/2P3b1/2pQPNP1/P4PBP/1RB2RK1 w - - 0 1,What is on g8?,black king,""
+P1-009,P1,r1bqkb1r/pp3ppp/2np1n2/2p1p3/4P3/P2P1N1P/1PP2PP1/RNBQKB1R w KQkq - 0 1,What is on a6?,empty,""
+P1-010,P1,5R2/2p2Q2/2k4p/p3b3/8/8/1P4KP/8 w - - 0 1,What is on e5?,black bishop,""
+P1-011,P1,r1bqkbnr/ppp2ppp/2n5/3p4/2BNP3/8/PPP2PPP/RNBQK2R b KQkq - 0 1,What is on h8?,black rook,""
+P1-012,P1,rr4k1/3n1ppp/3qpn2/8/Np1P4/1Q2PN2/5PPP/RR4K1 w - - 0 1,What is on d6?,black queen,""
+P1-013,P1,r1bqkbnr/pppp1ppp/6n1/1B2p3/4P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 1,What is on b2?,white pawn,""
+P1-014,P1,r1b3k1/p2nprPp/2p3p1/2pp4/5q2/N2P1N1P/PPP2PP1/R1Q1R1K1 b - - 0 1,What is on d2?,empty,""
+P1-015,P1,r1bqr1k1/pp1n1p1p/2pb2pB/4p3/2PPB3/5N2/PPQ2PPP/R4RK1 w - - 0 1,What is on f5?,empty,""
+P1-016,P1,r1b1k1n1/ppppq2Q/2n3p1/4p1N1/1b2P3/2NP4/PPP2PPP/R1B1K2R b KQ - 0 1,What is on a2?,white pawn,""
+P1-017,P1,1r1qr1k1/1ppb1ppp/3p1n2/p7/P1PNPP2/1PbP2PP/6BK/R1BQ1R2 w - - 0 1,What is on h5?,empty,""
+P1-018,P1,1rbqr1k1/bpp2pp1/p1np1n1p/4p3/1PP1PP2/P1NP2PP/4N1BK/R1BQ1R2 b - - 0 1,What is on b7?,black pawn,""
+P1-019,P1,rnb1kbnr/pppq1ppp/4p3/8/3PP3/2N5/PP3PPP/R1BQKBNR b KQkq - 0 1,What is on d4?,white pawn,""
+P1-020,P1,N7/p3Q1p1/4P1k1/7p/3p4/2P2P2/PP1P1P1P/RNB1KB1R w KQ - 0 1,What is on e7?,white queen,""
+P1-021,P1,6k1/p1N1r1p1/4P1pp/4R3/7P/P2b4/1P4P1/6K1 b - - 0 1,What is on g2?,white pawn,""
+P1-022,P1,6k1/6pp/3p3b/3P2P1/7P/P1B2p2/1P3K2/4Q3 w - - 0 1,What is on h7?,black pawn,""
+P1-023,P1,8/6b1/8/3k4/R7/3K4/8/8 w - - 0 1,What is on g8?,empty,""
+P1-024,P1,8/4k3/1b6/2n2Q2/5P2/5KP1/7P/8 w - - 0 1,What is on c5?,black knight,""
+P1-025,P1,rnb1kb1r/1p2pppp/p2n4/2q5/8/2NB1N2/PPPB1PPP/R2QK2R b KQkq - 0 1,What is on f8?,black bishop,""
+P1-026,P1,r1b1k2r/pp2bppp/1q2p3/3nN3/Q7/2P5/PP1B1PPP/R3KB1R b KQkq - 0 1,What is on d1?,empty,""
+P1-027,P1,6k1/8/5Qp1/3N1p1p/8/8/5PPP/6K1 w - - 0 1,What is on a3?,empty,""
+P1-028,P1,r2qk1nr/1b1nppbp/p5p1/2p5/P3P3/2N2N2/1P2BPPP/R1BQR1K1 b kq - 0 1,What is on f2?,white pawn,""
+P1-029,P1,5rk1/1bqn1pp1/1p2p2p/8/rPP5/3BQN2/3R1PPP/1K5R w - - 0 1,What is on g7?,black pawn,""
+P1-030,P1,r4rk1/pbq2ppp/2nppn2/2p5/2P1P3/5NP1/PPQN1PBP/R3R1K1 w - - 0 1,What is on c6?,black knight,""
+P1-031,P1,r1bq1rk1/ppp2ppp/2n2n2/2bBp3/4P3/2PP1N2/PP3PPP/RNBQ1RK1 b - - 0 1,What is on h2?,white pawn,""
+P1-032,P1,8/8/3k4/5p2/5n1K/8/8/8 w - - 0 1,What is on c8?,empty,""
+P1-033,P1,1r3r2/4qbk1/7R/1p2pB1P/4P3/4B3/1PP5/2KR4 w - - 0 1,What is on a5?,empty,""
+P1-034,P1,r3r1kq/ppp2p2/3p2p1/5NQn/2b1P3/2N2P2/PPP4P/2KR2R1 b - - 0 1,What is on h5?,black knight,""
+P1-035,P1,r2qnrk1/p2p3p/1p1Pp1p1/n1p1Pp2/5P2/P1PQ4/4N1PP/R1B2RK1 w - - 0 1,What is on f8?,black rook,""
+P1-036,P1,r2q1r2/2pbbkp1/p1n2pQ1/1p1pPB2/3P4/2P2N2/P4PPP/R1B1R1K1 b - - 0 1,What is on d7?,black bishop,""
+P1-037,P1,8/1B1b2k1/p7/P3K1P1/1P2P2p/8/8/8 w - - 0 1,What is on e5?,white king,""
+P1-038,P1,8/5pk1/6p1/p7/1p5p/2r4P/PR2K1P1/8 w - - 0 1,What is on b1?,empty,""
+P1-039,P1,r3kb1r/pp1np3/2p1p1pn/3p3p/3P3P/2NP1N2/PP1B1PP1/R4RK1 w kq - 0 1,What is on b7?,black pawn,""
+P1-040,P1,1k1r1b1r/ppp2ppp/8/4nB2/8/2P2P2/PP3P1P/R1B1K2R w KQ - 0 1,What is on c8?,empty,""
+P1-041,P1,r1b2k2/p6B/1pp1p2P/4n1N1/8/8/PPPR2P1/2K4R w - - 0 1,What is on g8?,empty,""
+P1-042,P1,8/p7/8/1P6/P6p/4k3/6K1/4b3 w - - 0 1,What is on g2?,white king,""
+P1-043,P1,6k1/1Q6/2K3B1/8/8/8/8/8 w - - 0 1,What is on g8?,black king,""
+P1-044,P1,r4rk1/pp2n1bp/1qnp2p1/2p5/4PB2/3P4/PPPQ1PBP/R2bNRK1 w - - 0 1,What is on h7?,black pawn,""
+P1-045,P1,8/1p5p/3p2p1/3Pkp2/8/1Bn1K1PP/P7/8 w - - 0 1,What is on h7?,black pawn,""
+P1-046,P1,r2qkbnr/pp3ppp/2n1p3/2ppP3/5P2/2P2Q1P/PP1P2P1/RNB1KB1R b KQkq - 0 1,What is on e1?,white king,""
+P1-047,P1,r1bqk2r/1ppp1ppp/p1n2n2/4N3/1bPPp3/2N3P1/PP2PP1P/R1BQKB1R w KQkq - 0 1,What is on a6?,black pawn,""
+P1-048,P1,r3k2r/pp1nbppb/1qp1p2p/3p4/P2PnBP1/1QP1PN1P/1P1NBP2/R3K2R w KQkq - 0 1,What is on f2?,white pawn,""
+P1-049,P1,1K6/1P1k4/5p2/8/4r3/8/8/3R4 b - - 0 1,What is on b8?,white king,""
+P1-050,P1,8/8/1R4pk/1P4p1/6K1/8/1r6/8 b - - 0 1,What is on b5?,white pawn,""
+P1-051,P1,r5k1/1p3p1p/p3bb1B/3p2p1/8/2PB2P1/PP3PP1/R3R1K1 w - - 0 1,What is on f2?,white pawn,""
+P1-052,P1,6rr/3k1p2/1p1p4/pP1K1R2/P3PP2/6p1/7p/3R4 b - - 0 1,What is on f8?,empty,""
+P1-053,P1,r1bqkbnr/p1pp1ppp/1p6/4p3/3nP3/2P2N2/PP1PBPPP/RNBQK2R b KQkq - 0 1,What is on c5?,empty,""
+P1-054,P1,6k1/3R4/4p2p/1n4p1/3P4/3r1NPP/6K1/8 w - - 0 1,What is on h6?,black pawn,""
+P1-055,P1,1r1r2k1/2q2pp1/p3b2p/4b3/1p2P1PP/N4P2/PPP1Q3/1K1R1B1R w - - 0 1,What is on g8?,black king,""
+P1-056,P1,8/5pk1/3Nb3/8/3P4/p1K4P/5PP1/8 b - - 0 1,What is on c3?,white king,""
+P1-057,P1,r3r1k1/1pp2pbp/2npqnp1/p3p3/1PP5/P1NP2PP/4PPB1/1RBQ1RK1 b - - 0 1,What is on b1?,white rook,""
+P1-058,P1,1B4k1/pP3p1p/5bp1/8/P2P4/6P1/5P1P/1r3BK1 w - - 0 1,What is on b8?,white bishop,""
+P1-059,P1,3r2k1/5p1p/6p1/1p6/1P3n2/2Pp2N1/5PPP/3R1K2 b - - 0 1,What is on c2?,empty,""
+P1-060,P1,rn1qkbnr/pppb2pp/5p2/1B1pp3/P2P4/4P3/1PP2PPP/RNBQK1NR w KQkq - 0 1,What is on b4?,empty,""
+P1-061,P1,r1b1r1k1/1pqnppbp/p5p1/8/4B3/1NP1B3/PP3PPP/R2QR1K1 w - - 0 1,What is on f7?,black pawn,""
+P1-062,P1,r1bq1rk1/2pn2bp/np1p2p1/3Ppp2/1PP1P3/2N2P2/3NBBPP/1R1QK2R w K - 0 1,What is on a6?,black knight,""
+P1-063,P1,2kr3r/ppp1qp2/1nb1p1p1/3pP2p/3P4/2NN1QP1/PPP2P2/2KR3R w - - 0 1,What is on f6?,empty,""
+P1-064,P1,r1b1k2r/pp2nppp/1qn1p3/2ppP3/3P1P2/8/PPPQN1PP/R3KBNR w KQkq - 0 1,What is on g2?,white pawn,""
+P1-065,P1,rnb2bnr/pppp1k1p/5q2/8/2Q5/4B3/P1P3PP/RN3RK1 b - - 0 1,What is on g8?,black knight,""
+P1-066,P1,4rbk1/3q1n1p/1pp3p1/3p1p1n/Pp1P1P1Q/3N1P1P/2PB4/4RB1K w - - 0 1,What is on b3?,empty,""
+P1-067,P1,5rk1/p6p/1p3qp1/1Q1R4/5P2/4P2R/P4KPP/2r5 b - - 0 1,What is on e8?,empty,""
+P1-068,P1,rnb1kbnr/ppp1qppp/8/3pN3/8/8/PPPPQPPP/RNB1KB1R b KQkq - 0 1,What is on f5?,empty,""
+P1-069,P1,4r1k1/3Rpb2/6p1/6q1/P1P2p1r/1P3p2/5Q1P/4RK2 b - - 0 1,What is on f3?,black pawn,""
+P1-070,P1,3r1r2/2k3p1/p1n4p/1p1pN2R/2p2PP1/2P1P3/PP2K1P1/3B4 w - - 0 1,What is on h5?,white rook,""
+P1-071,P1,6k1/8/1R2p1pp/p1B1b3/8/3r3P/5PP1/6K1 w - - 0 1,What is on b7?,empty,""
+P1-072,P1,6k1/5p2/2q1p1p1/4P2p/1r5P/6P1/5PK1/2R5 w - - 0 1,What is on b4?,black rook,""
+P1-073,P1,8/7p/5N1P/8/8/4k3/r4pK1/8 b - - 0 1,What is on a2?,black rook,""
+P1-074,P1,r4rk1/1p3ppp/p1q5/8/P7/2P2Q1P/2P2PP1/1R3RK1 b - - 0 1,What is on g1?,white king,""
+P1-075,P1,8/pq1rk1pb/2P2p2/3pnr2/4p2p/P1P1B2P/6PK/3R4 b - - 0 1,What is on f5?,black rook,""
+P1-076,P1,3r1rk1/1p2bppp/p1b1pn2/q7/2PB4/2NR4/PP3PPP/R2Q1BK1 b - - 0 1,What is on d1?,white queen,""
+P1-077,P1,1k1r1bnr/1p1n4/4p3/Qp1p1qpp/7P/5N2/PP3PP1/2R1R1K1 w - - 0 1,What is on e6?,black pawn,""
+P1-078,P1,rn1qkbnr/1b3ppp/p3p3/1ppp4/4PP2/2PP1N2/PP2B1PP/RNBQK2R w KQkq - 0 1,What is on a6?,black pawn,""
+P1-079,P1,8/4pk2/3p1pp1/3P4/q3P2P/4QP2/4BK2/8 w - - 0 1,What is on f2?,white king,""
+P1-080,P1,5r2/ppp3p1/3pk2p/Q1b1p3/3PP1Pq/2P5/PP2K1P1/RNB5 b - - 0 1,What is on e5?,black pawn,""
+P1-081,P1,4R2b/p6k/4pPp1/4p1P1/4P3/3P4/3NK3/r7 w - - 0 1,What is on f3?,empty,""
+P1-082,P1,8/7p/6p1/8/1N2k3/pK5P/6P1/8 w - - 0 1,What is on h3?,white pawn,""
+P1-083,P1,8/8/p6p/1p5k/1P4p1/P4K2/8/8 w - - 0 1,What is on h5?,black king,""
+P1-084,P1,2R5/2P2pk1/4p1p1/1p1pP2p/2r5/6K1/6P1/8 b - - 0 1,What is on b5?,black pawn,""
+P1-085,P1,Qqk4r/2p2ppp/2p1pn2/3r4/8/P3B1P1/4PPBP/5RK1 w - - 0 1,What is on a2?,empty,""
+P1-086,P1,r1b4r/p7/5P1p/3B1kp1/1b3P2/4P3/PPP3PP/2KR3R w - - 0 1,What is on e1?,empty,""
+P1-087,P1,3r4/1Q5p/4nk1P/6p1/8/5PP1/5PK1/3q1B1R w - - 0 1,What is on h1?,white rook,""
+P1-088,P1,rnbqkb1r/pp1n2pp/4p3/2ppP3/5P2/2N5/PPP3PP/R1BQKBNR b KQkq - 0 1,What is on e6?,black pawn,""
+P1-089,P1,7k/3r1prp/1p1P4/pPp1PR2/P4R2/7P/6PK/8 b - - 0 1,What is on g1?,empty,""
+P1-090,P1,rnbqkb1r/pp2ppp1/2p2n1p/3p4/3P1B1P/4P3/PPPN1PP1/R2QKBNR w KQkq - 0 1,What is on e3?,white pawn,""
+P1-091,P1,r2qkb1r/pp2pppp/2np3n/2p5/P3P3/R4N2/1PPP1PPP/1NBQK2R w Kkq - 0 1,What is on e7?,black pawn,""
+P1-092,P1,4Q3/6p1/5k1p/5p1P/p2np1q1/P1R3P1/1P3PK1/8 w - - 0 1,What is on a3?,white pawn,""
+P1-093,P1,r4r1k/1b4bp/1p4p1/pP1pp3/8/2PB1P2/P2B2PP/R3KR2 w Q - 0 1,What is on d4?,empty,""
+P1-094,P1,6k1/1p3p1p/1p4p1/2r5/8/P5PP/1PrR1P2/3R2K1 w - - 0 1,What is on b3?,empty,""
+P1-095,P1,2r1k2r/pp2nppp/2q1p3/3pPb2/3P4/1P3N1P/PB1NQPP1/5RK1 w k - 0 1,What is on e2?,white queen,""
+P1-096,P1,1rr3k1/2qbbppp/p2p4/1pn2pPP/4P3/PBN2P2/1PPQ4/1K1R3R w - - 0 1,What is on f5?,black pawn,""
+P1-097,P1,5k2/5p1p/6PP/1pp5/3b4/rpnB4/3R1P2/4R1K1 b - - 0 1,What is on c2?,empty,""
+P1-098,P1,rnb1kb1r/pp1n1ppp/8/2P1p3/4P3/4BP2/PP4PP/RN1K1BNR w kq - 0 1,What is on h1?,white rook,""
+P1-099,P1,r1bn1k2/ppN1b2p/3Q4/8/2BpP3/8/PPP3KP/q7 w - - 0 1,What is on e4?,white pawn,""
+P1-100,P1,r1bq1rk1/pp2ppb1/2p3pp/3n4/3P3B/3B1N2/PPP2PPP/R2QR1K1 b - - 0 1,What is on c8?,black bishop,""
+P1-101,P1,r1br2k1/1ppnqppp/p3p3/2PpN3/3PNP2/4P3/PP4PP/2RQKB1R b K - 0 1,What is on e5?,white knight,""
+P1-102,P1,k4q2/nb6/8/2N5/8/6Q1/8/6K1 w - - 0 1,What is on c5?,white knight,""
+P1-103,P1,8/6P1/1K4k1/8/8/4Q3/8/8 w - - 0 1,What is on a8?,empty,""
+P1-104,P1,8/3R1p1p/2p1r1k1/1p2bp2/p1P5/P5P1/1PK4P/3R4 b - - 0 1,What is on h7?,black pawn,""
+P1-105,P1,r3r1k1/5p1p/1n1q2p1/p3pP2/R1RbP3/1P5P/2PQ1PBN/6K1 w - - 0 1,What is on e2?,empty,""
+P1-106,P1,1R4k1/5p2/p5pp/3P4/2r1PpP1/4bP1P/8/7K b - - 0 1,What is on f4?,black pawn,""
+P1-107,P1,8/8/pR3pk1/P5pp/1P4P1/7P/1r6/5K2 w - - 0 1,What is on b2?,black rook,""
+P1-108,P1,r4nk1/1p5p/p1pN2p1/5b2/8/3pR3/P4PPP/R5K1 b - - 0 1,What is on c6?,black pawn,""
+P1-109,P1,2rqr1k1/1p3ppp/p1nb1n2/3p4/P5b1/1PN1PN2/1B2BPPP/2RQ1RK1 w - - 0 1,What is on d8?,black queen,""
+P1-110,P1,3r1rk1/7p/3p2p1/3P4/1p4p1/1Pb1R2P/5P2/1R3BK1 w - - 0 1,What is on h3?,white pawn,""
+P1-111,P1,5Q2/8/8/8/8/R1N5/8/2k3K1 w - - 0 1,What is on f6?,empty,""
+P1-112,P1,r2qk2r/pbpn4/1p1pp2p/5pp1/2PPn2P/P1PBPNB1/2Q2PP1/R3K2R b KQkq - 0 1,What is on f6?,empty,""
+P1-113,P1,r1b1r1k1/1pqn1ppp/p2b1n2/2p5/2P1pP2/1P1pP1P1/PB1P1NBP/R2QNRK1 w - - 0 1,What is on d4?,empty,""
+P1-114,P1,r2qkb1r/pbpnpppp/1p1p1n2/3P4/5B2/2N1PN2/PPP2PPP/R2QKB1R b KQkq - 0 1,What is on d6?,black pawn,""
+P1-115,P1,7k/2p1n1p1/8/1p2pbp1/8/2PP1Q2/1P3PPK/r7 w - - 0 1,What is on d4?,empty,""
+P1-116,P1,r6r/p1p1k2p/2B1p1p1/8/2P5/1Q6/1B4PP/R6K w - - 0 1,What is on c5?,empty,""
+P1-117,P1,3r2r1/1pp2p2/p5k1/8/3Pb1P1/2P5/PP3QP1/6K1 w - - 0 1,What is on a3?,empty,""
+P1-118,P1,8/3N4/7p/n2k1pp1/8/2K1P2P/5PP1/8 w - - 0 1,What is on h3?,white pawn,""
+P1-119,P1,8/6k1/8/8/7p/8/8/4K3 w - - 0 1,What is on h4?,black pawn,""
+P1-120,P1,6k1/3rpp1p/3p2p1/1q1P4/3Q4/1P5P/5PP1/2R3K1 w - - 0 1,What is on g1?,white king,""
+P1-121,P1,r2r2k1/ppqnbpp1/4pn1p/7P/2PN4/2B3N1/PP2QPP1/1K1R3R w - - 0 1,What is on h3?,empty,""
+P1-122,P1,6k1/3nppbp/3p2p1/2PP4/4P3/r4N2/3B1PPP/1R3K2 b - - 0 1,What is on f2?,white pawn,""
+P1-123,P1,r2q1r2/pp2bpk1/2n1b1p1/3pPpBp/3P3P/2P2NQ1/3N1PP1/R4RK1 w - - 0 1,What is on d5?,black pawn,""
+P1-124,P1,r1bq1rk1/pppp1pp1/2n2n1p/2b1p1B1/2B1P3/P2P1N2/1PP2PPP/RN1QK2R w KQ - 0 1,What is on a2?,empty,""
+P2-000,P2,r4r1k/1bp4p/p1q2p2/4nN1Q/5B2/2P1N1P1/PP6/R5K1 w - - 0 1,How many legal moves does the side to move have? List them.,"44: Bg5, Bh6, Bxe5, Kf1, Kf2, Kh2, Nc2, Nc4, Nd1, Nd4, Nd5, Nd6, Ne7, Nf1, Ng2, Ng4, Ng7, Nh4, Nh6, Qd1, Qe2, Qe8, Qf3, Qf7, Qg4, Qg5, Qg6, Qh1, Qh2, Qh3, Qh4, Qh6, Qxh7+, Rb1, Rc1, Rd1, Re1, Rf1, a3, a4, b3, b4, c4, g4",""
+P2-001,P2,3r1rk1/ppp2pp1/7p/3n1b2/2Q5/P3PN2/1q2BPPP/2R2RK1 w - - 0 1,How many legal moves does the side to move have? List them.,"41: Bd1, Bd3, Kh1, Nd2, Nd4, Ne1, Ne5, Ng5, Nh4, Qa2, Qa4, Qa6, Qb3, Qb4, Qb5, Qc2, Qc3, Qc5, Qc6, Qd3, Qd4, Qe4, Qf4, Qg4, Qh4, Qxc7, Qxd5, Ra1, Rb1, Rc2, Rc3, Rcd1, Rce1, Rfd1, Rfe1, a4, e4, g3, g4, h3, h4",""
+P2-002,P2,rnbqk1nr/ppp3pp/3b4/3pp3/5p2/PP1PP2P/2P2PP1/RNBQKBNR w KQkq - 0 1,How many legal moves does the side to move have? List them.,"27: Bb2, Bd2, Be2, Kd2, Ke2, Nc3, Nd2, Ne2, Nf3, Qd2, Qe2, Qf3, Qg4, Qh5+, Ra2, Rh2, a4, b4, c3, c4, d4, e4, exf4, f3, g3, g4, h4",""
+P2-003,P2,2R5/8/3k4/2R5/1n6/5K2/2pr2P1/8 w - - 0 1,How many legal moves does the side to move have? List them.,"28: Ke3, Ke4, Kf4, Kg3, Kg4, R5c6+, R5c7, R8c6+, R8c7, Ra5, Ra8, Rb5, Rb8, Rc3, Rc4, Rd5+, Rd8+, Re5, Re8, Rf5, Rf8, Rg5, Rg8, Rh5, Rh8, Rxc2, g3, g4",""
+P2-004,P2,4r1k1/R4p1p/4n1p1/B7/2r5/8/P5PP/4R1K1 b - - 0 1,How many legal moves does the side to move have? List them.,"36: Kf8, Kg7, Kh8, Nc5, Nc7, Nd4, Nd8, Nf4, Nf8, Ng5, Ng7, Ra4, Ra8, Rb4, Rb8, Rc1, Rc2, Rc3, Rc5, Rc6, Rc7, Rcc8, Rd4, Rd8, Re4, Re7, Rec8, Rf4, Rf8, Rg4, Rh4, f5, f6, g5, h5, h6",""
+P2-005,P2,bn3rk1/r4pbp/pN2p1pn/2p1P3/2B2PP1/2N1B2P/PP6/R2R2K1 w - - 0 1,How many legal moves does the side to move have? List them.,"47: Bb3, Bb5, Bc1, Bd2, Bd3, Bd4, Bd5, Be2, Bf1, Bf2, Bxa6, Bxc5, Bxe6, Kf1, Kf2, Kh2, Nb1, Nb5, Nba4, Nbd5, Nc8, Nca4, Ncd5, Nd7, Ne2, Ne4, Nxa8, Rab1, Rac1, Rd2, Rd3, Rd4, Rd5, Rd6, Rd7, Rd8, Rdb1, Rdc1, Re1, Rf1, a3, a4, b3, b4, f5, g5, h4",""
+P2-006,P2,6k1/pp3pBp/6p1/3b4/8/1P1P2PP/PQ2PP2/2r3K1 w - - 0 1,How many legal moves does the side to move have? List them.,"2: Kh2, Qxc1",""
+P2-007,P2,3rrk2/1b4pp/3q1p2/pp1P4/2p1BP2/6QP/PP4P1/3RR1K1 b - - 0 1,How many legal moves does the side to move have? List them.,"38: Ba6, Ba8, Bc6, Bc8, Bxd5, Ke7, Kf7, Kg8, Qa3, Qa6, Qb4, Qb6+, Qb8, Qc5+, Qc6, Qc7, Qd7, Qe5, Qe6, Qe7, Qxd5, Qxf4, Ra8, Rb8, Rc8, Rd7, Re5, Re6, Re7, Rxe4, a4, b4, c3, f5, g5, g6, h5, h6",""
+P2-008,P2,6k1/5pp1/1p5p/2p1B3/8/4N3/5PPP/1r3NK1 b - - 0 1,How many legal moves does the side to move have? List them.,"19: Kf8, Kh7, Kh8, Ra1, Rb2, Rb3, Rb4, Rb5, Rc1, Rd1, Re1, Rxf1+, b5, c4, f5, f6, g5, g6, h5",""
+P2-009,P2,r2qk1nr/p2p1ppp/bp2p3/4P3/2PP4/Pn1B1P1N/4Q1PP/R1B1K2R w KQkq - 0 1,How many legal moves does the side to move have? List them.,"39: Bb1, Bb2, Bc2, Bd2, Be3, Be4, Bf4, Bf5, Bg5, Bg6, Bh6, Bxh7, Kd1, Kf1, Kf2, Nf2, Nf4, Ng1, Ng5, O-O, Qa2, Qb2, Qc2, Qd1, Qd2, Qe3, Qe4, Qf1, Qf2, Ra2, Rb1, Rf1, Rg1, a4, c5, d5, f4, g3, g4",""
+P2-010,P2,5rk1/p2nq1pp/5n2/1p1p1p2/8/1P1P1BP1/PB2PP1P/Q1R3K1 b - - 0 1,How many legal moves does the side to move have? List them.,"37: Kf7, Kh8, Nb6, Nb8, Nc5, Ne4, Ne5, Ne8, Ng4, Nh5, Qa3, Qb4, Qc5, Qd6, Qd8, Qe3, Qe4, Qe5, Qe6, Qe8, Qf7, Qxe2, Ra8, Rb8, Rc8, Rd8, Re8, Rf7, a5, a6, b4, d4, f4, g5, g6, h5, h6",""
+P2-011,P2,6k1/p4p2/1p2q1p1/2prp2p/R6P/P3QP2/1P3PK1/8 b - - 0 1,How many legal moves does the side to move have? List them.,"29: Kf8, Kg7, Kh7, Kh8, Qc6, Qc8, Qd6, Qd7, Qe7, Qe8, Qf5, Qf6, Qg4+, Qh3+, Rd1, Rd2, Rd3, Rd4, Rd6, Rd7, Rd8, a5, a6, b5, c4, e4, f5, f6, g5",""
+P2-012,P2,8/1pp2p2/3k2p1/p2p4/P4P2/3P2K1/1PP1R3/2r5 w - - 0 1,How many legal moves does the side to move have? List them.,"24: Kf2, Kf3, Kg2, Kg4, Kh2, Kh3, Kh4, Rd2, Re1, Re3, Re4, Re5, Re6+, Re7, Re8, Rf2, Rg2, Rh2, b3, b4, c3, c4, d4, f5",""
+P2-013,P2,1r2b2k/4q1p1/2p1p1Bb/1p1nNr2/3PN1Q1/P5P1/P4P1P/R3R1K1 w - - 0 1,How many legal moves does the side to move have? List them.,"43: Bf7, Bh5, Bh7, Bxe8, Bxf5, Kf1, Kg2, Kh1, Nc3, Nc4, Nc5, Nd2, Nd3, Nd6, Nd7, Nf3, Nf6, Nf7+, Ng5, Nxc6, Qd1, Qe2, Qf3, Qf4, Qg5, Qh3, Qh4, Qh5, Qxf5, Rab1, Rac1, Rad1, Re2, Re3, Reb1, Rec1, Red1, Rf1, a4, f3, f4, h3, h4",""
+P2-014,P2,2r3k1/5p1p/Q1rq1pp1/8/P2P4/4P1PP/3N1P2/2R2K2 w - - 0 1,How many legal moves does the side to move have? List them.,"36: Ke1, Ke2, Kg1, Kg2, Nb1, Nb3, Nc4, Ne4, Nf3, Qa5, Qa7, Qa8, Qb5, Qb6, Qb7, Qc4, Qd3, Qe2, Qxc6, Qxc8+, Ra1, Rb1, Rc2, Rc3, Rc4, Rc5, Rd1, Re1, Rxc6, a5, d5, e4, f3, f4, g4, h4",""
+P2-015,P2,1n3rk1/1p3ppp/2b2n2/1N2p3/r1P5/1N1P2P1/P4PBP/R4RK1 b - - 0 1,How many legal moves does the side to move have? List them.,"33: Bd5, Bd7, Be4, Be8, Bf3, Bxb5, Bxg2, Kh8, Na6, Nbd7, Nd5, Ne4, Ne8, Nfd7, Ng4, Nh5, Ra3, Ra5, Ra6, Ra7, Ra8, Rb4, Rc8, Rd8, Re8, Rxa2, Rxc4, b6, e4, g5, g6, h5, h6",""
+P2-016,P2,rn1q1rkb/pp2pp1p/2p1b2N/4P3/2PPp3/8/PP2B1PP/R1BQ1RK1 b - - 0 1,How many legal moves does the side to move have? List them.,1: Kg7,""
+P2-017,P2,r4rk1/2q1pbbp/p1n2pp1/8/1p2B2P/2B1QN2/PPP2PP1/1K1R3R w - - 0 1,How many legal moves does the side to move have? List them.,"54: Bd2, Bd3, Bd4, Bd5, Be1, Be5, Bf5, Bxb4, Bxc6, Bxf6, Bxg6, Ka1, Kc1, Nd2, Nd4, Ne1, Ne5, Ng1, Ng5, Nh2, Qa7, Qb6, Qc1, Qc5, Qd2, Qd3, Qd4, Qe1, Qe2, Qf4, Qg5, Qh6, Rc1, Rd2, Rd3, Rd4, Rd5, Rd6, Rd7, Rd8, Rde1, Rdf1, Rdg1, Rh2, Rh3, Rhe1, Rhf1, Rhg1, a3, a4, b3, g3, g4, h5",""
+P2-018,P2,r2qkb1r/pp3ppp/3ppn2/2p5/4PP2/2NP1QP1/PPP4P/R1B1K2R w KQkq - 0 1,How many legal moves does the side to move have? List them.,"35: Bd2, Be3, Kd1, Kd2, Ke2, Kf1, Kf2, Na4, Nb1, Nb5, Nd1, Nd5, Ne2, O-O, Qd1, Qe2, Qe3, Qf1, Qf2, Qg2, Qg4, Qh5, Rb1, Rf1, Rg1, a3, a4, b3, b4, d4, e5, f5, g4, h3, h4",""
+P2-019,P2,1r4k1/p1p3p1/3q4/3p4/6B1/2PQPPn1/P5P1/R1K5 b - - 0 1,How many legal moves does the side to move have? List them.,"44: Kf7, Kf8, Kh8, Ne2+, Ne4, Nf1, Nf5, Nh1, Nh5, Qa3+, Qa6, Qb4, Qb6, Qc5, Qc6, Qd7, Qd8, Qe5, Qe6, Qe7, Qf4, Qf6, Qf8, Qg6, Qh6, Ra8, Rb1+, Rb2, Rb3, Rb4, Rb5, Rb6, Rb7, Rc8, Rd8, Re8, Rf8, a5, a6, c5, c6, d4, g5, g6",""
+P2-020,P2,2k2r2/1pb5/p1n4R/6r1/P1NP1pP1/2P5/3B4/1R3K2 b - - 0 1,How many legal moves does the side to move have? List them.,"39: Ba5, Bb6, Bb8, Bd6, Bd8, Be5, Kb8, Kd7, Kd8, Na5, Na7, Nb4, Nb8, Nd8, Ne5, Ne7, Nxd4, Ra5, Rb5, Rc5, Rd5, Rd8, Re5, Re8, Rf6, Rf7, Rff5, Rfg8, Rg6, Rg7, Rgf5, Rgg8, Rh5, Rh8, Rxg4, a5, b5, b6, f3",""
+P2-021,P2,r2q1rk1/ppp1bpp1/1n1p3p/n2P4/2PN1P2/2NQ4/PP4PP/R1B2RK1 b - - 0 1,How many legal moves does the side to move have? List them.,"27: Bf6, Bg5, Bh4, Kh8, Na4, Naxc4, Nb3, Nbxc4, Nc6, Nc8, Nd7, Nxd5, Qb8, Qc8, Qd7, Qe8, Rb8, Rc8, Re8, a6, c5, c6, f5, f6, g5, g6, h5",""
+P2-022,P2,8/2k5/2R5/1Pn2K2/p7/6p1/2B3N1/2b5 b - - 0 1,How many legal moves does the side to move have? List them.,"4: Kb7, Kb8, Kd7, Kd8",""
+P2-023,P2,Q1K3R1/8/5k2/8/2P5/8/8/r7 w - - 0 1,How many legal moves does the side to move have? List them.,"32: Kb7, Kb8, Kc7, Kd7, Kd8, Qa2, Qa3, Qa4, Qa5, Qa6+, Qa7, Qb7, Qb8, Qc6+, Qd5, Qe4, Qf3+, Qg2, Qh1, Qxa1+, Rd8, Re8, Rf8+, Rg1, Rg2, Rg3, Rg4, Rg5, Rg6+, Rg7, Rh8, c5",""
+P2-024,P2,k7/8/1p1Q4/8/P7/KP6/8/q7 w - - 0 1,How many legal moves does the side to move have? List them.,1: Kb4,""
+P2-025,P2,8/2k2p2/4p3/1B2P2p/3P1P2/2P4P/P7/5RK1 w - - 0 1,How many legal moves does the side to move have? List them.,"25: Ba4, Ba6, Bc4, Bc6, Bd3, Bd7, Be2, Be8, Kf2, Kg2, Kh1, Kh2, Ra1, Rb1, Rc1, Rd1, Re1, Rf2, Rf3, a3, a4, c4, d5, f5, h4",""
+P2-026,P2,1r2k2r/3pppb1/p2q4/1p1b4/6Q1/3P2P1/PP1P1P1P/R1B1R1K1 b k - 0 1,How many legal moves does the side to move have? List them.,"53: Ba8, Bb3, Bb7, Bc3, Bc4, Bc6, Bd4, Be4, Be5, Be6, Bf3, Bf6, Bf8, Bg2, Bh1, Bh6, Bxa2, Bxb2, Kd8, Kf8, O-O, Qa3, Qb4, Qb6, Qc5, Qc6, Qc7, Qe5, Qe6, Qf4, Qf6, Qg6, Qh6, Qxg3+, Ra8, Rb6, Rb7, Rc8, Rd8, Rf8, Rg8, Rh3, Rh4, Rh5, Rh6, Rh7, Rxh2, a5, b4, e5, e6, f5, f6",""
+P2-027,P2,6k1/3rbpp1/4p3/pp1pR1p1/3P4/PrP4P/1P3PP1/2BR1K2 b - - 0 1,How many legal moves does the side to move have? List them.,"25: Bb4, Bc5, Bd6, Bd8, Bf6, Bf8, Bxa3, Kf8, Kh7, Kh8, Ra7, Rb4, Rb7, Rc7, Rd6, Rd8, Rxa3, Rxb2, Rxc3, a4, b4, f5, f6, g4, g6",""
+P2-028,P2,8/8/4k2p/5p1q/3Bp1bN/P5P1/5R1K/8 w - - 0 1,How many legal moves does the side to move have? List them.,"25: Ba1, Ba7, Bb2, Bb6, Bc3, Bc5, Be3, Be5, Bf6, Bg7, Bh8, Kg1, Kg2, Kh1, Ra2, Rb2, Rc2, Rd2, Re2, Rf1, Rf3, Rf4, Rg2, Rxf5, a4",""
+P2-029,P2,8/8/7P/8/2kp1K2/7R/8/8 b - - 0 1,How many legal moves does the side to move have? List them.,"5: Kb4, Kb5, Kc5, Kd5, d3",""
+P2-030,P2,r1b1kb1r/pp1n1ppp/4pn2/q2p2B1/3P4/2N1PN2/PP3PPP/2RQKB1R b Kkq - 0 1,How many legal moves does the side to move have? List them.,"35: Ba3, Bb4, Bc5, Bd6, Be7, Kd8, Ke7, Nb6, Nb8, Nc5, Ne4, Ne5, Ng4, Ng8, Nh5, Qa3, Qa4, Qa6, Qb4, Qb5, Qb6, Qc5, Qc7, Qd8, Qxa2, Qxc3+, Rb8, Rg8, a6, b5, b6, e5, g6, h5, h6",""
+P2-031,P2,r5k1/p2q1ppp/2p1r3/1p6/Q7/2P4P/P4PP1/R4RK1 w - - 0 1,How many legal moves does the side to move have? List them.,"32: Kh1, Kh2, Qa3, Qa5, Qa6, Qb3, Qb4, Qc2, Qc4, Qd1, Qd4, Qe4, Qf4, Qg4, Qh4, Qxa7, Qxb5, Rab1, Rac1, Rad1, Rae1, Rfb1, Rfc1, Rfd1, Rfe1, a3, c4, f3, f4, g3, g4, h4",""
+P2-032,P2,rn1qkb1r/pp1b1ppp/5n2/2pP4/2B5/5N2/PP1P1PPP/RNBQK2R b KQkq - 0 1,How many legal moves does the side to move have? List them.,"32: Ba4, Bb5, Bc6, Bc8, Bd6, Be6, Be7, Bf5, Bg4, Bh3, Ke7, Na6, Nc6, Ne4, Ng4, Ng8, Nh5, Nxd5, Qa5, Qb6, Qc7, Qc8, Qe7+, Rg8, a5, a6, b5, b6, g5, g6, h5, h6",""
+P2-033,P2,3r2k1/p3qppp/2p3n1/1pP1p1b1/1P2P3/P2N1P2/6PP/3Q1N1K w - - 0 1,How many legal moves does the side to move have? List them.,"25: Kg1, Nb2, Nc1, Nd2, Ne1, Ne3, Nf2, Nf4, Ng3, Nxe5, Qa1, Qa4, Qb1, Qb3, Qc1, Qc2, Qd2, Qe1, Qe2, a4, f4, g3, g4, h3, h4",""
+P2-034,P2,r1bq1rnk/ppp2p2/1b3Np1/3P2P1/8/P1Q2N1P/1P3P2/R4RK1 w - - 0 1,How many legal moves does the side to move have? List them.,"45: Kg2, Kh1, Kh2, Nd2, Nd4, Nd7+, Ne1, Ne4+, Ne5, Ne8+, Ng4+, Nh2, Nh4, Nh5+, Nh7+, Nxg8+, Qa5, Qb3, Qb4, Qc1, Qc2, Qc4, Qc5, Qc6, Qd2, Qd3, Qd4, Qe1, Qe3, Qe5, Qxc7, Ra2, Rab1, Rac1, Rad1, Rae1, Rfb1, Rfc1, Rfd1, Rfe1, a4, b3, b4, d6, h4",""
+P2-035,P2,1rr5/3k2bp/p3ppp1/np1p4/3P4/P3PNP1/1P1NKP1P/1RR5 w - - 0 1,How many legal moves does the side to move have? List them.,"33: Kd1, Kd3, Ke1, Kf1, Nb3, Nc4, Ne1, Ne4, Ne5+, Nf1, Ng1, Ng5, Nh4, Ra1, Rc2, Rc3, Rc4, Rc5, Rc6, Rc7+, Rd1, Re1, Rf1, Rg1, Rh1, Rxc8, a4, b3, b4, e4, g4, h3, h4",""
+P2-036,P2,r3kb1r/ppN1pppp/2n2n2/q2p1b2/3P1B2/2P2P2/PP4PP/R2QKBNR b KQkq - 0 1,How many legal moves does the side to move have? List them.,"3: Kd7, Kd8, Qxc7",""
+P2-037,P2,r4rk1/ppp2pp1/7p/3P3b/R2nB3/8/3N1PPP/4R1K1 b - - 0 1,How many legal moves does the side to move have? List them.,"32: Bd1, Be2, Bf3, Bg4, Bg6, Kh8, Nb3, Nb5, Nc2, Nc6, Ne2+, Ne6, Nf3+, Nf5, Rab8, Rac8, Rad8, Rae8, Rfb8, Rfc8, Rfd8, Rfe8, a5, a6, b5, b6, c5, c6, f5, f6, g5, g6",""
+P2-038,P2,rnbqkb1r/pp1p1ppp/4pn2/8/2PQ1B2/2N5/PP2PPPP/R3KBNR b KQkq - 0 1,How many legal moves does the side to move have? List them.,"29: Ba3, Bb4, Bc5, Bd6, Be7, Ke7, Na6, Nc6, Nd5, Ne4, Ng4, Ng8, Nh5, Qa5, Qb6, Qc7, Qe7, Rg8, a5, a6, b5, b6, d5, d6, e5, g5, g6, h5, h6",""
+P2-039,P2,R3b3/6pk/8/8/P7/3K4/1r6/8 b - - 0 1,How many legal moves does the side to move have? List them.,"27: Bb5+, Bc6, Bd7, Bf7, Bg6+, Bh5, Bxa4, Kg6, Kg8, Kh6, Kh8, Ra2, Rb1, Rb3+, Rb4, Rb5, Rb6, Rb7, Rb8, Rc2, Rd2+, Re2, Rf2, Rg2, Rh2, g5, g6",""
+P2-040,P2,5rk1/p3R1pp/1q6/6Q1/1P1p4/4nP2/P1P3PP/1R3K2 w - - 0 1,How many legal moves does the side to move have? List them.,"6: Ke1, Ke2, Kf2, Kg1, Qxe3, Rxe3",""
+P2-041,P2,2r1k1qr/p1N5/2p1p1pp/6B1/2p2R2/8/PP3PPP/3R2K1 b - - 0 1,How many legal moves does the side to move have? List them.,1: Rxc7,""
+P2-042,P2,r2qkb1r/ppp1pppp/2n5/8/2BP4/2n5/PPP2PPP/R1BQK2R w KQkq - 0 1,How many legal moves does the side to move have? List them.,"38: Ba6, Bb3, Bb5, Bd2, Bd3, Bd5, Be2, Be3, Be6, Bf1, Bf4, Bg5, Bh6, Bxf7+, Kd2, Kf1, O-O, Qd2, Qd3, Qe2, Qf3, Qg4, Qh5, Rb1, Rf1, Rg1, a3, a4, b3, b4, bxc3, d5, f3, f4, g3, g4, h3, h4",""
+P2-043,P2,2kr3r/1ppqbppp/p1np4/8/3N2P1/2PQB2P/PPP2P2/2KR3R w - - 0 1,How many legal moves does the side to move have? List them.,"40: Bd2, Bf4, Bg5, Bh6, Kb1, Kd2, Nb3, Nb5, Ne2, Ne6, Nf3, Nf5, Nxc6, Qb5, Qc4, Qd2, Qe2, Qe4, Qf1, Qf5, Qg6, Qxa6, Qxh7, Rd2, Rde1, Rdf1, Rdg1, Rh2, Rhe1, Rhf1, Rhg1, a3, a4, b3, b4, c4, f3, f4, g5, h4",""
+P2-044,P2,rn1qkb1r/pp1B1ppp/4pn2/3P4/3p4/2N1P3/PP3PPP/R1BQK1NR b KQkq - 0 1,How many legal moves does the side to move have? List them.,"5: Ke7, Kxd7, Nbxd7, Nfxd7, Qxd7",""
+P2-045,P2,1Q4k1/r2q3p/6p1/1p3p2/2pp3P/3P4/1r3PP1/2R1R1K1 b - - 0 1,How many legal moves does the side to move have? List them.,"5: Kf7, Kg7, Qc8, Qd8, Qe8",""
+P2-046,P2,1r4k1/q4pp1/3Np1bp/p1R1P3/Pn3P2/1Q4P1/1P4BP/6K1 w - - 0 1,How many legal moves does the side to move have? List them.,"36: Ba8, Bb7, Bc6, Bd5, Be4, Bf1, Bf3, Bh1, Bh3, Kf1, Kf2, Kh1, Nb5, Nb7, Nc4, Nc8, Ne4, Ne8, Nf5, Nxf7, Qa2, Qa3, Qc2, Qc3, Qc4, Qd1, Qd3, Qd5, Qe3, Qf3, Qxb4, Qxe6, f5, g4, h3, h4",""
+P2-047,P2,r1b1r1k1/pppn2b1/3p3p/6qN/2PP1p2/7P/PPQ1BPPB/R3K2R w KQ - 0 1,How many legal moves does the side to move have? List them.,"39: Bg1, Bg3, Bxf4, Kd1, Kd2, Kf1, Nf6+, Ng3, Nxf4, Nxg7, O-O, O-O-O, Qa4, Qb1, Qb3, Qc1, Qc3, Qd1, Qd2, Qd3, Qe4, Qf5, Qg6, Qh7+, Rb1, Rc1, Rd1, Rf1, Rg1, a3, a4, b3, b4, c5, d5, f3, g3, g4, h4",""
+P2-048,P2,7k/pp6/3b4/5rp1/3P3p/6P1/PP3B1P/4R1K1 b - - 0 1,How many legal moves does the side to move have? List them.,"31: Ba3, Bb4, Bb8, Bc5, Bc7, Be5, Be7, Bf4, Bf8, Bxg3, Kg7, Kg8, Kh7, Ra5, Rb5, Rc5, Rd5, Re5, Rf3, Rf4, Rf6, Rf7, Rf8, Rxf2, a5, a6, b5, b6, g4, h3, hxg3",""
+P2-049,P2,r1b2rk1/pp1pBppp/n3p3/2P5/2P5/P1n5/1P2PPPP/R3KBNR b KQ - 0 1,How many legal moves does the side to move have? List them.,"27: Kh8, Na2, Na4, Nb1, Nb4, Nb5, Nb8, Nc7, Nd1, Nd5, Ne4, Nxc5, Nxe2, Rb8, Rd8, Re8, b5, b6, d5, d6, e5, f5, f6, g5, g6, h5, h6",""
+P2-050,P2,8/8/6p1/2k4p/2P3rP/2R2KP1/8/8 w - - 0 1,How many legal moves does the side to move have? List them.,"10: Ke2, Ke3, Kf2, Kg2, Ra3, Rb3, Rc1, Rc2, Rd3, Re3",""
+P2-051,P2,8/8/6k1/7p/5K1P/5p2/8/4B3 w - - 0 1,How many legal moves does the side to move have? List them.,"11: Ba5, Bb4, Bc3, Bd2, Bf2, Bg3, Ke3, Ke4, Ke5, Kg3, Kxf3",""
+P2-052,P2,1r1r2k1/1pqb1pbp/pNn1p1p1/P1p1P3/2P5/2BP2PP/1Q4B1/1R2R1K1 b - - 0 1,How many legal moves does the side to move have? List them.,"29: Bc8, Be8, Bf6, Bf8, Bh6, Bh8, Bxe5, Kf8, Kh8, Na7, Nb4, Nd4, Ne7, Nxa5, Nxe5, Qc8, Qd6, Qxb6, Qxe5, Ra8, Rbc8, Rdc8, Re8, Rf8, f5, f6, g5, h5, h6",""
+P2-053,P2,r1b1r1k1/pp1p2p1/2nBp1np/q3P3/8/3B1Q2/P4PPP/2R1R1K1 w - - 0 1,How many legal moves does the side to move have? List them.,"53: Ba3, Ba6, Bb1, Bb4, Bb5, Bb8, Bc2, Bc4, Bc5, Bc7, Be2, Be4, Be7, Bf1, Bf5, Bf8, Bxg6, Kf1, Kh1, Qd1, Qd5, Qe2, Qe3, Qe4, Qf4, Qf5, Qf6, Qf7+, Qf8+, Qg3, Qg4, Qh3, Qh5, Qxc6, Ra1, Rb1, Rc2, Rc3, Rc4, Rc5, Rcd1, Re2, Re3, Re4, Red1, Rf1, Rxc6, a3, a4, g3, g4, h3, h4",""
+P2-054,P2,rnbqkbnr/pp2pppp/2p5/3p4/3P1B2/4P3/PPP2PPP/RN1QKBNR b KQkq - 0 1,How many legal moves does the side to move have? List them.,"28: Bd7, Be6, Bf5, Bg4, Bh3, Kd7, Na6, Nd7, Nf6, Nh6, Qa5+, Qb6, Qc7, Qd6, Qd7, a5, a6, b5, b6, c5, e5, e6, f5, f6, g5, g6, h5, h6",""
+P2-055,P2,8/6k1/4Q3/2p2P2/6P1/8/7K/2q5 w - - 0 1,How many legal moves does the side to move have? List them.,"27: Kg2, Kg3, Kh3, Qa2, Qa6, Qb3, Qb6, Qc4, Qc6, Qc8, Qd5, Qd6, Qd7+, Qe1, Qe2, Qe3, Qe4, Qe5+, Qe7+, Qe8, Qf6+, Qf7+, Qg6+, Qg8+, Qh6+, f6+, g5",""
+P2-056,P2,r1b2rk1/1p2b1p1/2pp4/2n4p/p1PNpP2/2B1P1PP/PP6/R2R1BK1 b - - 0 1,How many legal moves does the side to move have? List them.,"34: Bd7, Bd8, Be6, Bf5, Bf6, Bg4, Bg5, Bh4, Bxh3, Kf7, Kh7, Kh8, Na6, Nb3, Nd3, Nd7, Ne6, Ra5, Ra6, Ra7, Rb8, Rd8, Re8, Rf5, Rf6, Rf7, Rxf4, a3, b5, b6, d5, g5, g6, h4",""
+P2-057,P2,7k/2R5/2p5/7p/Pr6/1K6/3q4/8 w - - 0 1,How many legal moves does the side to move have? List them.,1: Ka3,""
+P2-058,P2,rn3rk1/pbq2ppp/3bp3/2p5/4n3/2PB1NB1/PP2QPPP/R3K2R w KQ - 0 1,How many legal moves does the side to move have? List them.,"38: Ba6, Bb1, Bb5, Bc2, Bc4, Be5, Bf4, Bh4, Bxd6, Bxe4, Kd1, Kf1, Nd2, Nd4, Ne5, Ng1, Ng5, Nh4, O-O, O-O-O, Qc2, Qd1, Qd2, Qe3, Qf1, Qxe4, Rb1, Rc1, Rd1, Rf1, Rg1, a3, a4, b3, b4, c4, h3, h4",""
+P2-059,P2,r1bq1rk1/pp2ppbp/n5p1/3n4/3N4/1P4P1/PB1QPPBP/RN3RK1 b - - 0 1,How many legal moves does the side to move have? List them.,"39: Bd7, Be5, Be6, Bf5, Bf6, Bg4, Bh3, Bh6, Bh8, Bxd4, Kh8, Nab4, Nac7, Nb6, Nb8, Nc3, Nc5, Ndb4, Ndc7, Ne3, Nf4, Nf6, Qa5, Qb6, Qc7, Qd6, Qd7, Qe8, Rb8, Re8, b5, b6, e5, e6, f5, f6, g5, h5, h6",""
+P2-060,P2,r3r1k1/2qn1ppp/2b5/3p2b1/8/P1BB1N2/4QPPP/RR4K1 w - - 0 1,How many legal moves does the side to move have? List them.,"55: Ba5, Ba6, Bb2, Bb4, Bb5, Bc2, Bc4, Bd2, Bd4, Be1, Be4, Be5, Bf5, Bf6, Bg6, Bxg7, Bxh7+, Kf1, Kh1, Nd2, Nd4, Ne1, Ne5, Nh4, Nxg5, Qa2, Qb2, Qc2, Qd1, Qd2, Qe1, Qe3, Qe4, Qe5, Qe6, Qe7, Qf1, Qxe8+, Ra2, Rb2, Rb3, Rb4, Rb5, Rb6, Rb7, Rb8, Rc1, Rd1, Re1, Rf1, a4, g3, g4, h3, h4",""
+P2-061,P2,6k1/5pb1/4b1pp/1B2P3/2N2B2/1nPr4/5PPP/4R1K1 b - - 0 1,How many legal moves does the side to move have? List them.,"36: Bc8, Bd5, Bd7, Bf5, Bf6, Bf8, Bg4, Bh3, Bh8, Bxc4, Bxe5, Kf8, Kh7, Kh8, Na1, Na5, Nc1, Nc5, Nd2, Nd4, Rd1, Rd2, Rd4, Rd5, Rd6, Rd7, Rd8, Re3, Rf3, Rg3, Rh3, Rxc3, f5, f6, g5, h5",""
+P2-062,P2,rn1qkb1r/pp2pppp/2p2n2/3p4/4P3/2NP1Q2/PPP2PPP/R1B1KB1R w KQkq - 0 1,How many legal moves does the side to move have? List them.,"38: Bd2, Be2, Be3, Bf4, Bg5, Bh6, Kd1, Kd2, Ke2, Na4, Nb1, Nb5, Nd1, Ne2, Nxd5, Qd1, Qe2, Qe3, Qf4, Qf5, Qg3, Qg4, Qh3, Qh5, Qxf6, Rb1, Rg1, a3, a4, b3, b4, d4, e5, exd5, g3, g4, h3, h4",""
+P2-063,P2,2r2rk1/pb3ppp/1pnqpn2/4N3/3P4/1N4P1/PP3PBP/2RQ1RK1 w - - 0 1,How many legal moves does the side to move have? List them.,"43: Bd5, Be4, Bf3, Bh1, Bh3, Bxc6, Kh1, Na1, Na5, Nc4, Nc5, Nd2, Nd3, Nd7, Nf3, Ng4, Ng6, Nxc6, Nxf7, Qc2, Qd2, Qd3, Qe1, Qe2, Qf3, Qg4, Qh5, Ra1, Rb1, Rc2, Rc3, Rc4, Rc5, Re1, Rxc6, a3, a4, d5, f3, f4, g4, h3, h4",""
+P2-064,P2,r3r1k1/2qb1ppp/2p1pn2/p1Pp4/1P2Pb2/3B3P/P2NQPP1/R1B2R1K w - - 0 1,How many legal moves does the side to move have? List them.,"32: Ba3, Ba6, Bb1, Bb2, Bb5, Bc2, Bc4, Kg1, Nb1, Nb3, Nc4, Nf3, Qd1, Qe1, Qe3, Qf3, Qg4, Qh5, Rb1, Rd1, Re1, Rg1, a3, a4, b5, bxa5, e5, exd5, f3, g3, g4, h4",""
+P2-065,P2,2b1kb1r/1p1ppppp/1p3n2/4B3/8/2p5/rP2PPPP/RN2KBNR w KQk - 0 1,How many legal moves does the side to move have? List them.,"26: Bb8, Bc7, Bd4, Bd6, Bf4, Bg3, Bxc3, Bxf6, Kd1, Na3, Nd2, Nf3, Nh3, Nxc3, Rxa2, b3, b4, bxc3, e3, e4, f3, f4, g3, g4, h3, h4",""
+P2-066,P2,3r4/p2r1p1k/1p4np/2qN1Q2/8/PB4P1/1b3P2/3RR1K1 b - - 0 1,How many legal moves does the side to move have? List them.,"47: Ba1, Bc1, Bc3, Bd4, Be5, Bf6, Bg7, Bh8, Bxa3, Kg7, Kg8, Kh8, Qa5, Qb4, Qb5, Qc1, Qc2, Qc3, Qc4, Qc6, Qc7, Qc8, Qd4, Qd6, Qe3, Qe7, Qf8, Qxa3, Qxd5, Qxf2+, Ra8, Rb7, Rb8, Rc7, Rc8, Rd6, Re7, Re8, Rf8, Rg8, Rh8, Rxd5, a5, a6, b5, f6, h5",""
+P2-067,P2,8/8/5r2/2Pk4/P4r2/1NK1n3/8/1R5R w - - 0 1,How many legal moves does the side to move have? List them.,"29: Kb2, Kd2, Kd3, Na1, Na5, Nc1, Nd2, Nd4, Ra1, Rb2, Rbc1, Rbd1+, Rbe1, Rbf1, Rbg1, Rh2, Rh3, Rh4, Rh5+, Rh6, Rh7, Rh8, Rhc1, Rhd1+, Rhe1, Rhf1, Rhg1, a5, c6",""
+P2-068,P2,1r6/p1p4p/5p2/6p1/2k5/2P1PP2/P1R1K1PP/8 b - - 0 1,How many legal moves does the side to move have? List them.,"25: Kb5, Kc5, Kd5, Ra8, Rb1, Rb2, Rb3, Rb4, Rb5, Rb6, Rb7, Rc8, Rd8, Re8, Rf8, Rg8, Rh8, a5, a6, c5, c6, f5, g4, h5, h6",""
+P2-069,P2,r1bqk1nr/ppp2pbp/3p2p1/3Pp3/2PnP3/2N5/PP2NPPP/R1BQKB1R w KQkq - 0 1,How many legal moves does the side to move have? List them.,"32: Bd2, Be3, Bf4, Bg5, Bh6, Kd2, Na4, Nb1, Nb5, Nf4, Ng1, Ng3, Nxd4, Qa4+, Qb3, Qc2, Qd2, Qd3, Qxd4, Rb1, Rg1, a3, a4, b3, b4, c5, f3, f4, g3, g4, h3, h4",""
+P2-070,P2,rn1qkb1r/pp1b1ppp/4pn2/2p5/2Q5/P4NP1/1P1PPPBP/RNB1K2R b KQkq - 0 1,How many legal moves does the side to move have? List them.,"29: Ba4, Bb5, Bc6, Bc8, Bd6, Be7, Ke7, Na6, Nc6, Nd5, Ne4, Ng4, Ng8, Nh5, Qa5, Qb6, Qc7, Qc8, Qe7, Rg8, a5, a6, b5, b6, e5, g5, g6, h5, h6",""
+P2-071,P2,8/8/5k2/p7/p6p/2PK3P/1P6/8 w - - 0 1,How many legal moves does the side to move have? List them.,"10: Kc2, Kc4, Kd2, Kd4, Ke2, Ke3, Ke4, b3, b4, c4",""
+P2-072,P2,2r3k1/pp1bppbp/3p1npP/4n3/3NP1P1/2P1BP2/P1P1B3/2KR3R b - - 0 1,How many legal moves does the side to move have? List them.,"39: Ba4, Bb5, Bc6, Be6, Be8, Bf5, Bf8, Bh8, Bxg4, Bxh6, Kf8, Kh8, Nc4, Nc6, Nd3+, Nd5, Ne8, Nexg4, Nfxg4, Nh5, Nxe4, Nxf3, Ra8, Rb8, Rc4, Rc5, Rc6, Rc7, Rd8, Re8, Rf8, Rxc3, a5, a6, b5, b6, d5, e6, g5",""
+P2-073,P2,rnbq1rk1/ppp1ppbp/3p1np1/8/4P3/5N2/PPPP1PPP/RNBQRBK1 b - - 0 1,How many legal moves does the side to move have? List them.,"32: Bd7, Be6, Bf5, Bg4, Bh3, Bh6, Bh8, Kh8, Na6, Nbd7, Nc6, Nd5, Ne8, Nfd7, Ng4, Nh5, Nxe4, Qd7, Qe8, Re8, a5, a6, b5, b6, c5, c6, d5, e5, e6, g5, h5, h6",""
+P2-074,P2,2r2rk1/pbq2pp1/3bp3/2ppn2B/8/1PP1P1P1/PB1Q1P1P/R1N2RK1 w - - 0 1,How many legal moves does the side to move have? List them.,"31: Ba3, Bd1, Be2, Bf3, Bg4, Bg6, Bxf7+, Kg2, Kh1, Nd3, Ne2, Qc2, Qd1, Qd3, Qd4, Qe1, Qe2, Qxd5, Rb1, Rd1, Re1, a3, a4, b4, c4, e4, f3, f4, g4, h3, h4",""
+P2-075,P2,r1b1k1nr/ppq2ppp/2n1p3/2ppP3/3P4/P1PB4/2P2PPP/R1BQK1NR w KQkq - 0 1,How many legal moves does the side to move have? List them.,"37: Ba6, Bb2, Bb5, Bc4, Bd2, Be2, Be3, Be4, Bf1, Bf4, Bf5, Bg5, Bg6, Bh6, Bxh7, Kd2, Ke2, Kf1, Ne2, Nf3, Nh3, Qd2, Qe2, Qf3, Qg4, Qh5, Ra2, Rb1, a4, c4, dxc5, f3, f4, g3, g4, h3, h4",""
+P2-076,P2,3q4/2r4k/p4pp1/1ppn3p/8/1P3N1P/P2Q1PP1/3R2K1 b - - 0 1,How many legal moves does the side to move have? List them.,"33: Kg7, Kg8, Kh8, Nb4, Nb6, Nc3, Ne3, Ne7, Nf4, Qa8, Qb8, Qc8, Qd6, Qd7, Qe7, Qe8, Qf8, Qg8, Qh8, Ra7, Rb7, Rc6, Rc8, Rd7, Re7, Rf7, Rg7, a5, b4, c4, f5, g5, h4",""
+P2-077,P2,2br1rk1/1p3ppp/2pN2n1/Q7/P3P3/1q5P/5PP1/RR3BK1 b - - 0 1,How many legal moves does the side to move have? List them.,"41: Bd7, Be6, Bf5, Bg4, Bxh3, Kh8, Ne5, Ne7, Nf4, Nh4, Nh8, Qa2, Qa3, Qb2, Qb4, Qb5, Qb6, Qc2, Qc3, Qc4, Qd1, Qd3, Qd5, Qe3, Qe6, Qf3, Qg3, Qxa4, Qxb1, Qxh3, Rd7, Rde8, Rfe8, Rxd6, b5, b6, c5, f5, f6, h5, h6",""
+P2-078,P2,8/4Q3/2k5/8/8/3K4/8/1n6 w - - 0 1,How many legal moves does the side to move have? List them.,"29: Kc2, Kc4, Kd4, Ke2, Ke3, Ke4, Qa3, Qa7, Qb4, Qb7+, Qc5+, Qc7+, Qd6+, Qd7+, Qd8, Qe1, Qe2, Qe3, Qe4+, Qe5, Qe6+, Qe8+, Qf6+, Qf7, Qf8, Qg5, Qg7, Qh4, Qh7",""
+P2-079,P2,r2q4/p4p2/1p2b2k/2pBQ3/7N/P5P1/1P2PP2/4K3 b - - 0 1,How many legal moves does the side to move have? List them.,"29: Bc8, Bd7, Bf5, Bg4, Bh3, Bxd5, Kh7, Qb8, Qc7, Qc8, Qd6, Qd7, Qe7, Qe8, Qf6, Qf8, Qg5, Qg8, Qh8, Qxd5, Qxh4, Rb8, Rc8, a5, a6, b5, c4, f5, f6",""
+P2-080,P2,6k1/4np2/2p3p1/B5Pp/3q3P/6Q1/7K/8 b - - 0 1,How many legal moves does the side to move have? List them.,"37: Kf8, Kg7, Kh7, Kh8, Nc8, Nd5, Nf5, Qa1, Qa4, Qa7, Qb2+, Qb4, Qb6, Qc3, Qc4, Qc5, Qd1, Qd2+, Qd3, Qd5, Qd6, Qd7, Qd8, Qe3, Qe4, Qe5, Qf2+, Qf4, Qf6, Qg1+, Qg4, Qg7, Qh8, Qxh4+, c5, f5, f6",""
+P2-081,P2,3r4/1p3pNp/7k/2R2K2/r7/4P3/p4P1P/6R1 b - - 0 1,How many legal moves does the side to move have? List them.,"33: Ra3, Ra5, Ra6, Ra7, Raa8, Rad4, Rb4, Rb8, Rc4, Rc8, Rd1, Rd2, Rd3, Rd5+, Rd6, Rd7, Rda8, Rdd4, Re4, Re8, Rf4+, Rf8, Rg4, Rg8, Rh4, Rh8, a1=B, a1=N, a1=Q, a1=R, b5, b6, f6",""
+P2-082,P2,r2qk2r/1bpn1p2/p2pp2n/1p4Qp/3PP2P/P1N2P2/1PP5/R3KBNR w KQkq - 0 1,How many legal moves does the side to move have? List them.,"52: Bc4, Bd3, Be2, Bg2, Bh3, Bxb5, Kd1, Kd2, Ke2, Kf2, Na2, Na4, Nb1, Nce2, Nd1, Nd5, Nge2, Nh3, Nxb5, O-O-O, Qc1, Qc5, Qd2, Qd5, Qe3, Qe5, Qe7+, Qf4, Qf5, Qf6, Qg2, Qg3, Qg4, Qg6, Qg7, Qg8+, Qxb5, Qxd8+, Qxh5, Qxh6, Ra2, Rb1, Rc1, Rd1, Rh2, Rh3, a4, b3, b4, d5, e5, f4",""
+P2-083,P2,4q3/2Q1n1kp/B4pp1/8/8/5PP1/1P5P/1K6 b - - 0 1,How many legal moves does the side to move have? List them.,"21: Kf7, Kf8, Kg8, Kh6, Kh8, Qa4, Qa8, Qb5, Qb8, Qc6, Qc8, Qd7, Qd8, Qf7, Qf8, Qg8, Qh8, f5, g5, h5, h6",""
+P2-084,P2,r2q1rk1/pp3p1p/5np1/3p4/8/bP2PN2/Pn1NBPPP/RQ3RK1 w - - 0 1,How many legal moves does the side to move have? List them.,"31: Ba6, Bb5, Bc4, Bd1, Bd3, Kh1, Nc4, Nd4, Ne1, Ne4, Ne5, Ng5, Nh4, Qc1, Qc2, Qd1, Qd3, Qe1, Qe4, Qf5, Qxb2, Qxg6+, Rc1, Rd1, Re1, b4, e4, g3, g4, h3, h4",""
+P2-085,P2,r1bqk1nr/1p1n1ppp/4p3/pB1p4/1b1P4/2N2N2/PPP2PPP/R1BQ1RK1 w kq - 0 1,How many legal moves does the side to move have? List them.,"36: Ba4, Ba6, Bc4, Bc6, Bd2, Bd3, Be2, Be3, Bf4, Bg5, Bh6, Bxd7+, Kh1, Na4, Nb1, Nd2, Ne1, Ne2, Ne4, Ne5, Ng5, Nh4, Nxd5, Qd2, Qd3, Qe1, Qe2, Rb1, Re1, a3, a4, b3, g3, g4, h3, h4",""
+P2-086,P2,r1bk3r/pp2pQ1p/2p2bp1/5q2/8/PBP1B3/2P2PPP/R3R1K1 w - - 0 1,How many legal moves does the side to move have? List them.,"44: Ba2, Ba4, Bb6+, Bc1, Bc4, Bc5, Bd2, Bd4, Bd5, Be6, Bf4, Bg5, Bh6, Bxa7, Kf1, Kh1, Qc4, Qd5+, Qe6, Qe8+, Qf8+, Qg7, Qg8+, Qxe7+, Qxf6, Qxg6, Qxh7, Ra2, Rab1, Rac1, Rad1+, Re2, Reb1, Rec1, Red1+, Rf1, a4, c4, f3, f4, g3, g4, h3, h4",""
+P2-087,P2,r3k2r/p1ppbppp/b1p5/6B1/4p2P/3P4/PPP2Pq1/RN1QKR2 b Qkq - 0 1,How many legal moves does the side to move have? List them.,"42: Ba3, Bb4+, Bb5, Bb7, Bc4, Bc5, Bc8, Bd6, Bd8, Bf6, Bf8, Bxd3, Bxg5, Kd8, Kf8, O-O, O-O-O, Qf3, Qg1, Qg3, Qg4, Qh1, Qh2, Qh3, Qxf1+, Qxf2+, Qxg5, Rb8, Rc8, Rd8, Rf8, Rg8, c5, d5, d6, e3, exd3, f5, f6, g6, h5, h6",""
+P2-088,P2,r1bq1n1k/p1p2p1p/1p1p1bp1/3PPN2/2P1P1Q1/2P3P1/P5BP/R4RK1 b - - 0 1,How many legal moves does the side to move have? List them.,"27: Ba6, Bb7, Bd7, Be6, Be7, Bg5, Bg7, Bh4, Bxe5, Bxf5, Kg8, Nd7, Ne6, Qd7, Qe7, Qe8, Rb8, a5, a6, b5, c5, c6, dxe5, g5, gxf5, h5, h6",""
+P2-089,P2,1kb5/1pp1r1q1/p2p1p2/7P/P5P1/1PPBrQ2/1KP2P2/3R4 w - - 0 1,How many legal moves does the side to move have? List them.,"41: Bb5, Bc4, Be2, Be4, Bf1, Bf5, Bg6, Bh7, Bxa6, Ka1, Ka2, Ka3, Kb1, Kc1, Qc6, Qd5, Qe2, Qe4, Qf4, Qf5, Qg2, Qg3, Qh1, Qh3, Qxb7+, Qxe3, Qxf6, Ra1, Rb1, Rc1, Rd2, Re1, Rf1, Rg1, Rh1, a5, b4, c4, fxe3, g5, h6",""
+P2-090,P2,r1b1qrk1/p1p2ppp/2Nbp3/3n4/2QP4/6P1/PP1BPP1P/RN3RK1 b - - 0 1,How many legal moves does the side to move have? List them.,"32: Ba3, Ba6, Bb4, Bb7, Bc5, Bd7, Be5, Be7, Bf4, Bxg3, Kh8, Nb4, Nb6, Nc3, Ne3, Ne7, Nf4, Nf6, Qd7, Qd8, Qe7, Qxc6, Rb8, a5, a6, e5, f5, f6, g5, g6, h5, h6",""
+P2-091,P2,3q3k/p1p3p1/2n3rp/3pN3/3PpB2/Q1P4P/PP3KP1/R7 b - - 0 1,How many legal moves does the side to move have? List them.,"31: Kg8, Kh7, Na5, Nb4, Nb8, Ne7, Nxd4, Nxe5, Qa8, Qb8, Qc8, Qd6, Qd7, Qe7, Qe8, Qf6, Qf8, Qg5, Qg8, Qh4+, Rd6, Re6, Rf6, Rg3, Rg4, Rg5, Rxg2+, a5, a6, e3+, h5",""
+P2-092,P2,4k3/7R/4K3/8/5r1P/5P2/8/8 b - - 0 1,How many legal moves does the side to move have? List them.,"14: Kd8, Kf8, Ra4, Rb4, Rc4, Rd4, Re4+, Rf5, Rf6+, Rf7, Rf8, Rg4, Rxf3, Rxh4",""
+P2-093,P2,Q3N3/3p1Np1/3Q2R1/5p2/3pkp2/3ppp2/b7/3K4 b - - 0 1,How many legal moves does the side to move have? List them.,1: Bd5,""
+P2-094,P2,8/5Npk/4p2p/8/5QK1/4PPP1/3n3q/8 w - - 0 1,How many legal moves does the side to move have? List them.,"20: Nd6, Nd8, Ne5, Ng5+, Nh8, Nxh6, Qa4, Qb4, Qb8, Qc4, Qc7, Qd4, Qd6, Qe4+, Qe5, Qf5+, Qf6, Qg5, Qxh6+, e4",""
+P2-095,P2,4b1k1/1p3p2/4pPp1/p2pP1P1/P2P4/3B4/1P6/1K6 w - - 0 1,How many legal moves does the side to move have? List them.,"15: Ba6, Bb5, Bc2, Bc4, Be2, Be4, Bf1, Bf5, Bxg6, Ka1, Ka2, Kc1, Kc2, b3, b4",""
+P2-096,P2,4r1n1/2R2pkp/p5p1/1p4P1/8/1P3P2/P2B1K1P/8 b - - 0 1,How many legal moves does the side to move have? List them.,"21: Kf8, Kh8, Ne7, Nf6, Nh6, Ra8, Rb8, Rc8, Rd8, Re1, Re2+, Re3, Re4, Re5, Re6, Re7, Rf8, a5, b4, h5, h6",""
+P2-097,P2,r1bqk1r1/1p3p2/1b2p3/pP1pP2p/5Qpn/P2B3P/1BPN1PP1/R4R1K b q - 0 1,How many legal moves does the side to move have? List them.,"34: Ba7, Bc5, Bc7, Bd4, Bd7, Be3, Bxf2, Kd7, Ke7, Kf8, Nf3, Nf5, Ng6, Nxg2, Qc7, Qd6, Qd7, Qe7, Qf6, Qg5, Ra6, Ra7, Rb8, Rf8, Rg5, Rg6, Rg7, Rh8, a4, d4, f5, f6, g3, gxh3",""
+P2-098,P2,r2qkbnr/pp2pp1p/2bp2p1/2p5/4PP2/2NP4/PPP3PP/R1BQK1NR w KQkq - 0 1,How many legal moves does the side to move have? List them.,"31: Bd2, Be3, Kd2, Ke2, Kf1, Kf2, Na4, Nb1, Nb5, Nce2, Nd5, Nf3, Nge2, Nh3, Qd2, Qe2, Qf3, Qg4, Qh5, Rb1, a3, a4, b3, b4, d4, e5, f5, g3, g4, h3, h4",""
+P2-099,P2,6k1/pQ3p1p/6p1/4N3/5q2/1P5K/P1r3PP/8 w - - 0 1,How many legal moves does the side to move have? List them.,"29: Nc4, Nc6, Nd3, Nd7, Nf3, Ng4, Nxf7, Nxg6, Qa6, Qa8+, Qb4, Qb5, Qb6, Qb8+, Qc6, Qc7, Qc8+, Qd5, Qd7, Qe4, Qe7, Qf3, Qxa7, Qxf7+, a3, a4, b4, g3, g4",""
+P2-100,P2,q4r2/4R1kp/3P4/2p1Ppp1/2Q5/8/5PPP/6K1 b - - 0 1,How many legal moves does the side to move have? List them.,"4: Kg6, Kh6, Kh8, Rf7",""
+P2-101,P2,8/8/8/3k4/8/8/4K3/Q7 b - - 0 1,How many legal moves does the side to move have? List them.,"6: Kc4, Kc5, Kc6, Kd6, Ke4, Ke6",""
+P2-102,P2,8/6P1/8/5K2/7n/6k1/8/8 w - - 0 1,How many legal moves does the side to move have? List them.,"5: Ke4, Ke5, Ke6, Kf6, Kg5",""
+P2-103,P2,rq2k2r/1p3pb1/pPb1p1pp/2p1p2n/4N3/P2PB3/2P2PPP/1R1QRBK1 b kq - 0 1,How many legal moves does the side to move have? List them.,"29: Ba4, Bb5, Bd5, Bd7, Bf6, Bf8, Bxe4, Kd7, Kd8, Ke7, Kf8, Nf4, Nf6, Ng3, O-O, Qa7, Qc7, Qc8, Qd6, Qd8, Ra7, Rf8, Rg8, Rh7, a5, c4, f5, f6, g5",""
+P2-104,P2,r1bqk2r/pp2bppp/2n1pn2/2pp4/3P1P2/1PN1PN2/PBP3PP/R2QKB1R b KQkq - 0 1,How many legal moves does the side to move have? List them.,"35: Bd6, Bd7, Bf8, Kd7, Kf8, Na5, Nb4, Nb8, Nd7, Ne4, Ne5, Ng4, Ng8, Nh5, Nxd4, O-O, Qa5, Qb6, Qc7, Qd6, Qd7, Rb8, Rf8, Rg8, a5, a6, b5, b6, c4, cxd4, e5, g5, g6, h5, h6",""
+P2-105,P2,rnbqk2r/ppp1ppbp/5np1/3p4/8/2N1PN2/PPPPBPPP/R1BQK2R w KQkq - 0 1,How many legal moves does the side to move have? List them.,"31: Ba6, Bb5+, Bc4, Bd3, Bf1, Kf1, Na4, Nb1, Nb5, Nd4, Ne4, Ne5, Ng1, Ng5, Nh4, Nxd5, O-O, Rb1, Rf1, Rg1, a3, a4, b3, b4, d3, d4, e4, g3, g4, h3, h4",""
+P2-106,P2,6k1/5p2/p2pp2p/6p1/3bP1b1/3BQPP1/q5PK/8 w - - 0 1,How many legal moves does the side to move have? List them.,"21: Bb1, Bb5, Bc2, Bc4, Be2, Bf1, Bxa6, Kg1, Kh1, Qc1, Qd2, Qe1, Qe2, Qf2, Qf4, Qg1, Qxd4, Qxg5+, e5, f4, fxg4",""
+P2-107,P2,1r1qr1k1/p4pb1/1pP1p1pn/1P1p4/P1pP2p1/4P2P/1B2QPB1/2R2RK1 w - - 0 1,How many legal moves does the side to move have? List them.,"33: Ba1, Ba3, Bc3, Be4, Bf3, Bh1, Bxd5, Kh1, Kh2, Qc2, Qd1, Qd2, Qd3, Qe1, Qf3, Qxc4, Qxg4, Ra1, Rb1, Rc2, Rc3, Rcd1, Rce1, Rfd1, Rfe1, Rxc4, a5, c7, e4, f3, f4, h4, hxg4",""
+P2-108,P2,1qb2k1r/5ppp/4p3/1B2n3/6P1/2Q5/1PP1K2P/r2R3R w - - 0 1,How many legal moves does the side to move have? List them.,"51: Ba4, Ba6, Bc4, Bc6, Bd3, Bd7, Be8, Kd2, Ke1, Ke3, Kf1, Kf2, Qa3+, Qa5, Qb3, Qb4+, Qc4, Qc5+, Qc6, Qc7, Qd2, Qd3, Qd4, Qe1, Qe3, Qf3, Qg3, Qh3, Qxc8+, Qxe5, Rb1, Rc1, Rd2, Rd3, Rd4, Rd5, Rd6, Rd7, Rd8+, Rde1, Rdf1, Rdg1, Rhe1, Rhf1, Rhg1, Rxa1, b3, b4, g5, h3, h4",""
+P2-109,P2,rnbqk2r/pp3ppp/2pbp2n/3p4/3P4/1P1BPN2/P1P2PPP/RNBQK2R w KQkq - 0 1,How many legal moves does the side to move have? List them.,"38: Ba3, Ba6, Bb2, Bb5, Bc4, Bd2, Be2, Be4, Bf1, Bf5, Bg6, Bxh7, Kd2, Ke2, Kf1, Na3, Nbd2, Nc3, Ne5, Nfd2, Ng1, Ng5, Nh4, O-O, Qd2, Qe2, Rf1, Rg1, a3, a4, b4, c3, c4, e4, g3, g4, h3, h4",""
+P2-110,P2,1k3r2/2qn4/1p5Q/p5P1/4B3/5P2/PP5p/1K1R4 b - - 0 1,How many legal moves does the side to move have? List them.,"35: Ka7, Kc8, Nc5, Ne5, Nf6, Qa7, Qb7, Qc1+, Qc2+, Qc3, Qc4, Qc5, Qc6, Qc8, Qd6, Qd8, Qe5, Qf4, Qg3, Rc8, Rd8, Re8, Rf4, Rf5, Rf6, Rf7, Rg8, Rh8, Rxf3, a4, b5, h1=B, h1=N, h1=Q, h1=R",""
+P2-111,P2,8/7R/5k1P/pBb5/Pr2p3/8/4K3/8 b - - 0 1,How many legal moves does the side to move have? List them.,"22: Ba7, Bb6, Bd4, Bd6, Be3, Be7, Bf2, Bf8, Bg1, Ke5, Ke6, Kf5, Kg5, Kg6, Rb1, Rb2+, Rb3, Rc4, Rd4, Rxa4, Rxb5, e3",""
+P2-112,P2,8/3rk2p/5pp1/n3p3/4P2P/8/1R1N1PP1/6K1 w - - 0 1,How many legal moves does the side to move have? List them.,"22: Kf1, Kh1, Kh2, Nb1, Nb3, Nc4, Nf1, Nf3, Ra2, Rb1, Rb3, Rb4, Rb5, Rb6, Rb7, Rb8, Rc2, f3, f4, g3, g4, h5",""
+P2-113,P2,2q5/4kpb1/p5p1/8/6Pp/4P2P/P4P2/2R3K1 w - - 0 1,How many legal moves does the side to move have? List them.,"22: Kf1, Kg2, Kh1, Kh2, Ra1, Rb1, Rc2, Rc3, Rc4, Rc5, Rc6, Rc7+, Rd1, Re1, Rf1, Rxc8, a3, a4, e4, f3, f4, g5",""
+P2-114,P2,8/8/6p1/4k3/8/8/8/5KB1 w - - 0 1,How many legal moves does the side to move have? List them.,"11: Ba7, Bb6, Bc5, Bd4+, Be3, Bf2, Bh2+, Ke1, Ke2, Kf2, Kg2",""
+P2-115,P2,8/1P1r4/p3b3/3p1pp1/1PpR4/1kP3P1/5P2/5BK1 w - - 0 1,How many legal moves does the side to move have? List them.,"25: Bd3, Be2, Bg2, Bh3, Bxc4+, Kg2, Kh1, Kh2, Rd1, Rd2, Rd3, Re4, Rf4, Rg4, Rh4, Rxc4, Rxd5, b5, b8=B, b8=N, b8=Q, b8=R, f3, f4, g4",""
+P2-116,P2,8/2bb4/pk6/3P4/KP1N3p/p2q3P/6P1/8 w - - 0 1,How many legal moves does the side to move have? List them.,"3: Nb5, Nc6, b5",""
+P2-117,P2,r2r2k1/pp1n3p/2p1bpp1/7q/4PB1P/1PQ2PP1/PN4B1/R6K w - - 0 1,How many legal moves does the side to move have? List them.,"42: Bb8, Bc1, Bc7, Bd2, Bd6, Be3, Be5, Bf1, Bg5, Bh3, Bh6, Kg1, Kh2, Na4, Nc4, Nd1, Nd3, Qa5, Qb4, Qc1, Qc2, Qc4, Qc5, Qd2, Qd3, Qd4, Qe1, Qe3, Qe5, Qxc6, Qxf6, Rb1, Rc1, Rd1, Re1, Rf1, Rg1, a3, a4, b4, e5, g4",""
+P2-118,P2,rnbqk2r/ppp2ppp/8/2bPp3/2B2P2/3PBN2/PPP1Q1PP/RN2K2n b Qkq - 0 1,How many legal moves does the side to move have? List them.,"44: Ba3, Bb4+, Bb6, Bd4, Bd6, Bd7, Be6, Be7, Bf5, Bf8, Bg4, Bh3, Bxe3, Kd7, Ke7, Kf8, Na6, Nc6, Nd7, Nf2, Ng3, O-O, Qd6, Qd7, Qe7, Qf6, Qg5, Qh4+, Qxd5, Rf8, Rg8, a5, a6, b5, b6, c6, e4, exf4, f5, f6, g5, g6, h5, h6",""
+P2-119,P2,8/1p4p1/p4p2/P7/8/1k6/7r/1K6 b - - 0 1,How many legal moves does the side to move have? List them.,"24: Ka3, Ka4, Kb4, Kc3, Kc4, Ra2, Rb2+, Rc2, Rd2, Re2, Rf2, Rg2, Rh1#, Rh3, Rh4, Rh5, Rh6, Rh7, Rh8, b5, b6, f5, g5, g6",""
+P2-120,P2,2kr2n1/pp1b3r/2n1pp1p/q2pP1pP/2pP1P2/P1P1Q3/2PBB1P1/R3K1NR w KQ - 0 1,How many legal moves does the side to move have? List them.,"32: Bc1, Bd1, Bd3, Bf1, Bf3, Bg4, Bxc4, Kd1, Kf1, Kf2, Nf3, Nh3, O-O-O, Qd3, Qe4, Qf2, Qf3, Qg3, Qh3, Ra2, Rb1, Rc1, Rd1, Rh2, Rh3, Rh4, a4, exf6, f5, fxg5, g3, g4",""
+P2-121,P2,r2q1rk1/1pp1bppp/1n6/pP2p3/3n4/PbNP1NP1/1B1QPPBP/R4RK1 b - - 0 1,How many legal moves does the side to move have? List them.,"48: Ba2, Ba4, Bb4, Bc2, Bc4, Bc5, Bd1, Bd5, Bd6, Be6, Bf6, Bg5, Bh4, Bxa3, Kh8, Na4, Nc2, Nc4, Nc6, Nc8, Nd5, Nd7, Ne6, Nf5, Nxb5, Nxe2+, Nxf3+, Qb8, Qc8, Qd5, Qd6, Qd7, Qe8, Ra6, Ra7, Rb8, Rc8, Re8, a4, c5, c6, e4, f5, f6, g5, g6, h5, h6",""
+P2-122,P2,8/p5k1/1p4Rp/4P2P/5K2/8/8/r7 b - - 0 1,How many legal moves does the side to move have? List them.,"4: Kf7, Kf8, Kh7, Kh8",""
+P2-123,P2,r1bqk2r/pp1p1ppp/2n1pn2/2b5/2B1P3/2N2N2/PPP2PPP/R1BQK2R b KQkq - 0 1,How many legal moves does the side to move have? List them.,"41: Ba3, Bb4, Bb6, Bd4, Bd6, Be3, Be7, Bf8, Bxf2+, Ke7, Kf8, Na5, Nb4, Nb8, Nd4, Nd5, Ne5, Ne7, Ng4, Ng8, Nh5, Nxe4, O-O, Qa5, Qb6, Qc7, Qe7, Rb8, Rf8, Rg8, a5, a6, b5, b6, d5, d6, e5, g5, g6, h5, h6",""
+P2-124,P2,2r3k1/pp1q1rpp/2n1N3/8/3pR3/P7/1P3PPP/3QR1K1 b - - 0 1,How many legal moves does the side to move have? List them.,"36: Kh8, Na5, Nb4, Nb8, Nd8, Ne5, Ne7, Qc7, Qd5, Qd6, Qd8, Qe7, Qe8, Qxe6, Ra8, Rb8, Rc7, Rcf8, Rd8, Re7, Re8, Rf3, Rf4, Rf5, Rf6, Rff8, Rxf2, a5, a6, b5, b6, d3, g5, g6, h5, h6",""
+P3-000,P3,8/5p1p/3k2p1/1p6/3K3P/P4P2/5P2/8 b - - 0 1,FEN after Kc6?,8/5p1p/2k3p1/1p6/3K3P/P4P2/5P2/8 w - - 1 2,Kc6
+P3-001,P3,r2qk2r/1b1pn1bp/p3ppp1/1pp2PN1/4P3/2NPB3/PPP3PP/R3QRK1 b kq - 0 1,FEN after Ra7?,3qk2r/rb1pn1bp/p3ppp1/1pp2PN1/4P3/2NPB3/PPP3PP/R3QRK1 w k - 1 2,Ra7
+P3-002,P3,r2q1rk1/ppp2pp1/3p3p/4n3/4N1Qb/4B2P/PPP2PP1/R4RK1 w - - 0 1,FEN after Ng5?,r2q1rk1/ppp2pp1/3p3p/4n1N1/6Qb/4B2P/PPP2PP1/R4RK1 b - - 1 1,Ng5
+P3-003,P3,1r1r1bk1/p2q1p1p/4p1p1/n3P3/1p2QPP1/2nP3P/P3N1B1/2BR1RK1 w - - 0 1,FEN after Kh2?,1r1r1bk1/p2q1p1p/4p1p1/n3P3/1p2QPP1/2nP3P/P3N1BK/2BR1R2 b - - 1 1,Kh2
+P3-004,P3,8/4rk2/p6Q/1p3p2/1P1Pq3/7P/8/6K1 w - - 0 1,FEN after Qh7+?,8/4rk1Q/p7/1p3p2/1P1Pq3/7P/8/6K1 b - - 1 1,Qh7+
+P3-005,P3,rnbqk1nr/pp1p1ppp/4p3/2b5/8/5NP1/PPP1PP1P/RNBQKB1R b KQkq - 0 1,FEN after Ne7?,rnbqk2r/pp1pnppp/4p3/2b5/8/5NP1/PPP1PP1P/RNBQKB1R w KQkq - 1 2,Ne7
+P3-006,P3,r1b1r3/1pq1bkp1/p3pB1p/7Q/3P4/P2B4/1P3PPP/5RK1 b - - 0 1,FEN after g6?,r1b1r3/1pq1bk2/p3pBpp/7Q/3P4/P2B4/1P3PPP/5RK1 w - - 0 2,g6
+P3-007,P3,r1b1k2r/pppp1ppp/2n3q1/3nP1B1/2B5/2Q2N2/P4PPP/R4RK1 w kq - 0 1,FEN after Nd4?,r1b1k2r/pppp1ppp/2n3q1/3nP1B1/2BN4/2Q5/P4PPP/R4RK1 b kq - 1 1,Nd4
+P3-008,P3,r1b1kbnr/1pqppppp/p7/8/B2pP3/2P5/PP1P1PPP/RNBQ1RK1 b kq - 0 1,FEN after Qf4?,r1b1kbnr/1p1ppppp/p7/8/B2pPq2/2P5/PP1P1PPP/RNBQ1RK1 w kq - 1 2,Qf4
+P3-009,P3,rnb1kbnr/pp1p1ppp/1q6/8/1B2p3/P3PN2/1PP2PPP/RN1QKB1R w KQkq - 0 1,FEN after Bxf8?,rnb1kBnr/pp1p1ppp/1q6/8/4p3/P3PN2/1PP2PPP/RN1QKB1R b KQkq - 0 1,Bxf8
+P3-010,P3,6k1/5p1p/4p1p1/1p2P3/1Pp2P2/2P1bb2/1Q5P/r1BR3K w - - 0 1,FEN after Qg2?,6k1/5p1p/4p1p1/1p2P3/1Pp2P2/2P1bb2/6QP/r1BR3K b - - 1 1,Qg2
+P3-011,P3,8/4N2k/3NNN2/1N6/8/6K1/8/N3N3 b - - 0 1,FEN after Kh8?,7k/4N3/3NNN2/1N6/8/6K1/8/N3N3 w - - 1 2,Kh8
+P3-012,P3,r1bqr1k1/pp1n1pbp/2pp1np1/8/1PPN4/2N1P3/P1Q1BPPP/R1BR2K1 b - - 0 1,FEN after Bh6?,r1bqr1k1/pp1n1p1p/2pp1npb/8/1PPN4/2N1P3/P1Q1BPPP/R1BR2K1 w - - 1 2,Bh6
+P3-013,P3,3rk3/p4p2/Pp1R2p1/1Pp3Pp/2P4P/3K4/8/8 w - - 0 1,FEN after Rxd8+?,3Rk3/p4p2/Pp4p1/1Pp3Pp/2P4P/3K4/8/8 b - - 0 1,Rxd8+
+P3-014,P3,r1q2rk1/1p2ppbp/p1b3p1/6BP/5Q2/2N2N2/PPP2nP1/2KR3R b - - 0 1,FEN after Bxc3?,r1q2rk1/1p2pp1p/p1b3p1/6BP/5Q2/2b2N2/PPP2nP1/2KR3R w - - 0 2,Bxc3
+P3-015,P3,r2q1rk1/4ppbp/3p2p1/3PP3/2n2P2/2NQ2PP/P5K1/R1B1R3 b - - 0 1,FEN after Qb6?,r4rk1/4ppbp/1q1p2p1/3PP3/2n2P2/2NQ2PP/P5K1/R1B1R3 w - - 1 2,Qb6
+P3-016,P3,rnbqkb1r/ppp2ppp/3pp3/4P3/3P4/2P2N2/P1P2PPP/R1BQKB1R b KQkq - 0 1,FEN after Kd7?,rnbq1b1r/pppk1ppp/3pp3/4P3/3P4/2P2N2/P1P2PPP/R1BQKB1R w KQ - 1 2,Kd7
+P3-017,P3,r4rk1/pp2b1pp/1qnppn2/2p5/4PB2/2N3P1/PPP2P1P/1R1QKB1R b K - 0 1,FEN after e5?,r4rk1/pp2b1pp/1qnp1n2/2p1p3/4PB2/2N3P1/PPP2P1P/1R1QKB1R w K - 0 2,e5
+P3-018,P3,2r1kb1r/pp3ppp/2n1p2n/1B1pPb2/3N1P1q/7P/PPP1Q1P1/RNB1K2R w KQk - 0 1,FEN after g3?,2r1kb1r/pp3ppp/2n1p2n/1B1pPb2/3N1P1q/6PP/PPP1Q3/RNB1K2R b KQk - 0 1,g3
+P3-019,P3,r1bqnrk1/ppppnppp/1b1P4/4P3/1PB5/P4N2/5PPP/RNBQ1RK1 b - - 0 1,FEN after Be3?,r1bqnrk1/ppppnppp/3P4/4P3/1PB5/P3bN2/5PPP/RNBQ1RK1 w - - 1 2,Be3
+P3-020,P3,rnbq1rk1/pp2ppbp/2p2np1/3p4/3P1B2/2N2N1P/PPPQPPP1/2KR1B1R b - - 0 1,FEN after Ng4?,rnbq1rk1/pp2ppbp/2p3p1/3p4/3P1Bn1/2N2N1P/PPPQPPP1/2KR1B1R w - - 1 2,Ng4
+P3-021,P3,8/2k5/2P5/1R6/PK6/1P6/8/r7 w - - 0 1,FEN after Kc4?,8/2k5/2P5/1R6/P1K5/1P6/8/r7 b - - 1 1,Kc4
+P3-022,P3,k2r4/1p1P4/p2Q4/P2R4/8/4q3/1P6/1K6 w - - 0 1,FEN after Ka2?,k2r4/1p1P4/p2Q4/P2R4/8/4q3/KP6/8 b - - 1 1,Ka2
+P3-023,P3,8/5Q2/8/1k1K4/8/8/8/8 w - - 0 1,FEN after Ke6?,8/5Q2/4K3/1k6/8/8/8/8 b - - 1 1,Ke6
+P3-024,P3,r1bqk2r/ppp2pbp/2np1np1/8/3NP2P/2N5/PPP1BPP1/R1BQK2R w KQkq - 0 1,FEN after g4?,r1bqk2r/ppp2pbp/2np1np1/8/3NP1PP/2N5/PPP1BP2/R1BQK2R b KQkq - 0 1,g4
+P3-025,P3,3r1k2/pp3ppB/4p3/2qn2Q1/8/2P3P1/PP3P1P/4R1K1 b - - 0 1,FEN after Rc8?,2r2k2/pp3ppB/4p3/2qn2Q1/8/2P3P1/PP3P1P/4R1K1 w - - 1 2,Rc8
+P3-026,P3,1r2n2r/p1q2ppk/5b1p/2p1n2R/1p1pPBP1/3P3P/PPPQN1B1/R6K w - - 0 1,FEN after Kg1?,1r2n2r/p1q2ppk/5b1p/2p1n2R/1p1pPBP1/3P3P/PPPQN1B1/R5K1 b - - 1 1,Kg1
+P3-027,P3,r2qk2r/pp3ppp/6b1/2p1b3/3pPBP1/3P3P/PPP3B1/R2Q1RK1 b kq - 0 1,FEN after Qg5?,r3k2r/pp3ppp/6b1/2p1b1q1/3pPBP1/3P3P/PPP3B1/R2Q1RK1 w kq - 1 2,Qg5
+P3-028,P3,8/p4kp1/pb6/5pB1/3p4/6P1/1P1R1P1P/4n1K1 b - - 0 1,FEN after a5?,8/p4kp1/1b6/p4pB1/3p4/6P1/1P1R1P1P/4n1K1 w - - 0 2,a5
+P3-029,P3,3rk2r/qbp2ppp/p1pbpn2/4N3/N2P4/P3B3/1PP1QPPP/R4RK1 w k - 0 1,FEN after Rfe1?,3rk2r/qbp2ppp/p1pbpn2/4N3/N2P4/P3B3/1PP1QPPP/R3R1K1 b k - 1 1,Rfe1
+P3-030,P3,r2q1rk1/1pp3b1/2nppn1p/p3p1p1/P3P3/2PP1N1P/1P1N1PP1/R1BQ1RK1 w - - 0 1,FEN after c4?,r2q1rk1/1pp3b1/2nppn1p/p3p1p1/P1P1P3/3P1N1P/1P1N1PP1/R1BQ1RK1 b - - 0 1,c4
+P3-031,P3,4R2k/b5p1/7p/1pq2B2/2r5/8/6PP/5R1K b - - 0 1,FEN after Qf8?,4Rq1k/b5p1/7p/1p3B2/2r5/8/6PP/5R1K w - - 1 2,Qf8
+P3-032,P3,r5k1/1pq2ppp/p3pn2/3r4/3N2P1/2P1R3/PP2QPP1/4R1K1 b - - 0 1,FEN after e5?,r5k1/1pq2ppp/p4n2/3rp3/3N2P1/2P1R3/PP2QPP1/4R1K1 w - - 0 2,e5
+P3-033,P3,r4rk1/1bpq1ppp/p5n1/1p2p1Q1/8/P1PP4/B1P2PPP/R1B1R1K1 b - - 0 1,FEN after Bc8?,r1b2rk1/2pq1ppp/p5n1/1p2p1Q1/8/P1PP4/B1P2PPP/R1B1R1K1 w - - 1 2,Bc8
+P3-034,P3,2r5/1p1k1p2/7p/pb1p1B2/8/1P6/Pb3PPP/3R2K1 b - - 0 1,FEN after Kd6?,2r5/1p3p2/3k3p/pb1p1B2/8/1P6/Pb3PPP/3R2K1 w - - 1 2,Kd6
+P3-035,P3,r1bqkb1r/3n2pp/1Pp1pn2/3p1p2/Np1P4/6P1/P2BPPBP/R2QK1NR b KQkq - 0 1,FEN after Nb8?,rnbqkb1r/6pp/1Pp1pn2/3p1p2/Np1P4/6P1/P2BPPBP/R2QK1NR w KQkq - 1 2,Nb8
+P3-036,P3,r3kbnr/1ppqp2p/p1n2pp1/3p1b2/3P1B2/2PBPN2/PPQ2PPP/RN2K2R w KQkq - 0 1,FEN after Qd1?,r3kbnr/1ppqp2p/p1n2pp1/3p1b2/3P1B2/2PBPN2/PP3PPP/RN1QK2R b KQkq - 1 1,Qd1
+P3-037,P3,rnb1k2r/ppp1ppbp/5np1/6B1/3qP3/2NB4/PP3PPP/R2QK1NR w KQkq - 0 1,FEN after Bf4?,rnb1k2r/ppp1ppbp/5np1/8/3qPB2/2NB4/PP3PPP/R2QK1NR b KQkq - 1 1,Bf4
+P3-038,P3,7r/2k4p/p2p2N1/1p3Q2/8/8/PPPq2PP/4RR1K b - - 0 1,FEN after Qd1?,7r/2k4p/p2p2N1/1p3Q2/8/8/PPP3PP/3qRR1K w - - 1 2,Qd1
+P3-039,P3,2q2rk1/5pp1/p5p1/1pn5/8/P5NP/1PQ2PPK/2R5 b - - 0 1,FEN after Kh8?,2q2r1k/5pp1/p5p1/1pn5/8/P5NP/1PQ2PPK/2R5 w - - 1 2,Kh8
+P3-040,P3,3rq2k/p2nb1pp/2p1pr2/3p4/3P1BQ1/2NR4/PP3PPP/R5K1 w - - 0 1,FEN after Bg3?,3rq2k/p2nb1pp/2p1pr2/3p4/3P2Q1/2NR2B1/PP3PPP/R5K1 b - - 1 1,Bg3
+P3-041,P3,rnbqk2r/p4pb1/3p1n1p/2p3p1/2Pp4/4P3/PB3PPP/RN1QKBNR w KQkq - 0 1,FEN after Qc1?,rnbqk2r/p4pb1/3p1n1p/2p3p1/2Pp4/4P3/PB3PPP/RNQ1KBNR b KQkq - 1 1,Qc1
+P3-042,P3,3r1k2/p4p1p/1p6/2p2P2/2P1K2P/1P6/PB1p2N1/8 w - - 0 1,FEN after Bf6?,3r1k2/p4p1p/1p3B2/2p2P2/2P1K2P/1P6/P2p2N1/8 b - - 1 1,Bf6
+P3-043,P3,3r2k1/p4p2/1p5p/2p1Pqp1/3p4/P2Pn1P1/1P2Q2P/R3R1K1 w - - 0 1,FEN after b3?,3r2k1/p4p2/1p5p/2p1Pqp1/3p4/PP1Pn1P1/4Q2P/R3R1K1 b - - 0 1,b3
+P3-044,P3,2br2k1/2R2pp1/7p/pP6/P7/4PP2/6P1/4R1K1 b - - 0 1,FEN after Rf8?,2b2rk1/2R2pp1/7p/pP6/P7/4PP2/6P1/4R1K1 w - - 1 2,Rf8
+P3-045,P3,r2qk1nr/pp1b1ppp/2n1p3/1BbpP3/P7/8/1PP2PPP/RNBQK1NR w KQkq - 0 1,FEN after Qd2?,r2qk1nr/pp1b1ppp/2n1p3/1BbpP3/P7/8/1PPQ1PPP/RNB1K1NR b KQkq - 1 1,Qd2
+P3-046,P3,b2r4/6p1/R7/2p1R3/1k1p4/pP3PP1/P4KP1/8 w - - 0 1,FEN after Ke2?,b2r4/6p1/R7/2p1R3/1k1p4/pP3PP1/P3K1P1/8 b - - 1 1,Ke2
+P3-047,P3,rnb2r1k/qp2b2B/4pn1Q/1P1p4/p7/P4N2/3N1PPP/4RRK1 w - - 0 1,FEN after Rxe6?,rnb2r1k/qp2b2B/4Rn1Q/1P1p4/p7/P4N2/3N1PPP/5RK1 b - - 0 1,Rxe6
+P3-048,P3,r1bqk1nr/pppn1ppp/3p1b2/3Np3/3PP3/2P2N2/PP3PPP/R1BQKB1R b KQkq - 0 1,FEN after Bg5?,r1bqk1nr/pppn1ppp/3p4/3Np1b1/3PP3/2P2N2/PP3PPP/R1BQKB1R w KQkq - 1 2,Bg5
+P3-049,P3,6k1/8/6P1/6K1/2p5/PP6/P7/8 b - - 0 1,FEN after c3?,6k1/8/6P1/6K1/8/PPp5/P7/8 w - - 0 2,c3
+P3-050,P3,r1bqk2r/ppp2ppp/1bn5/3pP1N1/2BP2n1/8/PP3PPP/RNBQK2R w KQkq d6 0 1,FEN after h3?,r1bqk2r/ppp2ppp/1bn5/3pP1N1/2BP2n1/7P/PP3PP1/RNBQK2R b KQkq - 0 1,h3
+P3-051,P3,2Q5/3P4/8/1k5p/7P/8/6P1/6K1 w - - 0 1,FEN after Qa8?,Q7/3P4/8/1k5p/7P/8/6P1/6K1 b - - 1 1,Qa8
+P3-052,P3,2rqk2r/1p1nbppp/p4n2/2PN4/B7/4BQ2/PP3PPP/2KR3R b k - 0 1,FEN after a5?,2rqk2r/1p1nbppp/5n2/p1PN4/B7/4BQ2/PP3PPP/2KR3R w k - 0 2,a5
+P3-053,P3,6Q1/1p6/8/7P/2p5/8/2k5/Q5K1 w - - 0 1,FEN after Qh7+?,8/1p5Q/8/7P/2p5/8/2k5/Q5K1 b - - 1 1,Qh7+
+P3-054,P3,8/8/8/8/7Q/3K4/8/kq6 w - - 0 1,FEN after Kc4?,8/8/8/8/2K4Q/8/8/kq6 b - - 1 1,Kc4
+P3-055,P3,rnb1k2r/pp2qppp/3bpn2/2ppN3/3P1B2/2P1P3/PP1N1PPP/R2QKB1R b KQkq - 0 1,FEN after Kd8?,rnbk3r/pp2qppp/3bpn2/2ppN3/3P1B2/2P1P3/PP1N1PPP/R2QKB1R w KQ - 1 2,Kd8
+P3-056,P3,1r1r2k1/1pR1n1pp/4q3/3pNp2/Q2Pn3/3BP3/PP3PPP/5RK1 b - - 0 1,FEN after Rf8?,1r3rk1/1pR1n1pp/4q3/3pNp2/Q2Pn3/3BP3/PP3PPP/5RK1 w - - 1 2,Rf8
+P3-057,P3,r1bqkbnr/pp1p1ppp/4p3/2p1n3/2B1P3/2N2Q2/PPPP1PPP/R1B1K1NR w KQkq - 0 1,FEN after Qxf7+?,r1bqkbnr/pp1p1Qpp/4p3/2p1n3/2B1P3/2N5/PPPP1PPP/R1B1K1NR b KQkq - 0 1,Qxf7+
+P3-058,P3,1r2r3/2p3p1/1p1p1k1p/p2P1bnP/P1P1pN2/1P2P1R1/1K2BPR1/8 w - - 0 1,FEN after Ka3?,1r2r3/2p3p1/1p1p1k1p/p2P1bnP/P1P1pN2/KP2P1R1/4BPR1/8 b - - 1 1,Ka3
+P3-059,P3,r4rk1/p1p1bppp/b1B1pn2/8/8/6P1/PP2PP1P/RNBR2K1 b - - 0 1,FEN after Bc5?,r4rk1/p1p2ppp/b1B1pn2/2b5/8/6P1/PP2PP1P/RNBR2K1 w - - 1 2,Bc5
+P3-060,P3,5rk1/p5pp/3R4/4p3/2p1p3/2B1b3/PPP2rPP/2K4R w - - 0 1,FEN after Rd2?,5rk1/p5pp/8/4p3/2p1p3/2B1b3/PPPR1rPP/2K4R b - - 1 1,Rd2
+P3-061,P3,rnbq1rk1/pp3ppp/8/3Pp3/4P3/2N1n3/PP1Q2PP/RN2KB1R b KQ - 0 1,FEN after Re8?,rnbqr1k1/pp3ppp/8/3Pp3/4P3/2N1n3/PP1Q2PP/RN2KB1R w KQ - 1 2,Re8
+P3-062,P3,r2qk2r/pp3ppp/2nbpnb1/2p1P3/8/5NP1/PPPN1PBP/R1BQR1K1 b kq - 0 1,FEN after Qd7?,r3k2r/pp1q1ppp/2nbpnb1/2p1P3/8/5NP1/PPPN1PBP/R1BQR1K1 w kq - 1 2,Qd7
+P3-063,P3,rnbqkb1r/pp2ppp1/5n1p/2p5/3PN3/2N5/PPP2PPP/R1BQKB1R b KQkq - 0 1,FEN after Nd5?,rnbqkb1r/pp2ppp1/7p/2pn4/3PN3/2N5/PPP2PPP/R1BQKB1R w KQkq - 1 2,Nd5
+P3-064,P3,r4k1r/pbpQ1p1p/1p4p1/1P1qP1N1/5P2/2p5/P4RPP/R5K1 w - - 0 1,FEN after Kf1?,r4k1r/pbpQ1p1p/1p4p1/1P1qP1N1/5P2/2p5/P4RPP/R4K2 b - - 1 1,Kf1
+P3-065,P3,2k5/8/2K5/3N4/3B4/8/8/8 b - - 0 1,FEN after Kb8?,1k6/8/2K5/3N4/3B4/8/8/8 w - - 1 2,Kb8
+P3-066,P3,8/8/p7/1pp1kPp1/2P3P1/PK6/8/8 w - - 0 1,FEN after Ka2?,8/8/p7/1pp1kPp1/2P3P1/P7/K7/8 b - - 1 1,Ka2
+P3-067,P3,5r1k/Q5qp/8/2P5/1P3p2/P3n3/6P1/6K1 w - - 0 1,FEN after Qb7?,5r1k/1Q4qp/8/2P5/1P3p2/P3n3/6P1/6K1 b - - 1 1,Qb7
+P3-068,P3,8/8/4b1k1/8/3K1Q2/8/8/8 w - - 0 1,FEN after Ke3?,8/8/4b1k1/8/5Q2/4K3/8/8 b - - 1 1,Ke3
+P3-069,P3,8/3k4/8/1p2r1b1/1K1N3p/2P5/1P3R1P/8 b - - 0 1,FEN after Bc1?,8/3k4/8/1p2r3/1K1N3p/2P5/1P3R1P/2b5 w - - 1 2,Bc1
+P3-070,P3,r2q1rk1/ppp1bppp/2n1pn2/3p4/2PPbB1N/2N1P2P/PP3PP1/R2QKB1R w KQ - 0 1,FEN after b4?,r2q1rk1/ppp1bppp/2n1pn2/3p4/1PPPbB1N/2N1P2P/P4PP1/R2QKB1R b KQ - 0 1,b4
+P3-071,P3,6Q1/7P/4K3/1k6/8/8/8/4q3 w - - 0 1,FEN after Kd7?,6Q1/3K3P/8/1k6/8/8/8/4q3 b - - 1 1,Kd7
+P3-072,P3,8/5k2/5p2/1p1p4/1PpP1P2/q3PK2/7R/2R5 w - - 0 1,FEN after Rf1?,8/5k2/5p2/1p1p4/1PpP1P2/q3PK2/7R/5R2 b - - 1 1,Rf1
+P3-073,P3,r2qr1k1/1p1bpnbp/6p1/5p2/1nPp1P2/3P1NP1/3BP1BP/1R1Q1RK1 w - - 0 1,FEN after Be3?,r2qr1k1/1p1bpnbp/6p1/5p2/1nPp1P2/3PBNP1/4P1BP/1R1Q1RK1 b - - 1 1,Be3
+P3-074,P3,8/p3Q3/3K2k1/8/8/8/8/2q5 w - - 0 1,FEN after Qf7+?,8/p4Q2/3K2k1/8/8/8/8/2q5 b - - 1 1,Qf7+
+P3-075,P3,8/6bp/1N1k2p1/p4p1n/5P2/PP3K1P/8/8 b - - 0 1,FEN after h6?,8/6b1/1N1k2pp/p4p1n/5P2/PP3K1P/8/8 w - - 0 2,h6
+P3-076,P3,3rr1k1/1p3ppq/p1bb1n1p/3p4/7Q/1P2PNN1/PB3PPP/2RR2K1 b - - 0 1,FEN after Kf8?,3rrk2/1p3ppq/p1bb1n1p/3p4/7Q/1P2PNN1/PB3PPP/2RR2K1 w - - 1 2,Kf8
+P3-077,P3,rnbqkbnr/pp1p1pp1/7p/2p1N3/2BpP3/8/PPP2PPP/RNBQK2R b KQkq - 0 1,FEN after d3?,rnbqkbnr/pp1p1pp1/7p/2p1N3/2B1P3/3p4/PPP2PPP/RNBQK2R w KQkq - 0 2,d3
+P3-078,P3,8/8/2K2r2/8/8/3k4/6Q1/8 w - - 0 1,FEN after Kb5?,8/8/5r2/1K6/8/3k4/6Q1/8 b - - 1 1,Kb5
+P3-079,P3,4rrk1/p5pp/8/3RN1B1/8/2P5/PP3bPP/7K b - - 0 1,FEN after Bg3?,4rrk1/p5pp/8/3RN1B1/8/2P3b1/PP4PP/7K w - - 1 2,Bg3
+P3-080,P3,8/8/2k2K2/4Q3/8/3B4/8/8 b - - 0 1,FEN after Kb6?,8/8/1k3K2/4Q3/8/3B4/8/8 w - - 1 2,Kb6
+P3-081,P3,2b5/4Rp1p/2N1nkp1/1p6/2p1P3/2P4P/5PP1/r2B2K1 w - - 0 1,FEN after e5+?,2b5/4Rp1p/2N1nkp1/1p2P3/2p5/2P4P/5PP1/r2B2K1 b - - 0 1,e5+
+P3-082,P3,rnbqkb1r/ppp2ppp/3p1n2/8/2BpP3/2N5/PPP2PPP/R1BQK1NR w KQkq - 0 1,FEN after Qe2?,rnbqkb1r/ppp2ppp/3p1n2/8/2BpP3/2N5/PPP1QPPP/R1B1K1NR b KQkq - 1 1,Qe2
+P3-083,P3,8/r7/1k3pPP/8/4P3/4K3/R5p1/8 b - - 0 1,FEN after Re7?,8/4r3/1k3pPP/8/4P3/4K3/R5p1/8 w - - 1 2,Re7
+P3-084,P3,8/8/8/2q5/7p/3K2k1/8/8 b - - 0 1,FEN after Qa5?,8/8/8/q7/7p/3K2k1/8/8 w - - 1 2,Qa5
+P3-085,P3,r2qkb1r/1bp2ppp/p1np2n1/1p2p3/P2PP3/1BP2N2/1P3PPP/RNBQ1RK1 b kq - 0 1,FEN after Be7?,r2qk2r/1bp1bppp/p1np2n1/1p2p3/P2PP3/1BP2N2/1P3PPP/RNBQ1RK1 w kq - 1 2,Be7
+P3-086,P3,8/3k4/2R5/8/4K3/8/1R6/8 w - - 0 1,FEN after Rc7+?,8/2Rk4/8/8/4K3/8/1R6/8 b - - 1 1,Rc7+
+P3-087,P3,5k2/5p1p/8/2q5/5R2/8/6P1/5B1K b - - 0 1,FEN after Qa5?,5k2/5p1p/8/q7/5R2/8/6P1/5B1K w - - 1 2,Qa5
+P3-088,P3,r1b1r1k1/pp2Bpbp/2n3p1/1B1NP3/6n1/5N2/PP3PPP/3RK2R b K - 0 1,FEN after g5?,r1b1r1k1/pp2Bpbp/2n5/1B1NP1p1/6n1/5N2/PP3PPP/3RK2R w K - 0 2,g5
+P3-089,P3,2r3k1/5pp1/qp2p2p/3p4/2rPnB2/2P4P/PQR2PP1/2R3K1 b - - 0 1,FEN after Nd2?,2r3k1/5pp1/qp2p2p/3p4/2rP1B2/2P4P/PQRn1PP1/2R3K1 w - - 1 2,Nd2
+P3-090,P3,r1bqk1nr/1ppp1ppp/2n5/pB6/1b1PP3/5N2/PP1B1PPP/RN1QK2R b KQkq - 0 1,FEN after Nxd4?,r1bqk1nr/1ppp1ppp/8/pB6/1b1nP3/5N2/PP1B1PPP/RN1QK2R w KQkq - 0 2,Nxd4
+P3-091,P3,8/8/8/6p1/4q1Bk/7P/5PK1/8 w - - 0 1,FEN after Kf1?,8/8/8/6p1/4q1Bk/7P/5P2/5K2 b - - 1 1,Kf1
+P3-092,P3,r3r1k1/p1p2pp1/b6p/8/2q5/7P/PBP2PP1/R2QR1K1 b - - 0 1,FEN after Re6?,r5k1/p1p2pp1/b3r2p/8/2q5/7P/PBP2PP1/R2QR1K1 w - - 1 2,Re6
+P3-093,P3,8/6k1/5p2/p1p1p3/1p2P1pP/1P4P1/1PPK4/8 b - - 0 1,FEN after a4?,8/6k1/5p2/2p1p3/pp2P1pP/1P4P1/1PPK4/8 w - - 0 2,a4
+P3-094,P3,r1b1k2r/pp2bpp1/2p2n2/2n4p/3q3P/2NPN1P1/PP3PB1/R1BQ1RK1 w kq - 0 1,FEN after Ncd5?,r1b1k2r/pp2bpp1/2p2n2/2nN3p/3q3P/3PN1P1/PP3PB1/R1BQ1RK1 b kq - 1 1,Ncd5
+P3-095,P3,r1bqkr2/pp1p1p1p/2p5/8/2BnP3/2N3Q1/PPK2PPP/R6R w q - 0 1,FEN after Kd2?,r1bqkr2/pp1p1p1p/2p5/8/2BnP3/2N3Q1/PP1K1PPP/R6R b q - 1 1,Kd2
+P3-096,P3,r2qkb1r/pp1nppp1/2p2n1p/5b2/2BP4/4BP2/PPP1N2P/R2QK1NR b KQkq - 0 1,FEN after b5?,r2qkb1r/p2nppp1/2p2n1p/1p3b2/2BP4/4BP2/PPP1N2P/R2QK1NR w KQkq - 0 2,b5
+P3-097,P3,r1bq1rk1/2p2ppp/p7/3pN3/2pP2Q1/4bP2/PPP1N1PP/R4R1K w - - 0 1,FEN after Ng6?,r1bq1rk1/2p2ppp/p5N1/3p4/2pP2Q1/4bP2/PPP1N1PP/R4R1K b - - 1 1,Ng6
+P3-098,P3,r2qr1k1/3bbpp1/3p2np/p1pPp1n1/1pP1P3/PP2BN1P/RNBQ1PP1/4R1K1 w - - 0 1,FEN after axb4?,r2qr1k1/3bbpp1/3p2np/p1pPp1n1/1PP1P3/1P2BN1P/RNBQ1PP1/4R1K1 b - - 0 1,axb4
+P3-099,P3,r5rk/2p2p2/p2P3p/1p6/3b4/PB3q2/1P3P2/R3RK2 b - - 0 1,FEN after c6?,r5rk/5p2/p1pP3p/1p6/3b4/PB3q2/1P3P2/R3RK2 w - - 0 2,c6
+P3-100,P3,2k4r/2p1n3/1p3pp1/p6p/P4N1P/6P1/1PP2P2/2K4R b - - 0 1,FEN after Kd7?,7r/2pkn3/1p3pp1/p6p/P4N1P/6P1/1PP2P2/2K4R w - - 1 2,Kd7
+P3-101,P3,8/5p2/8/1p2kPPp/7P/8/pK1N4/8 w - - 0 1,FEN after Nb1?,8/5p2/8/1p2kPPp/7P/8/pK6/1N6 b - - 1 1,Nb1
+P3-102,P3,r1bqkbnr/pp3ppp/2npp3/2p5/8/2P1P1P1/PP1PNPBP/RNBQK2R b KQkq - 0 1,FEN after b5?,r1bqkbnr/p4ppp/2npp3/1pp5/8/2P1P1P1/PP1PNPBP/RNBQK2R w KQkq - 0 2,b5
+P3-103,P3,8/1k3p2/R5p1/P7/1K5P/8/5r2/8 b - - 0 1,FEN after Re2?,8/1k3p2/R5p1/P7/1K5P/8/4r3/8 w - - 1 2,Re2
+P3-104,P3,4r3/1p4pk/7p/p2b1P2/P1p1p3/2br3P/1P4PK/4QR2 w - - 0 1,FEN after Kg1?,4r3/1p4pk/7p/p2b1P2/P1p1p3/2br3P/1P4P1/4QRK1 b - - 1 1,Kg1
+P3-105,P3,r2qkb1r/pp1bnpp1/2n1p2p/1N1pP1B1/8/3B1N2/PP3PPP/R2Q1RK1 b kq - 0 1,FEN after f6?,r2qkb1r/pp1bn1p1/2n1pp1p/1N1pP1B1/8/3B1N2/PP3PPP/R2Q1RK1 w kq - 0 2,f6
+P3-106,P3,r2q1rk1/2p1bp1p/p5N1/np1p1B1Q/2nP4/2P4P/PP3PP1/R1B1R1K1 b - - 0 1,FEN after Kg7?,r2q1r2/2p1bpkp/p5N1/np1p1B1Q/2nP4/2P4P/PP3PP1/R1B1R1K1 w - - 1 2,Kg7
+P3-107,P3,3b4/8/2B2k2/p2R4/4p2P/4K3/r7/8 b - - 0 1,FEN after Ke6?,3b4/8/2B1k3/p2R4/4p2P/4K3/r7/8 w - - 1 2,Ke6
+P3-108,P3,8/8/1N3k2/8/2Q2K2/8/8/8 b - - 0 1,FEN after Ke7?,8/4k3/1N6/8/2Q2K2/8/8/8 w - - 1 2,Ke7
+P3-109,P3,r3r1k1/ppp1qpp1/2npbn1p/b3p3/4P3/1BNPBN1P/PPPQ1PP1/3RR1K1 w - - 0 1,FEN after Nd4?,r3r1k1/ppp1qpp1/2npbn1p/b3p3/3NP3/1BNPB2P/PPPQ1PP1/3RR1K1 b - - 1 1,Nd4
+P3-110,P3,r2rbk2/pN3p1p/2n1pp2/8/8/4P1P1/PP3PBP/R2R2K1 b - - 0 1,FEN after Rd6?,r3bk2/pN3p1p/2nrpp2/8/8/4P1P1/PP3PBP/R2R2K1 w - - 1 2,Rd6
+P3-111,P3,r2qk1nr/1ppnppbp/p2p2p1/8/2PPP1b1/2N1BN2/PP2BPPP/R2QK2R b KQkq - 0 1,FEN after h5?,r2qk1nr/1ppnppb1/p2p2p1/7p/2PPP1b1/2N1BN2/PP2BPPP/R2QK2R w KQkq - 0 2,h5
+P3-112,P3,7Q/1pp5/3p2k1/1P1N4/6q1/6P1/r3PP2/2K5 w - - 0 1,FEN after Qh6+?,8/1pp5/3p2kQ/1P1N4/6q1/6P1/r3PP2/2K5 b - - 1 1,Qh6+
+P3-113,P3,1r5k/5RR1/8/8/8/4B3/P1r5/K3n3 b - - 0 1,FEN after Ng2?,1r5k/5RR1/8/8/8/4B3/P1r3n1/K7 w - - 1 2,Ng2
+P3-114,P3,r2q1rk1/pb1nbNpp/1p2pn2/6B1/2BP4/2N5/PP3PPP/R2QR1K1 b - - 0 1,FEN after Nd5?,r2q1rk1/pb1nbNpp/1p2p3/3n2B1/2BP4/2N5/PP3PPP/R2QR1K1 w - - 1 2,Nd5
+P3-115,P3,r4rk1/2q1p2p/3p1npR/p2P2P1/1p6/5P2/PPPQ4/2KR1B2 b - - 0 1,FEN after Qc4?,r4rk1/4p2p/3p1npR/p2P2P1/1pq5/5P2/PPPQ4/2KR1B2 w - - 1 2,Qc4
+P3-116,P3,1k1r1b1r/ppp1qppp/2n2n2/3p4/3P1Bb1/2P1PN2/PP1N1PPP/R2QKB1R w KQ - 0 1,FEN after Rg1?,1k1r1b1r/ppp1qppp/2n2n2/3p4/3P1Bb1/2P1PN2/PP1N1PPP/R2QKBR1 b Q - 1 1,Rg1
+P3-117,P3,8/4k3/pp1pPppp/8/PPP2PPP/8/8/5K2 b - - 0 1,FEN after b5?,8/4k3/p2pPppp/1p6/PPP2PPP/8/8/5K2 w - - 0 2,b5
+P3-118,P3,r1b2r2/ppq2pk1/4p1p1/7p/4N3/2P3P1/P2n1P1b/RN3K2 w - - 0 1,FEN after Ke1?,r1b2r2/ppq2pk1/4p1p1/7p/4N3/2P3P1/P2n1P1b/RN2K3 b - - 1 1,Ke1
+P3-119,P3,r1b2r1k/bpp3pn/p1np1q1p/3B4/2PPNNp1/4B2P/PP3P1K/R2Q1R2 b - - 0 1,FEN after Qh4?,r1b2r1k/bpp3pn/p1np3p/3B4/2PPNNpq/4B2P/PP3P1K/R2Q1R2 w - - 1 2,Qh4
+P3-120,P3,rnbq1rk1/4ppbp/p2p1np1/1PpP2B1/P3P3/2N5/1P2BPPP/R2QK1NR b KQ - 0 1,FEN after a5?,rnbq1rk1/4ppbp/3p1np1/pPpP2B1/P3P3/2N5/1P2BPPP/R2QK1NR w KQ - 0 2,a5
+P3-121,P3,rnbqk1nr/pp2bppp/8/2ppP3/4Q3/5N2/PPP2PPP/RNB1KB1R w KQkq - 0 1,FEN after Qd3?,rnbqk1nr/pp2bppp/8/2ppP3/8/3Q1N2/PPP2PPP/RNB1KB1R b KQkq - 1 1,Qd3
+P3-122,P3,8/4k3/7p/1p1B2pP/p2K2P1/2p5/2P5/8 w - - 0 1,FEN after Ba2?,8/4k3/7p/1p4pP/p2K2P1/2p5/B1P5/8 b - - 1 1,Ba2
+P3-123,P3,6k1/3R4/4P3/1p2B3/1P5n/P7/5P2/5K2 b - - 0 1,FEN after Nf5?,6k1/3R4/4P3/1p2Bn2/1P6/P7/5P2/5K2 w - - 1 2,Nf5
+P3-124,P3,Bn1k1b1r/2p1q1pp/3nP3/1p1Q2p1/3P4/8/PPP3PP/2KR1R2 w - - 0 1,FEN after h3?,Bn1k1b1r/2p1q1pp/3nP3/1p1Q2p1/3P4/7P/PPP3P1/2KR1R2 b - - 0 1,h3
+P4-000,P4,7R/P6k/8/5r1p/5P1K/8/8/8 b - - 0 1,Is the side to move in check?,"yes, by Rh8",""
+P4-001,P4,r2qk2r/1p1n1pp1/p1p1pb1p/4N2P/3P2Q1/8/PPPB1PP1/1K1RR3 b k - 0 1,Is the side to move in check?,no,""
+P4-002,P4,8/1K2q3/8/3Q4/8/8/6p1/7k w - - 0 1,Is the side to move in check?,"yes, by Qe7",""
+P4-003,P4,r1r5/4ppkp/p2p2p1/1p1P1b2/2P5/1P3P2/P2KB1PP/2R4R b - - 0 1,Is the side to move in check?,no,""
+P4-004,P4,8/6k1/3rp1pp/5p2/6KP/4R1P1/5P2/8 w - - 0 1,Is the side to move in check?,"yes, by f5",""
+P4-005,P4,r1b1kb1r/ppqp1ppp/5n2/2p1p3/2PnP3/P4N2/1PQP1PPP/RNB1KB1R w KQkq - 0 1,Is the side to move in check?,no,""
+P4-006,P4,5r2/2k5/3bp2p/PR4p1/1P4B1/2P5/6P1/R4r1K w - - 0 1,Is the side to move in check?,"yes, by Rf1",""
+P4-007,P4,1n3rk1/5ppp/2q1p1b1/1pp5/6Q1/3P2P1/2P2P1P/R1B1R1K1 w - - 0 1,Is the side to move in check?,no,""
+P4-008,P4,6Q1/8/7K/8/5p2/1k6/5P2/q7 b - - 0 1,Is the side to move in check?,"yes, by Qg8",""
+P4-009,P4,8/4Q2p/6rk/5K2/8/8/8/8 w - - 0 1,Is the side to move in check?,no,""
+P4-010,P4,rn1qkb1r/ppn1pppp/2B5/2p5/2Q5/2N3P1/PP1PPP1P/R1B1K1NR b KQkq - 0 1,Is the side to move in check?,"yes, by Bc6",""
+P4-011,P4,2rqk2r/pp1b1ppp/2n1p3/1B1pPn2/3P4/P1P2N2/5PPP/R1BQR1K1 b k - 0 1,Is the side to move in check?,no,""
+P4-012,P4,8/6pk/1Q6/4bp1b/8/PB1r1PK1/1P5R/8 w - - 0 1,Is the side to move in check?,"yes, by Be5",""
+P4-013,P4,8/8/4pk2/1R6/8/r5PK/8/8 w - - 0 1,Is the side to move in check?,no,""
+P4-014,P4,5B1k/6Pp/4N3/5nP1/8/8/K4p2/8 b - - 0 1,Is the side to move in check?,"yes, by g7",""
+P4-015,P4,2rr2k1/3qn1p1/p3b2p/1pRpPp2/1P5P/P2Q2P1/5PBN/2R3K1 b - - 0 1,Is the side to move in check?,no,""
+P4-016,P4,8/R2k4/8/1b1K4/p7/1r6/8/8 b - - 0 1,Is the side to move in check?,"yes, by Ra7",""
+P4-017,P4,r1bqkb1r/pppn2pp/4p2n/1B1p1p2/3PP3/2N2N2/PPP2PPP/R1BQK2R b KQkq - 0 1,Is the side to move in check?,no,""
+P4-018,P4,rnbq1bnr/pp2k1pp/8/2ppQ3/8/1P2P3/PBPP1PPP/RN2KB1R b KQ - 0 1,Is the side to move in check?,"yes, by Qe5",""
+P4-019,P4,r1b1kbnr/p3pppp/2pp4/8/2P5/8/PP2PPPP/RNB1KB1R w KQkq - 0 1,Is the side to move in check?,no,""
+P4-020,P4,2b1k3/p2q1r1p/4Q1p1/2p3P1/B4P2/8/PP5P/6K1 b - - 0 1,Is the side to move in check?,"yes, by Qe6",""
+P4-021,P4,rnb1kb1r/p4ppp/2p5/q3p3/P1pPn2B/1pN1PN2/1P3PPP/R2QKB1R w KQkq - 0 1,Is the side to move in check?,no,""
+P4-022,P4,r4k2/5P1N/2n1p1pP/3pq3/2b2Q2/6PB/1P3P1K/8 b - - 0 1,Is the side to move in check?,"yes, by Nh7",""
+P4-023,P4,r2q1rk1/pp2pp1p/6p1/2P5/6b1/B1bB1N2/P4PPP/R2QR1K1 b - - 0 1,Is the side to move in check?,no,""
+P4-024,P4,rn2kb1r/pp2pppp/5n2/qN1p4/3p1B2/4P3/PPP1QPPP/R3K1NR w KQkq - 0 1,Is the side to move in check?,"yes, by Qa5",""
+P4-025,P4,r2qk2r/p1ppbppp/1pn5/3Q4/8/P5N1/1PP2PPP/R1B2RK1 w kq - 0 1,Is the side to move in check?,no,""
+P4-026,P4,8/k7/q7/8/4R3/3K4/8/6R1 w - - 0 1,Is the side to move in check?,"yes, by Qa6",""
+P4-027,P4,rnbqkb1r/p4ppp/2p1pn2/1p1p4/3P1B2/2NQ1N2/PPP1PPPP/2KR1B1R b kq - 0 1,Is the side to move in check?,no,""
+P4-028,P4,2Q3k1/1p3p2/6rp/p1pP2q1/2Pp1p2/5P2/PP2R1P1/6K1 b - - 0 1,Is the side to move in check?,"yes, by Qc8",""
+P4-029,P4,3r4/p4pk1/2r5/4R2p/1q2P1b1/1N2Q3/PP6/1K2R3 w - - 0 1,Is the side to move in check?,no,""
+P4-030,P4,6k1/1qbb1ppp/4pn2/1nPp4/1P1P4/1QBB1N1P/3N1PP1/r5K1 w - - 0 1,Is the side to move in check?,"yes, by Ra1",""
+P4-031,P4,r4rk1/pp2pp1p/1nb3p1/4P3/8/4NNP1/Pb1R1PBP/4R1K1 b - - 0 1,Is the side to move in check?,no,""
+P4-032,P4,2r2r1k/1b4Qq/p3pn1P/1p2ppR1/4P3/1PbB4/PBP2P2/1K5R b - - 0 1,Is the side to move in check?,"yes, by Qg7",""
+P4-033,P4,rR2r1k1/2Pp1p1p/p1b1p1p1/1n6/8/8/P4PPP/1R4K1 w - - 0 1,Is the side to move in check?,no,""
+P4-034,P4,1r1q3k/b1r4Q/4pN1P/pp1pN3/3n4/2P5/PP4P1/3R1RK1 b - - 0 1,Is the side to move in check?,"yes, by Qh7",""
+P4-035,P4,2r1r1k1/1bqnppbp/pp1p1np1/8/P2NP2B/2P5/1PQN1PPP/R3RBK1 b - - 0 1,Is the side to move in check?,no,""
+P4-036,P4,5k2/5pp1/ppq4p/8/1P3R2/1Q4P1/P4NKP/2r5 w - - 0 1,Is the side to move in check?,"yes, by Qc6",""
+P4-037,P4,2kr2nr/1ppq1ppp/p1n1p3/1B6/P2P1B2/2P2P2/5PPP/R2Q1RK1 w - - 0 1,Is the side to move in check?,no,""
+P4-038,P4,5Q2/8/8/3P4/P2q1k1r/KB6/1P6/8 b - - 0 1,Is the side to move in check?,"yes, by Qf8",""
+P4-039,P4,r1bqkb1r/pp3pp1/2n1pn1p/3p4/3P4/1B3N2/PPP2PPP/RNBQ1RK1 w kq - 0 1,Is the side to move in check?,no,""
+P4-040,P4,r1b1k2r/pp1pN2p/3Pn1p1/5p2/2pnK2Q/1qR2N2/4PPPP/5B1R w kq - 0 1,Is the side to move in check?,"yes, by f5",""
+P4-041,P4,5rk1/pb2qnp1/1p2pn1p/3p4/1P1P4/P2BNN2/4QPPP/4R1K1 b - - 0 1,Is the side to move in check?,no,""
+P4-042,P4,rnb1kbnr/pp2qppp/2p5/3p4/3P4/1B6/PPP2PPP/RNBQK1NR w KQkq - 0 1,Is the side to move in check?,"yes, by Qe7",""
+P4-043,P4,4r2k/5Qp1/4pn2/7p/2P5/5P2/5P1P/5K2 w - - 0 1,Is the side to move in check?,no,""
+P4-044,P4,k7/2K5/8/4b3/8/5R2/8/8 w - - 0 1,Is the side to move in check?,"yes, by Be5",""
+P4-045,P4,2k5/2p2p1p/2p5/p7/Pr3P2/2K4P/2PB2P1/8 b - - 0 1,Is the side to move in check?,no,""
+P4-046,P4,8/r4p2/6p1/2R2k1p/4p2P/4K1P1/5P2/8 b - - 0 1,Is the side to move in check?,"yes, by Rc5",""
+P4-047,P4,1r6/1q2bkp1/p5p1/2prp3/2p2P2/2P1B3/PP5Q/K5RR b - - 0 1,Is the side to move in check?,no,""
+P4-048,P4,3rk2r/ppp2ppp/2p5/5b2/2B1n3/2P2P2/P1P3PP/R1BKR3 w k - 0 1,Is the side to move in check?,"yes, by Rd8",""
+P4-049,P4,3b4/5pk1/R2P2p1/2p4r/P1NpP3/3P2K1/7P/8 b - - 0 1,Is the side to move in check?,no,""
+P4-050,P4,8/4k1p1/4bP2/3B4/1pK2P1P/8/8/8 b - - 0 1,Is the side to move in check?,"yes, by f6",""
+P4-051,P4,r1bqkbnr/5ppp/ppn1p3/2p1P3/2pP4/2N1BN2/PP3PPP/R2QKB1R w KQkq - 0 1,Is the side to move in check?,no,""
+P4-052,P4,5r1k/3PqN1p/p5p1/2pQ4/3b4/1P4P1/P4P1P/3R2K1 b - - 0 1,Is the side to move in check?,"yes, by Nf7",""
+P4-053,P4,2r5/5kpp/4p3/4P3/5PP1/1K6/3q3P/8 w - - 0 1,Is the side to move in check?,no,""
+P4-054,P4,5k2/7R/8/5K2/p1p5/P7/2b5/8 w - - 0 1,Is the side to move in check?,"yes, by Bc2",""
+P4-055,P4,2kr1b2/p4pp1/2p4r/N1P2b2/7p/P5P1/1Q3PBP/3R2K1 b - - 0 1,Is the side to move in check?,no,""
+P4-056,P4,6k1/5p2/5n2/4Q1bP/4KpP1/8/8/8 w - - 0 1,Is the side to move in check?,"yes, by Nf6",""
+P4-057,P4,2kr1b1r/ppp2q2/3p1Nnp/3P2p1/8/3QB2P/PPP2PP1/R3K2R w KQ - 0 1,Is the side to move in check?,no,""
+P4-058,P4,8/8/6p1/5k1p/3rp2P/5KP1/8/4R3 w - - 0 1,Is the side to move in check?,"yes, by e4",""
+P4-059,P4,5R2/8/P7/4k2r/4p3/8/3bK3/8 w - - 0 1,Is the side to move in check?,no,""
+P4-060,P4,3Q1k2/p4r1r/1p2p3/3bNp1P/8/P3KP2/1P4P1/8 b - - 0 1,Is the side to move in check?,"yes, by Qd8",""
+P4-061,P4,r1bqkb1r/pp2pppp/3p1n2/8/4nB2/2N2N2/PPP2PPP/R2QKB1R w KQkq - 0 1,Is the side to move in check?,no,""
+P4-062,P4,2R5/5p2/4p3/3pP3/1k3Pp1/1N4r1/8/1R3K1r w - - 0 1,Is the side to move in check?,"yes, by Rh1",""
+P4-063,P4,r2q1k2/1pp1n3/p2pP1p1/5pp1/2B5/7P/PP1Q1P1P/4R1K1 w - - 0 1,Is the side to move in check?,no,""
+P4-064,P4,r6r/p1R1k2p/1p4b1/2p1pp2/8/1PPPK3/1P5P/R1N5 b - - 0 1,Is the side to move in check?,"yes, by Rc7",""
+P4-065,P4,1kr2r2/1p1n4/p2p2qp/3Pp3/PPP5/2R1R1pP/1B1Q1Pp1/6K1 w - - 0 1,Is the side to move in check?,no,""
+P4-066,P4,6k1/8/6Q1/3q2P1/5P1K/8/8/8 b - - 0 1,Is the side to move in check?,"yes, by Qg6",""
+P4-067,P4,3k4/7R/2K5/3P4/3r4/8/8/8 w - - 0 1,Is the side to move in check?,no,""
+P4-068,P4,6k1/pb3ppp/3p4/1Np5/B1P1n1PQ/P5KP/5P2/r7 w - - 0 1,Is the side to move in check?,"yes, by Ne4",""
+P4-069,P4,3R1bk1/5p1p/p3pp2/1p6/1P3N2/P1r3P1/4PP1P/6K1 b - - 0 1,Is the side to move in check?,no,""
+P4-070,P4,r1bqkb1r/ppp2pp1/2B4p/2n1P3/8/5N2/PPP2PPP/RNBQ1RK1 b kq - 0 1,Is the side to move in check?,"yes, by Bc6",""
+P4-071,P4,8/q1P5/8/8/pQ6/p4p1K/p1Pbpk1N/R7 w - - 0 1,Is the side to move in check?,no,""
+P4-072,P4,r1b1kb1r/1p2pppp/p1n2n2/q1pp4/N2P1B2/4PN1P/PPP2PP1/R2QKB1R w KQkq - 0 1,Is the side to move in check?,"yes, by Qa5",""
+P4-073,P4,rnbqk2r/ppp1ppb1/6pp/8/3PQ2B/8/PPP1PPPP/R3KBNR w KQkq - 0 1,Is the side to move in check?,no,""
+P4-074,P4,8/8/8/2kB4/3BK3/8/8/8 b - - 0 1,Is the side to move in check?,"yes, by Bd4",""
+P4-075,P4,3rr1k1/1ppqbpp1/p1n1b2p/8/3P4/P2QBN1P/1P2BPP1/R4RK1 w - - 0 1,Is the side to move in check?,no,""
+P4-076,P4,8/8/8/2R5/1R6/4K3/2k5/8 b - - 0 1,Is the side to move in check?,"yes, by Rc5",""
+P4-077,P4,8/8/6K1/8/5k2/8/6p1/8 w - - 0 1,Is the side to move in check?,no,""
+P4-078,P4,r1bq1r2/pp2nppk/2n1p3/3pP1N1/1b1P4/8/PP1N1PPP/R1BQK2R b KQ - 0 1,Is the side to move in check?,"yes, by Ng5",""
+P4-079,P4,2k2b1r/Q1p2ppp/p7/1p4q1/3N1n2/2P1BP2/PP6/R3RK2 b - - 0 1,Is the side to move in check?,no,""
+P4-080,P4,3Q2k1/6pp/8/8/p7/4N3/Pn3BPP/5RK1 b - - 0 1,Is the side to move in check?,"yes, by Qd8",""
+P4-081,P4,r2q1rk1/1ppbbppp/2n2n2/p3p1B1/2Q5/2NP1NP1/PP2PPBP/R4RK1 b - - 0 1,Is the side to move in check?,no,""
+P4-082,P4,8/4n3/8/R3k1p1/6P1/5K2/5P2/8 b - - 0 1,Is the side to move in check?,"yes, by Ra5",""
+P4-083,P4,r1bqkb1r/1ppp1ppp/2n5/p3P3/2P1n3/P4N2/1PQ1PPPP/RNB1KB1R b KQkq - 0 1,Is the side to move in check?,no,""
+P4-084,P4,8/8/B7/P1p5/2P2k2/5pp1/5K2/8 w - - 0 1,Is the side to move in check?,"yes, by g3",""
+P4-085,P4,5r2/2p1rp1k/6np/1p1Pp3/p3PpB1/3P3P/PP4P1/2R2RK1 w - - 0 1,Is the side to move in check?,no,""
+P4-086,P4,5r2/r1qnb3/bp2R2k/2p5/p1Pp2QP/3P2P1/PP3PB1/3R2K1 b - - 0 1,Is the side to move in check?,"yes, by Re6",""
+P4-087,P4,r1b1kbnr/4p2p/p1qp2p1/1pp2p2/4PP2/2NP1N2/PPP3PP/R1B1QRK1 w kq - 0 1,Is the side to move in check?,no,""
+P4-088,P4,8/8/5Pp1/6k1/8/r5K1/5R2/8 w - - 0 1,Is the side to move in check?,"yes, by Ra3",""
+P4-089,P4,rnbq1b2/pppkp1pQ/8/3p4/3P2n1/8/PPP1PP2/RNB1KBN1 b Q - 0 1,Is the side to move in check?,no,""
+P4-090,P4,5r2/4Q1k1/6Pp/3p3r/pp1Pp3/1q2P2P/5P2/6RK b - - 0 1,Is the side to move in check?,"yes, by Qe7",""
+P4-091,P4,8/7p/p5p1/1p6/P1pK4/1k5P/1P6/3N4 w - - 0 1,Is the side to move in check?,no,""
+P4-092,P4,rn3r2/1p6/p1pq1k1Q/6p1/2P2p2/8/PP3PP1/2K1R3 b - - 0 1,Is the side to move in check?,"yes, by Qh6",""
+P4-093,P4,8/8/8/8/1Q2p3/p7/k2K4/8 b - - 0 1,Is the side to move in check?,no,""
+P4-094,P4,r4bnr/pp1k1pp1/n3P1p1/2p5/2P3P1/P6P/1P2BP2/RNB1K2R b KQ - 0 1,Is the side to move in check?,"yes, by e6",""
+P4-095,P4,r3r1k1/6p1/5p1p/pN1n4/P7/1PPP3q/3K1P2/R1BQR3 b - - 0 1,Is the side to move in check?,no,""
+P4-096,P4,r1b2rk1/pppnqppB/4p3/3pP3/8/2P1P1P1/PP1N1PP1/R2QK2R b KQ - 0 1,Is the side to move in check?,"yes, by Bh7",""
+P4-097,P4,rnbqk2r/pp3pbp/3p2p1/3p4/3P1B2/2P2N2/PP3PPP/R2QKB1R b KQkq - 0 1,Is the side to move in check?,no,""
+P4-098,P4,2R3k1/5p2/5p1p/3P1Pp1/1pP2n2/1P2r2P/1BB2b1K/8 b - - 0 1,Is the side to move in check?,"yes, by Rc8",""
+P4-099,P4,8/8/6p1/p1p1kpp1/P1P5/1P1p1P1P/3K1bP1/8 w - - 0 1,Is the side to move in check?,no,""
+P4-100,P4,5n2/4Q3/3N2Pp/1p1pkP2/8/8/6PK/8 b - - 0 1,Is the side to move in check?,"yes, by Qe7",""
+P4-101,P4,rn1q1rk1/pp1b1pbp/3p1np1/2pP4/7N/2N3P1/PP2PPBP/R1BQ1RK1 w - - 0 1,Is the side to move in check?,no,""
+P4-102,P4,3r4/pp4k1/4N1q1/2Pp1r1p/7K/4B3/PP2P3/R1Q3RB b - - 0 1,Is the side to move in check?,"yes, by Ne6",""
+P4-103,P4,4k3/R3P3/8/3K4/8/8/8/1r6 w - - 0 1,Is the side to move in check?,no,""
+P4-104,P4,7k/2R3p1/p4p2/7p/5P2/1K2r3/PP4PP/8 w - - 0 1,Is the side to move in check?,"yes, by Re3",""
+P4-105,P4,r1b1kn1r/ppq1bp2/2p2n1p/4N1p1/2B1P3/2N1B3/PPP1QPPP/3R1RK1 b kq - 0 1,Is the side to move in check?,no,""
+P4-106,P4,r2qk2r/ppp2ppp/4p1b1/4n1Pn/B3P3/2P2P2/P2P2QP/R1B1K1NR b KQkq - 0 1,Is the side to move in check?,"yes, by Ba4",""
+P4-107,P4,2k2b1r/p1p2p1p/2p2n2/6p1/3r4/P2N1P2/1PP2P1P/R1B1R1K1 b - - 0 1,Is the side to move in check?,no,""
+P4-108,P4,r1bqk1nr/ppp2ppp/2n5/3pP3/3P1B2/2b2N2/PPP3PP/R2QKB1R w KQkq - 0 1,Is the side to move in check?,"yes, by Bc3",""
+P4-109,P4,1k1r4/4bp1r/2b2p2/p1p1pP1p/1p2P3/5BN1/PPPR2PP/1KR5 w - - 0 1,Is the side to move in check?,no,""
+P4-110,P4,R5k1/1p2r1p1/2p5/1nN2p1p/3PpP2/4P3/5KPP/8 b - - 0 1,Is the side to move in check?,"yes, by Ra8",""
+P4-111,P4,r3k2r/1bpqnpb1/pn2p1pp/3pP3/1p1PNPP1/3BBN2/PPP1Q2P/2KR1R2 w kq - 0 1,Is the side to move in check?,no,""
+P4-112,P4,5b2/2p5/4k1P1/5P2/pp1P3N/3K4/P7/8 b - - 0 1,Is the side to move in check?,"yes, by f5",""
+P4-113,P4,R7/P5k1/8/8/8/8/K7/7r w - - 0 1,Is the side to move in check?,no,""
+P4-114,P4,r4r1k/1Q3BpR/p2p1b2/8/5q2/8/PPP3P1/1K1R4 b - - 0 1,Is the side to move in check?,"yes, by Rh7",""
+P4-115,P4,r2r2k1/1pq3pp/p1nnbp2/2B5/8/5N2/PP2QPPP/R2R2K1 w - - 0 1,Is the side to move in check?,no,""
+P4-116,P4,7k/8/6Q1/8/8/5r1K/8/8 w - - 0 1,Is the side to move in check?,"yes, by Rf3",""
+P4-117,P4,rn1qkb1r/pp1b1ppp/4pn2/2pP4/Q1P5/5N2/PP3PPP/RNB1KB1R w KQkq - 0 1,Is the side to move in check?,no,""
+P4-118,P4,r5k1/1b2Q2p/2p1p1p1/3p4/6P1/1P3P2/2P4P/q2KR3 w - - 0 1,Is the side to move in check?,"yes, by Qa1",""
+P4-119,P4,8/5k2/2B5/B3K3/8/8/8/8 w - - 0 1,Is the side to move in check?,no,""
+P4-120,P4,8/6k1/6p1/pR6/6Pp/5p2/PP3PK1/8 w - - 0 1,Is the side to move in check?,"yes, by f3",""
+P4-121,P4,r1bqkbnr/pp1ppp1p/2n3p1/2p4Q/4P3/7P/PPPP1PP1/RNB1KBNR w KQkq - 0 1,Is the side to move in check?,no,""
+P4-122,P4,r4r2/p3bpk1/4pn1R/2p3R1/3P4/1P3qP1/PBQ2P1P/6K1 b - - 0 1,Is the side to move in check?,"yes, by Rg5",""
+P4-123,P4,3rr3/1ppk1ppp/1q6/3n4/4P3/5PB1/4Q1PP/R1R4K w - - 0 1,Is the side to move in check?,no,""
+P4-124,P4,5Q1k/6b1/8/8/8/4B3/5P2/2K5 b - - 0 1,Is the side to move in check?,"yes, by Qf8",""

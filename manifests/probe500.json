@@ -1,0 +1,20 @@
+{
+  "name": "probe500",
+  "data_version": "v1",
+  "outputs": [
+    "evals/sets/probe500.csv"
+  ],
+  "sha256": "79dba6d41b40da1dee86d764bed6d6e8f0f28dc5af1f6964dd9314355032595a",
+  "fingerprint": "e13c62218456cdd6eff3c469f40d270d2958e4cbded5cd1befbcb8eea7879f09",
+  "git_sha": "8f12a34ee9df-dirty",
+  "built_at": "2026-10-21T14:13:22+00:00",
+  "seed": 2026,
+  "rows": 500,
+  "per_task": {
+    "P1": 125,
+    "P2": 125,
+    "P3": 125,
+    "P4": 125
+  },
+  "p4_in_check": 63
+}

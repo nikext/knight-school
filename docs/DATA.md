@@ -31,14 +31,18 @@ OpeningTags, DailyDate`. Notes:
 
 - The FEN has only 4 fields (no move counters). Append ` 0 1` before parsing.
 - `line` is in **UCI_Chess960** format, so castling is king-takes-rook
-  (`e1h1`). Parse it with `chess.Board(fen, chess960=True)` and emit SAN.
-  Unit-test this, because it is an easy bug.
+  (`e1h1`; seen in the stream on 2026-10-21). `ks.chess.board.pv_to_san`
+  parses it with `chess.Board(fen, chess960=True)` and emits SAN. A
+  standard `e1g1` in a PV is rejected, not silently misread (unit-tested).
 - Take the evaluation with the highest depth and its first PV. `cp` and
-  `mate` are from White's point of view (verify), so convert them to the side
-  to move.
-- The file is huge. **Stream it** (`curl | zstd -dc`) and stop early. Don't
-  download all of it. Reservoir-sample over the first ~30M lines and record
-  the seed and line count in the manifest, since the file order may be biased.
+  `mate` are from White's point of view (verified 2026-10-21: in Black-to-move
+  positions the PVs are sorted by ascending cp), so `ks.data.evaldb` flips
+  them to the side to move.
+- The file is huge (22.4 GB compressed, 2026-10-02 export). **Stream it** and
+  stop early. M1 keeps a 2M-position reservoir sample (Algorithm R, seed
+  2026) of the first 30M lines in `data/evaldb/sample.parquet`; the
+  manifest records the seed, the lines read and the file's Last-Modified.
+  Streaming runs at about 4.5 MB/s, so this takes 20–30 min.
 
 ## 2. Puzzle filtering
 
@@ -73,19 +77,24 @@ solver position, whose target is the solution's 2nd move. Apply the target
 and the opponent's reply to get the next position, and so on.
 
 Each record: `puzzle_id, ply, fen, legal_san[], solution_san, solution_uci,
-is_last, rating, themes`. `legal_san` is sorted the way the prompt shows it
-(alphabetical SAN; decide once, test it, never change it).
+is_last, rating, themes`. `legal_san` is sorted the way the prompt shows it. **Frozen in M1:** plain
+code-point order of the SAN strings (`ks.chess.board.sort_san`), so piece
+moves come first (`B…, K…, N…, O-O, Q…, R…`) and pawn moves last
+(`a3, exd5, …`). `fen` is python-chess's `board.fen()`, which writes the ep
+square only when an ep capture is legal. `ply` is the solution move's index in
+`Moves` (1, 3, 5, 7).
 
 - **Move accuracy** is scored per position.
 - **Solve rate** is scored per puzzle. The model must find every solver move,
   with the opponent's replies taken from the solution, and any mate accepted
-  on the last move.
+  on the last move (`ks.chess.board.solver_move_ok`, unit-tested).
 
 ## 5. Contamination filter
 
 - **Key:** `board.epd(en_passant="legal")`, i.e. piece placement, side to
-  move, castling, and the ep square only if an ep capture is legal (verify the
-  python-chess API).
+  move, castling, and the ep square only if an ep capture is legal (verified
+  on python-chess 1.11.2, `ks.chess.board.key`, unit-tested). Move counters
+  are not part of the key.
 - **Blocklist:** every position along every line of `test2000`, `dev500` and
   `probe500` (pre-move, post-opponent-move and later plies). Write it to
   `evals/sets/blocklist.epd.txt`, sorted and committed. The eval puzzles'
@@ -98,21 +107,27 @@ is_last, rating, themes`. `legal_san` is sorted the way the prompt shows it
 
 ## 6. Stockfish reward tables (for `rl_train`)
 
-- **Stockfish:** the latest official release, a native binary installed to
-  `~/.local/bin/stockfish` in M1, with its version recorded in every
-  manifest. Chess-lab uses Stockfish 19 (WASM). Use the same major version if
-  it is still current.
+- **Stockfish:** **Stockfish 19** (`sf_19`, released 2026-09-05), the same
+  major version as chess-lab. From 19 on, the release ships one "universal"
+  x86-64 binary that picks AVX2/BMI2/AVX-512 code at runtime, so there is no
+  per-CPU build to choose. `stockfish-linux-x86-64-universal.tar.gz`, sha256
+  `9defc0d4…e03611f` (matches GitHub's asset digest), installed to
+  `~/.local/bin/stockfish` (binary sha256 `0f83d24c…4c12da19`). NNUE
+  `nn-1a298aa575a0.nnue`. The version string is in every manifest.
 - **Settings per position:** `Threads=1`, `Hash=64`,
-  `MultiPV = number of legal moves` (Stockfish caps MultiPV at 256 and no
-  position has more than 218 legal moves; verify the cap), and
-  `go nodes N`. Run 18 worker processes, leaving 2 threads for the desktop.
-  It must be resumable (write in shards).
+  `MultiPV = number of legal moves` (Stockfish 19's MultiPV max is 256,
+  verified from the `uci` option list; no position has more than 218 legal
+  moves), `go nodes N`, and a `ucinewgame` before every position (python-chess
+  `game=object()`), which clears the hash so a table is reproducible. Run 18
+  worker processes, leaving 2 threads for the desktop. Shards of 250
+  positions are written atomically, so a run resumes where it stopped.
 - **Choosing N:** time 200 positions at N ∈ {100k, 300k, 1M}, then pick the
   largest N that finishes 60k positions in ≤ 4 h. Also check how stable the
   top-move ranking is between the N values.
 - **Win probability** (Lichess formula), side to move:
-  `wp = 0.5 + 0.5 * (2 / (1 + exp(-0.00368208 * cp)) - 1)`. Mate for the
-  side to move gives `wp = 1`, mate against gives `0`.
+  `wp = 0.5 + 0.5 * (2 / (1 + exp(-0.00368208 * cp)) - 1)`, with `cp`
+  clamped to ±1000 first, as lila does. Mate for the side to move gives
+  `wp = 1`, mate against gives `0`.
 - **Store per position:** key, fen, legal_san[], solution_san, wp[] and
   cp_or_mate[] aligned with legal_san, sf_best_san, nodes, sf_version.
 - **Data-quality stat:** the share of positions where Stockfish's top move is

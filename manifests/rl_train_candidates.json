@@ -1,0 +1,20 @@
+{
+  "name": "rl_train_candidates",
+  "data_version": "v1",
+  "outputs": [
+    "data/splits/rl_train_puzzles.parquet",
+    "data/splits/primer_pool.parquet",
+    "data/positions/rl_train_candidates.parquet"
+  ],
+  "sha256": "8871188bfc4d4c37d4e2b76e58004aefa5d7f8924ed814ea2a0a101c90038e7b",
+  "fingerprint": "47e8487f5a1ff3a9bd4fb215f9dad16e2cc7c644e43f305fbb6e8f47025342fe",
+  "git_sha": "8f12a34ee9df-dirty",
+  "built_at": "2026-10-21T14:13:45+00:00",
+  "rl_train_puzzles": 29929,
+  "rl_train_positions": 66009,
+  "primer_pool_puzzles": 3281538,
+  "eval_games_removed": 2500,
+  "contamination_hits": 0,
+  "blocklist_hits_dropped": 1,
+  "duplicates_dropped": 13
+}

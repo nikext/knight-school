@@ -1,0 +1,68 @@
+{
+  "name": "puzzles",
+  "data_version": "v1",
+  "outputs": [
+    "data/puzzles/filtered.parquet",
+    "evals/sets/test2000.csv",
+    "evals/sets/dev500.csv",
+    "evals/sets/test500.ids"
+  ],
+  "sha256": "a7ec33f97ddf765814752f07d53f4aaea037e2d7654f31e92cba0fabad590263",
+  "fingerprint": "fc41b550f28a70e6ac49175707f96b0fc6aabe0a92cf5f2afa250ba79b008503",
+  "git_sha": "8f12a34ee9df-dirty",
+  "built_at": "2026-10-21T14:13:20+00:00",
+  "source": "https://database.lichess.org/lichess_db_puzzle.csv.zst",
+  "raw_sha256": "76335bfa7d7c4a7f93c1366d81549e53951ebb79dd43d34904cab8f22d962f8d",
+  "seed": 2026,
+  "filter_counts": {
+    "downloaded": 6157341,
+    "NbPlays >= 200": 4024575,
+    "RatingDeviation <= 90": 3383515,
+    "Popularity >= 50": 3375981,
+    "400 <= Rating <= 2800": 3375110,
+    "<= 4 solver moves": 3313967
+  },
+  "rows": 3313967,
+  "games": 3313967,
+  "eval_sets": {
+    "test2000": {
+      "puzzles": 2000,
+      "games": 2000
+    },
+    "dev500": {
+      "puzzles": 500,
+      "games": 500
+    }
+  },
+  "eval_per_bin": {
+    "test2000": [
+      167,
+      167,
+      167,
+      167,
+      167,
+      167,
+      167,
+      167,
+      166,
+      166,
+      166,
+      166
+    ],
+    "dev500": [
+      42,
+      42,
+      42,
+      42,
+      42,
+      42,
+      42,
+      42,
+      41,
+      41,
+      41,
+      41
+    ]
+  },
+  "test500": 500
+}

@@ -1,0 +1,19 @@
+{
+  "name": "blocklist",
+  "data_version": "v1",
+  "outputs": [
+    "evals/sets/blocklist.epd.txt",
+    "evals/sets/blocklist.games.txt"
+  ],
+  "sha256": "c1063fbc91808759eb2151670aa5f05e08c88fab0346149eaff40d9d7c87d322",
+  "fingerprint": "d6fc6bceaab07fba795d269f08ef3b27ff19f65230ea2f72f80b0c337c5ec67d",
+  "git_sha": "8f12a34ee9df-dirty",
+  "built_at": "2026-10-21T14:13:22+00:00",
+  "keys": 14819,
+  "games": 2500,
+  "keys_per_set": {
+    "test2000": 11368,
+    "dev500": 2826,
+    "probe500": 625
+  }
+}

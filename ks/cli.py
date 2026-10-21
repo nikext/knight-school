@@ -163,6 +163,21 @@ def charge(
     typer.echo(f"ledger: charge {id} ${usd:.4f} to {pool}/{milestone}")
 
 
+@app.command()
+def data(
+    steps: Annotated[list[str] | None, typer.Argument(help="Steps to run; default: all.")] = None,
+    force: Annotated[bool, typer.Option("--force", help="Rebuild even if unchanged.")] = False,
+) -> None:
+    """Build the M1 datasets (DATA.md). Steps whose inputs and code are unchanged are skipped."""
+    from ks.data.build import STEPS, run
+
+    chosen = steps or list(STEPS)
+    unknown = [s for s in chosen if s not in STEPS]
+    if unknown:
+        raise typer.BadParameter(f"unknown steps {unknown}; known: {list(STEPS)}")
+    run(chosen, log=lambda s: typer.echo(s, err=True), force=force)
+
+
 def main() -> None:
     app()
 

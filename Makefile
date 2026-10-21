@@ -2,10 +2,10 @@
 UV ?= $(HOME)/.local/bin/uv
 KS := $(UV) run ks
 
-.PHONY: help setup lint test costs reconcile sweep prices data eval
+.PHONY: help setup lint test costs reconcile sweep prices data upload-data eval
 
 help:
-	@grep -E '^[a-z]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
+	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
 
 setup: ## uv sync and install the pre-commit hooks
 	$(UV) sync
@@ -31,8 +31,15 @@ sweep: ## list everything that can bill by the hour (DELETE=1 deletes ours)
 prices: ## fetch spot prices into costs/prices.yaml (verified: false)
 	$(KS) prices
 
-data: ## M1: puzzles -> splits -> positions -> reward tables -> primer
-	@echo "make data arrives in M1 (docs/tasks/M1-data.md)"; exit 1
+data: ## M1: puzzles -> splits -> positions -> reward tables -> primer (skips unchanged steps)
+	$(KS) data
+
+GCLOUD ?= $(HOME)/google-cloud-sdk/bin/gcloud
+BUCKET = $(shell grep -E '^BUCKET=' .env | cut -d= -f2 | cut -d' ' -f1)
+
+upload-data: ## M1: copy data/ (minus raw/, logs/, reward shards) to the bucket under data/v1/ (adds, never deletes)
+	$(GCLOUD) storage rsync --recursive \
+		--exclude='^(raw|logs|positions/rewards)/' data/ $(BUCKET)/data/v1/
 
 eval: ## M2: run the eval harness (MODEL=... SET=dev)
 	@echo "make eval arrives in M2 (docs/tasks/M2-evals-baselines.md)"; exit 1
