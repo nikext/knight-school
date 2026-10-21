@@ -39,6 +39,7 @@ class CloudOps(Protocol):
     def delete_instance(self, name: str, zone: str) -> None: ...
     def read_text(self, url: str) -> str | None: ...
     def deletion_time(self, name: str) -> datetime | None: ...
+    def was_preempted(self, name: str) -> bool: ...
     def list_instances(self) -> list[dict[str, Any]]: ...
     def list_disks(self) -> list[dict[str, Any]]: ...
     def list_custom_jobs(self, region: str) -> list[dict[str, Any]]: ...
@@ -111,6 +112,17 @@ class GcloudOps:
         entries = json.loads(p.stdout or "[]")
         stamps = [datetime.fromisoformat(e["timestamp"].replace("Z", "+00:00")) for e in entries]
         return max(stamps) if stamps else None
+
+    def was_preempted(self, name: str) -> bool:
+        """True if the audit log has GCE's `instances.preempted` event for the instance."""
+        flt = (
+            f'resource.type="gce_instance" AND protoPayload.resourceName:"instances/{name}" AND '
+            'protoPayload.methodName:"instances.preempted"'
+        )
+        p = self._run(
+            "logging", "read", flt, "--freshness=30d", "--limit=1", "--format=json", check=False
+        )
+        return p.returncode == 0 and bool(json.loads(p.stdout or "[]"))
 
     def list_instances(self) -> list[dict[str, Any]]:
         return self._json("compute", "instances", "list")

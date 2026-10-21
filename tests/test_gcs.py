@@ -57,3 +57,29 @@ def test_download_quotes_the_object_name(tmp_path: Path):
     s = Session([], {"runs%2Fx%2Fadapter.bin": b"weights"})
     out = gcs.download("gs://bkt/runs/x/adapter.bin", tmp_path / "a" / "adapter.bin", s)
     assert out.read_bytes() == b"weights"
+
+
+class WriteSession(Session):
+    def __init__(self) -> None:
+        super().__init__([], {})
+        self.posts: list[tuple[str, dict[str, str], bytes]] = []
+
+    def post(self, url: str, params: dict[str, str], data: Any, **kw: Any) -> Resp:
+        self.posts.append((url, dict(params), data.read()))
+        return Resp()
+
+
+def test_push_keeps_relative_paths(tmp_path: Path, monkeypatch):
+    (tmp_path / "eval" / "dev500").mkdir(parents=True)
+    (tmp_path / "eval" / "dev500" / "m.json").write_text("{}")
+    (tmp_path / "done").mkdir()
+    (tmp_path / "done" / "eval-m").write_text("")
+    s = WriteSession()
+    monkeypatch.setattr(gcs, "_session", lambda write=False: s)
+    assert gcs.push(tmp_path, "gs://bkt/runs/x/attempts/2/out/") == 2
+    names = sorted(p[1]["name"] for p in s.posts)
+    assert names == [
+        "runs/x/attempts/2/out/done/eval-m",
+        "runs/x/attempts/2/out/eval/dev500/m.json",
+    ]
+    assert all(p[0].endswith("/upload/storage/v1/b/bkt/o") for p in s.posts)

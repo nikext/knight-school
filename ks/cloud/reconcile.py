@@ -77,7 +77,10 @@ def close(att: Attempt, ops: CloudOps, bucket: str, now: datetime) -> EndEvent |
         near_limit = end_at is not None and end_at >= limit - timedelta(minutes=3)
         status = "timeout" if near_limit else "stopped"
     elif (t := ops.deletion_time(instance_name(att))) is not None:
-        end_at, source, status = t, "audit-log", "vanished"
+        # The shutdown script has ~30 s to write its marker and can miss (m2-screen-a100-r2 did),
+        # so a preemption in the audit log counts as one: the watcher may then retry.
+        status = "preempted" if ops.was_preempted(instance_name(att)) else "vanished"
+        end_at, source = t, "audit-log"
     else:
         source, status = "max-hours-fallback", "unknown"
 

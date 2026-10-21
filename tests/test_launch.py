@@ -213,6 +213,16 @@ def test_reconcile_falls_back_to_the_audit_log(ledger_path):
     assert end.hours == pytest.approx(6 / 60, abs=1e-3)
 
 
+def test_audit_log_preemption_without_marker_counts_as_preempted(ledger_path):
+    cloud = launched(ledger_path)
+    cloud.instances.clear()
+    cloud.deletions["ks-m0-smoke-l4-a1"] = NOW + timedelta(minutes=4)
+    cloud.preemptions.add("ks-m0-smoke-l4-a1")
+    R.reconcile(cloud, BUCKET, NOW + timedelta(minutes=30), ledger_path)
+    end = closed(ledger_path)
+    assert end.source == "audit-log" and end.status == "preempted"
+
+
 def test_reconcile_without_evidence_charges_max_hours(ledger_path):
     cloud = launched(ledger_path)
     cloud.instances.clear()
