@@ -1,0 +1,2815 @@
+[
+ {
+  "skuId": "088C-6492-3BB3",
+  "description": "Nvidia H100 80GB GPU running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "12",
+        "nanos": 735516000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "1397-17F4-F577",
+  "description": "Nvidia H100 80GB GPU attached to DWS Defined Duration VMs running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "4",
+        "nanos": 200761000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "13AE-31D0-309A",
+  "description": "Spot Preemptible E2 Custom Instance Ram running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "RAM",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 2027000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte hour",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 3865470566400
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "1B35-7EB3-EEE9",
+  "description": "Spot Preemptible E2 Custom Instance Core running in Iowa",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "CPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 13740000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "204F-FA84-6E50",
+  "description": "Commitment v1: Nvidia Tesla A100 80GB GPU running in Americas for 1 Year",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit1Yr"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "3",
+        "nanos": 481090000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "251D-6925-C671",
+  "description": "Spot Preemptible A3 Instance Ram running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "RAM",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 1399000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte hour",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 3865470566400
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "28A2-9207-5A67",
+  "description": "Spot Preemptible G2 Instance Core running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "CPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 15760000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "2B51-3F7E-4896",
+  "description": "Reserved Nvidia H100 80GB Mega GPU in Netherlands in Calendar Mode",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "4",
+        "nanos": 841121033
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "2C3A-BAB7-8C82",
+  "description": "Commitment v1: Nvidia H100 80GB GPU running in Americas for 3 Years",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit3Yr"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "4",
+        "nanos": 299898566
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "302A-B1A1-06DD",
+  "description": "Commitment v1: Nvidia H100 80GB GPU running in Americas for 1 Year",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit1Yr"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "6",
+        "nanos": 798808570
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "3178-715E-CFB6",
+  "description": "Spot Preemptible A2 Instance Core running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "CPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 18970000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "341A-49A5-0C07",
+  "description": "Nvidia H100 80GB GPU attached to DWS Defined Duration VMs running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "4",
+        "nanos": 200761000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "3B65-1F69-77A1",
+  "description": "Spot Preemptible G2 Custom Instance Core running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "CPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 16540000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "4124-1765-0CA6",
+  "description": "Nvidia H100 80GB Mega GPU running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "13",
+        "nanos": 447560000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "484D-8AA8-3F73",
+  "description": "Nvidia Tesla A100 80GB GPU attached to DWS Defined Duration VMs running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "1",
+        "nanos": 846198000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "4A7F-C13E-5293",
+  "description": "Spot Preemptible G2 Instance Ram running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "RAM",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 1846000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte hour",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 3865470566400
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "4D6B-44A7-C581",
+  "description": "Commitment v1: Nvidia H100 80GB GPU running in Netherlands for 1 Year",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit1Yr"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "8",
+        "nanos": 838451000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "5038-EF2D-3652",
+  "description": "Nvidia L4 GPU attached to Spot Preemptible VMs running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 353100000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "59A6-9C49-BDDB",
+  "description": "Spot Preemptible G2 Instance Core running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "CPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 14950000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "5CFD-16B2-4F41",
+  "description": "Balanced PD Capacity in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Storage",
+   "resourceGroup": "SSD",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.mo",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 110000000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte month",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 2875910101401600.0
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "5DC7-220E-D29D",
+  "description": "Nvidia H100 80GB Mega GPU attached to Spot Preemptible VMs running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "8",
+        "nanos": 60100000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "5F45-2ADE-3091",
+  "description": "Commitment v1: Nvidia H100 80GB Plus GPU running in Americas for 3 Years",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit3Yr"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "4",
+        "nanos": 498983869
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "60B2-2A10-9A50",
+  "description": "Commitment v1: Nvidia L4 GPU running in Americas for 3 Years",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit3Yr"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 252018107
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "61AD-5055-1A78",
+  "description": "Commitment v1: Nvidia L4 GPU running in Netherlands for 1 Year",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit1Yr"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 370837090
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "65A3-16DB-D57A",
+  "description": "Spot Preemptible A2 Instance Ram running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "RAM",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 2542000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte hour",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 3865470566400
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "67E2-6600-34C2",
+  "description": "Nvidia L4 GPU attached to DWS Defined Duration VMs running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 560040239
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "68E2-2B10-686E",
+  "description": "Spot Preemptible G2 Custom Instance Ram running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "RAM",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 1839000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte hour",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 3865470566400
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "6AE1-525F-8B80",
+  "description": "Balanced PD Capacity",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Storage",
+   "resourceGroup": "SSD",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-central2",
+   "us-east1",
+   "us-west1",
+   "asia-east1",
+   "europe-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.mo",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 100000000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte month",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 2875910101401600.0
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "6C1E-9559-947E",
+  "description": "Nvidia L4 GPU attached to DWS Defined Duration VMs running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 588042300
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "6CA6-FB4B-081C",
+  "description": "Commitment v1: Nvidia H100 80GB Plus GPU running in Americas for 1 Year",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit1Yr"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "7",
+        "nanos": 113593407
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "7247-96F6-A23E",
+  "description": "Spot Preemptible G2 Custom Instance Ram running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "RAM",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 1938000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte hour",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 3865470566400
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "7A6D-F74C-B0A3",
+  "description": "Nvidia H100 80GB GPU attached to Spot Preemptible VMs running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "5",
+        "nanos": 556100000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "7A8F-09E3-523C",
+  "description": "Spot Preemptible E2 Instance Ram running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "RAM",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 1931000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte hour",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 3865470566400
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "7CFD-81D6-E49C",
+  "description": "Nvidia H100 80GB Plus GPU running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "10",
+        "nanos": 344275712
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "7F71-B589-3331",
+  "description": "Commitment v1: Nvidia Tesla A100 80GB GPU running in Americas for 3 Years",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit3Yr"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "3",
+        "nanos": 96590000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "821D-D579-14CC",
+  "description": "Nvidia Tesla A100 80GB GPU attached to DWS Defined Duration VMs running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "2",
+        "nanos": 32848000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "8609-4BAD-F240",
+  "description": "Nvidia H100 80GB Plus GPU attached to Spot Preemptible VMs running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "5",
+        "nanos": 307300000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "896C-76BD-08B2",
+  "description": "Reserved Nvidia H100 80GB GPU in Netherlands in Calendar Mode",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "4",
+        "nanos": 570090841
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "8BB7-4510-69FB",
+  "description": "Commitment v1: Nvidia Tesla A100 80GB GPU running in Netherlands for 3 Years",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit3Yr"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "3",
+        "nanos": 409655000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "8D0B-EA58-9E35",
+  "description": "SSD backed Local Storage attached to Spot Preemptible VMs in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Storage",
+   "resourceGroup": "LocalSSD",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.mo",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 52800000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte month",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 2875910101401600.0
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "91F8-8802-95B4",
+  "description": "Spot Preemptible A3 Instance Core running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "CPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 16060000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "9353-708C-35DF",
+  "description": "Nvidia Tesla A100 80GB GPU attached to Spot Preemptible VMs running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "2",
+        "nanos": 449600000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "976A-D3D9-74CD",
+  "description": "Reserved Nvidia H100 80GB Mega GPU in Americas in Calendar Mode",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "4",
+        "nanos": 841121033
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "97A5-D1C6-4BCD",
+  "description": "Commitment v1: Nvidia L4 GPU running in Netherlands for 3 Years",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit3Yr"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 264883595
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "9B1F-1E62-4061",
+  "description": "Spot Preemptible E2 Instance Ram running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "RAM",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 1754000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte hour",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 3865470566400
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "9B80-5A20-FD85",
+  "description": "Commitment v1: Nvidia H100 80GB Mega GPU running in Netherlands for 1 Year",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit1Yr"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "9",
+        "nanos": 247671000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "9D2A-5124-7078",
+  "description": "Nvidia H100 80GB GPU attached to Spot Preemptible VMs running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "7",
+        "nanos": 637900000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "A06F-6842-C9C1",
+  "description": "Reserved Nvidia Tesla A100 80GB GPU in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 0
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "A71C-A63B-6B00",
+  "description": "Commitment v1: Nvidia Tesla A100 80GB GPU running in Netherlands for 1 Year",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit1Yr"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "3",
+        "nanos": 833028000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "A88A-5A60-E821",
+  "description": "Nvidia L4 GPU running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 560040239
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "AC33-B5A5-C20F",
+  "description": "Nvidia Tesla A100 80GB GPU running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "4",
+        "nanos": 325209000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "AE60-7D45-1DF5",
+  "description": "Reserved Nvidia H100 80GB GPU in Americas in Calendar Mode",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "4",
+        "nanos": 570090841
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "AEC2-3D5C-61BF",
+  "description": "Nvidia L4 GPU attached to Spot Preemptible VMs running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 335200000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "BEFB-F03D-B770",
+  "description": "Commitment v1: Nvidia L4 GPU running in Americas for 1 Year",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit1Yr"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 352825350
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "BF80-650A-78E6",
+  "description": "Spot Preemptible G2 Instance Ram running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "RAM",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 1751000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte hour",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 3865470566400
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "D45F-2D53-1247",
+  "description": "Spot Preemptible E2 Custom Instance Ram running in Iowa",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "RAM",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 1842000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte hour",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 3865470566400
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "D466-5C0F-2AFB",
+  "description": "Commitment v1: Nvidia H100 80GB Mega GPU running in Netherlands for 3 Years",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit3Yr"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "5",
+        "nanos": 848679000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "D4E2-451A-15B9",
+  "description": "Nvidia H100 80GB GPU running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "9",
+        "nanos": 796550569
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "D55E-4C77-A49B",
+  "description": "Spot Preemptible E2 Instance Core running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "CPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 14410000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "D66C-80B7-6A38",
+  "description": "Commitment v1: Nvidia H100 80GB GPU running in Netherlands for 3 Years",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Commit3Yr"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "5",
+        "nanos": 589868000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "D847-3FF3-B717",
+  "description": "Spot Preemptible A2 Instance Ram running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "RAM",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 2399000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte hour",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 3865470566400
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "DD69-8E46-B313",
+  "description": "Reserved Nvidia Tesla A100 80GB GPU in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 0
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "DD90-547C-2AAA",
+  "description": "Nvidia Tesla A100 80GB GPU attached to Spot Preemptible VMs running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "2",
+        "nanos": 356800000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "E540-EA28-2318",
+  "description": "Spot Preemptible A2 Instance Core running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "CPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 17910000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "E725-3CC5-D4BE",
+  "description": "SSD backed Local Storage attached to Spot Preemptible VMs",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Storage",
+   "resourceGroup": "LocalSSD",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1",
+   "asia-east1",
+   "europe-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.mo",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 45500000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte month",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 2875910101401600.0
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "E975-984D-BEFA",
+  "description": "Nvidia L4 GPU running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 588630286
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "EC45-055B-A1E0",
+  "description": "Spot Preemptible G2 Custom Instance Core running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "CPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 15700000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "EDA0-3A70-3138",
+  "description": "Nvidia Tesla A100 80GB GPU running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "GPU",
+   "usageType": "OnDemand"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "3",
+        "nanos": 928080000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "EEE5-1DA5-D9CF",
+  "description": "Spot Preemptible A3 Instance Core running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "CPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 14480000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "EF63-3F97-6406",
+  "description": "Spot Preemptible E2 Custom Instance Core running in Netherlands",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "CPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "europe-west4"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 15130000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "F179-E1EA-D97A",
+  "description": "Spot Preemptible E2 Instance Core running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "CPU",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 13090000
+       }
+      }
+     ],
+     "usageUnitDescription": "hour",
+     "baseUnit": "s",
+     "baseUnitDescription": "second",
+     "baseUnitConversionFactor": 3600
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ },
+ {
+  "skuId": "F619-87C3-D3BA",
+  "description": "Spot Preemptible A3 Instance Ram running in Americas",
+  "category": {
+   "serviceDisplayName": "Compute Engine",
+   "resourceFamily": "Compute",
+   "resourceGroup": "RAM",
+   "usageType": "Preemptible"
+  },
+  "serviceRegions": [
+   "us-central1",
+   "us-east1",
+   "us-west1"
+  ],
+  "pricingInfo": [
+   {
+    "summary": "",
+    "pricingExpression": {
+     "usageUnit": "GiBy.h",
+     "displayQuantity": 1,
+     "tieredRates": [
+      {
+       "startUsageAmount": 0,
+       "unitPrice": {
+        "currencyCode": "USD",
+        "units": "0",
+        "nanos": 1259000
+       }
+      }
+     ],
+     "usageUnitDescription": "gibibyte hour",
+     "baseUnit": "By.s",
+     "baseUnitDescription": "byte second",
+     "baseUnitConversionFactor": 3865470566400
+    },
+    "currencyConversionRate": 1,
+    "effectiveTime": "2026-10-21T07:00:00Z"
+   }
+  ]
+ }
+]

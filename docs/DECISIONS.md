@@ -133,3 +133,63 @@ engineers can read the repo.
 run, including failures, is in the ledger and the results. Nothing is
 cherry-picked: the final checkpoint gets the test eval.
 **Consequences:** Results may look less flashy, but they hold up.
+
+### ADR-013: Two real credits, one expiring 2026-11-12: front-load GPU work, Gemini after
+**Status:** accepted (2026-10-21, approved by the user in the M0 session)
+**Context:** The plan assumed open-ended "$400 GCP + $200 Vertex" credits.
+Billing → Credits showed something else. One credit is the Google Developer
+Program annual credit, $440.94 left, covering all of Google Cloud, which
+**expires 2026-11-12**. The other is "Marketing – GDP Premium Support 4",
+$209.26 left, expiring 2027-04-08, with scope "certain usage". The user
+could not open its terms, but past Gemini spend came out of it. Both credits
+are shared with the user's other projects. Spot prices (measured in M0) are
+about 70% above the third-party figures the plan used.
+**Decision:**
+- `compute` pool = the annual credit, ceiling $360 (= min(360, 0.9 ×
+  440.94)). The gate refuses any job whose worst-case end is less than 48 h
+  before expiry, so **all GPU work must end by 2026-11-10 00:00Z**. That
+  includes M6's final evals. Sessions run every ~2–3 days, and M5 shrinks to
+  whatever fits.
+- `vertex` pool = the Marketing credit, ceiling $180, scope **assumed**
+  Gemini-only. Custom training is assumed not covered, so the Vertex
+  backend stays a stub and the vertex M5 line is dead. Gemini baselines
+  move out of M2 to after the annual credit expires (`usable_from:
+  2026-11-13`), so they cannot eat compute credit. They start with a 1-cent
+  scope test checked in Billing → Reports. Before then, the only Vertex spend
+  is the M0 smoke call.
+- The bucket and registry are emptied by 2026-11-11 unless the Marketing
+  credit is shown to cover storage. Data stays on the laptop, and models go
+  to Hugging Face only with the user's yes.
+- The credit snapshot in caps.yaml must be re-read weekly. Other projects
+  draw on the same credits, so the gate also caps the worst case at 0.9 ×
+  remaining credit minus our spend since the reading (ADR-014).
+**Consequences:** Roughly 118 A100-hours at most, and a tight calendar. If the
+GDP subscription renews and a new credit appears, the user updates
+caps.yaml and this ADR gets a successor. The `ks-net` budget plus the kill
+switch (billing detach at $5 net) is the backstop if a credit runs out
+early.
+
+### ADR-014: Gate additions in M0: credit window, credit headroom, one job at a time, CPU-only VMs
+**Status:** accepted (2026-10-21)
+**Context:** BUDGET.md §3.3 listed the original gate rules. M0 found three
+gaps. The credits expire (ADR-013). They are shared with other projects, so
+the caps.yaml ceiling can be wrong without anyone editing it. And the
+kill-switch test needs a labelled VM that has no GPU.
+**Decision:** On top of BUDGET.md §3.3, `ks.cloud.gate.check()` also refuses
+when:
+- the pool's credit is not yet usable (`usable_from`), or the job's
+  worst-case end is within `expiry_margin_hours` (48) of `expires`;
+- the credit reading is missing or older than 7 days;
+- `worst_case > 0.9 × remaining_usd − spent_since(checked_on) − running`;
+- any other attempt in the pool is still open (one job at a time; this
+  also catches double launches);
+- a fresh run reuses an id, or a retry doesn't follow the last attempt;
+- the run id doesn't start with its milestone, or the machine's GPU count
+  differs from the run's `gpus`.
+
+Machines may have **at most** one GPU rather than exactly one, so a CPU-only
+spot VM (`e2-standard-2`, priced like any other machine) can be launched for
+infra tests. Worst cases round up to 1/100 cent.
+**Consequences:** 44 gate tests. A CPU VM still goes through every money rule.
+"Exactly 1 GPU" in ADR-002 now reads "at most 1 GPU". The no-multi-GPU
+intent is unchanged.

@@ -1,0 +1,27 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.0  # no floating major tag exists
+        with:
+          version: "0.13.1"
+      - run: uv sync --locked
+      - name: lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+          uv run pyright
+      - name: unit tests (no GCP access in CI)
+        run: uv run pytest
+      - name: shell syntax
+        run: for f in infra/*.sh infra/killswitch/*.sh; do bash -n "$f"; done

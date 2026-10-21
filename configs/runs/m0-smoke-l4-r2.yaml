@@ -1,0 +1,14 @@
+# M0 smoke, second try (r1 found no Docker on the DLVM image; vm_startup.sh now installs it).
+# a spot L4 VM boots the Deep Learning VM image, runs nvidia-smi in a
+# container, uploads its log, and deletes itself. Expect ~$0.05-0.10.
+id: m0-smoke-l4-r2
+milestone: M0
+description: "15-minute L4 spot smoke test of the launch path"
+machine: g2-standard-8
+gpus: 1
+zones: [us-central1-a, us-central1-b, us-central1-c]
+max_hours: 0.25
+max_attempts: 2
+boot_disk_gb: 100
+image: nvidia/cuda:12.9.1-base-ubuntu24.04
+command: "nvidia-smi && nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv > /out/gpu.csv && sleep 120"

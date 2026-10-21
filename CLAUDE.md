@@ -21,6 +21,11 @@ file.
    with `gh pr list`.
 4. Read `docs/BUDGET.md` §1 and §3 if the milestone spends money. Every
    milestone from M2 on does.
+5. **Calendar:** the compute credit expires 2026-11-12 and every GPU job
+   must end by 2026-11-10 00:00Z (ADR-013). If `make costs` shows the credit
+   reading as STALE (older than 7 days), ask the user to re-read Billing →
+   Credits and update `remaining_usd` and `checked_on` in caps.yaml before
+   any launch. That edit records a fact; it doesn't change a ceiling.
 
 ## Money rules (hard)
 
@@ -102,32 +107,46 @@ file.
 - Stockfish is **not installed** yet; M1 installs a pinned native binary
   user-local.
 - `gh` is authenticated as `nikext` (scopes: repo, workflow).
-- gcloud SDK 586.0.0, default project `random-projects-509513` (shared with
-  other apps). M0 asks the user which project to use; a dedicated one is
-  recommended.
+- gcloud SDK 586.0.0 without the `beta` component (use REST APIs instead
+  of installing it). gcloud's default project is `random-projects-509513`
+  (shared with other apps). This project uses `knight-school-nt26` from
+  `.env`. ADC works for Vertex.
 - One billing account (USD). Its credits are **shared** with the user's other
   projects (zuri-sunny, swiss-admin-navigator, …). That is why M0 checks the
   *remaining* credit, not the original amount.
 
 ## Commands
 
-Fill these in as they come to exist (M0 creates the Makefile):
-
 ```bash
 make setup        # uv sync, pre-commit install
-make lint test    # ruff, pyright, pytest
-make costs        # ledger totals per pool and milestone vs caps
+make lint test    # ruff, ruff format --check, pyright, pytest
+make costs        # ledger totals per pool and milestone vs caps, credit headroom, deadline
 make reconcile    # close finished runs in the ledger with actual cost
-make sweep        # list running labelled resources (DELETE=1 deletes them)
+make sweep        # list everything billable in the project (DELETE=1 deletes ours)
+make prices       # re-fetch spot prices (writes verified: false; cross-check, then set true)
 make data         # M1: puzzles → splits → positions → reward tables → primer
 make eval MODEL=… SET=dev   # M2: run the harness
-ks launch configs/runs/<run>.yaml [--confirm] [--watch]   # M0/M3
+uv run ks launch configs/runs/<run>.yaml              # show the gate only
+uv run ks launch configs/runs/<run>.yaml --confirm --watch [--interval 300]
+uv run ks watch configs/runs/<run>.yaml               # re-attach to a running run
+uv run ks charge --id … --milestone … --pool … --kind … --usd …   # book a one-off cost
+infra/setup.sh | infra/budgets.sh | infra/killswitch/deploy.sh    # idempotent, DRY_RUN=1 prints
 ```
+
+Run `ks launch … --watch` with `run_in_background` and wait for the
+notification. For a run that lasts hours, use the default 300 s interval.
 
 ## Session-agreed settings
 
-- GCP project: _(ask in M0)_
-- PR review: _(ask in M0: review before merge, or merge on green CI)_
-- Experiment tracking: _(ask in M0: W&B public project, or TensorBoard + committed CSVs)_
-- Kill switch may disable billing on the project at the net-spend trigger: _(ask in M0; only sensible on a dedicated project)_
-- Remaining credit, expiry, scope: _(the user reads Billing → Credits in M0)_
+- GCP project: **`knight-school-nt26`**, dedicated, created 2026-10-21. gcloud's default
+  project is still `random-projects-509513`, so always pass `--project` or use `.env`.
+- PR review: **merge on green CI**. Claude merges once CI passes and the task's
+  "Done when" is met.
+- Experiment tracking: **TensorBoard logs in GCS + metric CSVs committed to `results/`**.
+- Kill switch may disable billing at net ≥ $5: **yes** (deployed with `KS_DETACH_BILLING=1`).
+- Credits (read 2026-10-21, re-read weekly):
+  - compute: GDP annual, **$440.94** left, all of Google Cloud, **expires 2026-11-12**
+  - vertex: Marketing – GDP Premium Support 4, **$209.26** left, scope unverified
+    (assumed Gemini only), expires 2027-04-08, usable from 2026-11-13
+
+  ADR-013 has the schedule this forces.

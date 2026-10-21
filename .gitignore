@@ -7,7 +7,7 @@
 application_default_credentials.json
 
 # data and training artefacts (rebuilt by `make data`, stored in GCS)
-data/
+/data/
 checkpoints/
 outputs/
 wandb/

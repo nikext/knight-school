@@ -3,9 +3,9 @@
 Teaching a small open LLM chess tactics with reinforcement learning, on a
 fixed cloud budget, with every dollar logged.
 
-> **Status: blueprint.** This first commit holds the plan and docs only. The
-> code is built milestone by milestone, one fresh Claude Code session per
-> milestone. See [docs/PLAN.md](docs/PLAN.md) for where things stand.
+> **Status: M0 done (money guardrails, launcher, kill switch).** The code is
+> built milestone by milestone, one fresh Claude Code session per milestone.
+> See [docs/PLAN.md](docs/PLAN.md) for where things stand.
 
 ## The question
 
@@ -47,14 +47,14 @@ written down before each experiment runs.
 
 ## Budget
 
-| Pool | Credit | Ceiling this project plans to | Spent |
+| Pool | Credit (left on 2026-10-21) | Ceiling this project plans to | Spent |
 |---|---|---|---|
-| GCP compute | $400 | $360 | $0 |
-| Vertex AI | $200 | $180 | $0 |
+| GCP compute | $440.94, expires 2026-11-12 | $360 | see `make costs` |
+| Vertex AI (Gemini baselines) | $209.26, expires 2027-04-08 | $180 | see `make costs` |
 
 GPUs are spot only, one GPU at a time (the quota is set to 1), every job has a
 hard time limit, and a launcher refuses any job whose worst-case cost would
-break the ceiling. Budgets and a kill switch act as the backstop. The full
+break the ceiling, or that could still be running when its credit expires. Budgets and a kill switch act as the backstop. The full
 rules are in [docs/BUDGET.md](docs/BUDGET.md), and the ledger is
 [costs/ledger.jsonl](costs/ledger.jsonl).
 

@@ -14,8 +14,10 @@
 
 ## 2. Project
 
-**Recommended: a new dedicated project**, e.g. `knight-school-<suffix>`,
-linked to the user's existing billing account. Reasons:
+**Chosen in M0: the dedicated project `knight-school-nt26`**, linked to the
+user's billing account on 2026-10-21. The account allows 5 linked projects;
+to free a slot the user had billing unlinked from `empl-mngmt` (its one Cloud
+Run service was already failing). Reasons for a dedicated project:
 
 - The budgets can filter on one project, with no other app's spend mixed in.
 - The kill switch may detach billing at the net-spend trigger (BUDGET.md §3.5)
@@ -28,8 +30,8 @@ disabled. The user chooses in M0. Record the choice in CLAUDE.md
 "Session-agreed settings".
 
 **Credits:** one billing account (USD) holds the credits and is shared by all
-the user's projects. Check in M0 that the credits apply to this project.
-Some promotional credits are project-scoped.
+the user's projects. Neither credit is project-scoped. The annual one covers
+all of Google Cloud and expires 2026-11-12 (BUDGET.md §1, ADR-013).
 
 ## 3. Region
 
@@ -53,14 +55,20 @@ Some promotional credits are project-scoped.
   default).
 - **Artifact Registry:** `knight-school` (docker, us-central1). Keep only
   the last 3 tags via a cleanup policy.
-- **Service accounts:**
+- **Service accounts** (created by `infra/setup.sh` in M0):
 
 | SA | Used by | Roles |
 |---|---|---|
 | `ks-runner@` | training/eval VMs and Vertex jobs | `storage.objectAdmin` on the bucket, `artifactregistry.reader`, `logging.logWriter`, `compute.instanceAdmin.v1` (so a VM can delete itself; a dedicated project keeps this contained), `aiplatform.user` (Gemini calls from eval jobs, if any) |
-| `ks-killswitch@` | kill-switch function | `compute.instanceAdmin.v1`, `aiplatform.user` (cancel custom jobs), and only with the opt-in, billing detach per Google's "disable billing with notifications" guide (verify the minimal role) |
+| `ks-killswitch@` | kill-switch function | `compute.instanceAdmin.v1`, `aiplatform.user` (cancel custom jobs), `logging.logWriter`, and for the billing detach (opted in) `billing.projectManager` on the project, the minimal role that can unlink the project's billing account. It also has `run.invoker` on the function, because the Eventarc trigger calls it as this SA. |
 
-- **Quotas** (request in M0, as approval can take hours or days): set
+- **Quotas.** All requested and **approved at 1** on 2026-10-21 within
+  minutes: `GPUS-ALL-REGIONS-per-project` (it was 0) and
+  `PREEMPTIBLE-NVIDIA-{A100-80GB,H100}-GPUS-per-project-region` in
+  us-central1 and europe-west4. Spot L4 was already 1 in both regions. They
+  were requested as quota preferences through the Cloud Quotas REST API
+  (`POST /v1/projects/<p>/locations/global/quotaPreferences`), because
+  `gcloud beta` isn't installed. Original plan: set
   `GPUS_ALL_REGIONS` to 1, and 1 each for the spot (preemptible) L4, A100 80 GB
   and H100 quotas in us-central1 (and europe-west4 for fallback). Use the
   console (IAM & Admin → Quotas) or `gcloud beta quotas preferences create`
@@ -87,8 +95,20 @@ gcloud compute instances create ks-<run-id>-a<attempt> \
 ```
 
 - `ks launch` builds this command. It is never typed by hand.
-- Verify the current Deep Learning VM image family names with
-  `gcloud compute images list --project deeplearning-platform-release`.
+- Image: `common-cu129-ubuntu-2404-nvidia-580` (Deep Learning VM, NVIDIA
+  driver 580, CUDA 12.9; checked 2026-10-21). It has **no Docker**: the
+  first M0 smoke failed with `docker: No such file or directory`. The
+  NVIDIA container toolkit (1.19.1) is there. So `vm_startup.sh` installs
+  `docker.io` from Ubuntu when it's missing (24 s in the M0 smoke: Docker
+  29.1.3), configures the NVIDIA runtime, and logs both versions. If the
+  toolkit is ever missing, it installs that from NVIDIA's apt repo too. It's the default in
+  `RunConfig.vm_image_family`. CPU-only test VMs use `debian-12` with
+  `image: host`, which runs the command on the VM without Docker.
+- `infra/vm_shutdown.sh` runs in the ~30 s GCE gives on deletion. It writes
+  a `preempted` marker (if metadata says so) or `shutdown`, unless `ended`
+  already exists. Only `preempted` makes the watcher retry.
+- The job gets `max_hours` minus a reserve of min(10 min, a third) for
+  syncing outputs and self-deleting.
 - **`infra/vm_startup.sh`:**
   1. Write `runs/<id>/attempts/<n>/started` to GCS.
   2. `docker pull` the image.
@@ -118,7 +138,12 @@ fail) and set the watcher accordingly.
 Fetch SKUs from the Cloud Billing Catalog API using a gcloud access token:
 `GET https://cloudbilling.googleapis.com/v1/services/<service-id>/skus?currencyCode=USD`.
 Compute Engine is `6F81-5844-456A` and Vertex AI is `C7E2-9256-1C43`
-(verify both via `/v1/services`). For each machine, add up the spot GPU SKU
+(both verified via `/v1/services` on 2026-10-21). SKU names as of then:
+`Nvidia L4 GPU attached to Spot Preemptible VMs running in <region>`,
+`Spot Preemptible G2 Instance Core|Ram running in <region>` (A2, A3 and E2
+alike), and `SSD backed Local Storage attached to Spot Preemptible VMs`.
+A2 Ultra and A3 machines bundle 375 GiB of local SSD per partition (1 and 2
+partitions), which is billed and included in the price. For each machine, add up the spot GPU SKU
 and the spot vCPU and RAM SKUs × the machine's shape (get the shape from
 `gcloud compute machine-types describe`). Write `costs/prices.yaml` with
 `fetched_on`. Set `verified: true` only after the user has cross-checked one
@@ -135,7 +160,9 @@ machine against the console pricing calculator.
     $180.
   - `ks-net`: `--credit-types-treatment=include-all-credits`, $5.
 
-  These flags were checked in gcloud 586 on 2026-10-21. Budgets publish
+  All three use a fixed period, `--start-date=2026-10-01
+  --end-date=2027-04-30`. A calendar-month budget would reset on Nov 1.
+  The flags were checked in gcloud 586 on 2026-10-21. Budgets publish
   several times a day, not only when a threshold is crossed, so the function
   computes `costAmount / budgetAmount` itself.
 - **Function `ks-killswitch`** (Cloud Run functions, Python, Pub/Sub
@@ -148,15 +175,20 @@ machine against the console pricing calculator.
   6. Log a structured line.
 
   It is idempotent and has unit tests for the decision logic.
-- **Test in M0:** create a labelled `e2-micro` (about a cent), publish a
-  synthetic message over the threshold to `ks-budget`, and check the VM is
-  gone and the function logged the decision.
+- **Deployed in M0** by `infra/killswitch/deploy.sh`: gen2, python312,
+  internal-only ingress, max 1 instance, `KS_DETACH_BILLING=1`.
+- **Tested in M0** (`infra/killswitch/test.sh`): a labelled `e2-standard-2`
+  spot VM (`ks launch configs/runs/m0-killswitch-test.yaml`, $0.003). A 19%
+  message did nothing; a 93% message deleted it within ~90 s. Logged:
+  `"actions": ["delete us-central1-a/ks-m0-killswitch-test-a1: ok"]`.
 
 ## 8. Sweep and teardown
 
-- `make sweep` lists labelled instances (all zones), disks,
-  RUNNING/PENDING Vertex custom jobs, any Vertex endpoints, and Workbench
-  instances. `DELETE=1` deletes them after printing them.
+- `make sweep` lists **every** instance and disk in the project (it's
+  dedicated), RUNNING/PENDING/QUEUED Vertex custom jobs, Vertex endpoints,
+  and Workbench instances in our regions. Anything without
+  `app=knight-school` is flagged UNEXPECTED: stop and tell the user.
+  `DELETE=1` deletes only our own resources.
 - **Final teardown (M6):** delete old registry images, `scratch/`, and
   optimizer states. Keep the final models in Hugging Face and the eval
   outputs in the repo. Keep the budgets and kill switch until the project is

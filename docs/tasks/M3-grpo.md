@@ -7,6 +7,12 @@ dense). Then re-plan M4 and M5 with the measured costs.
 **Budget:** compute $70 · vertex $0. Expected: smoke and throughput tests
 ≈ $5, two E2 runs ≈ $15–25 each, evals ≈ $3.
 
+**Calendar (ADR-013):** every GPU job must end by 2026-11-10 00:00Z (the
+gate enforces it), and M4 and M5 come after this. The re-plan prices the
+remaining runs in dollars **and** in calendar days. Measured spot prices are
+$3.04/h for the A100 and $6.27/h for the H100, ~70–110% above the old plan
+(BUDGET.md §2), so expect to cut M5.
+
 **Read first:** TRAINING.md (all of it), RESEARCH.md §2–4, BUDGET.md §2–3,
 ADR-004, ADR-005 and ADR-007, and the M2 notes in PLAN.md.
 

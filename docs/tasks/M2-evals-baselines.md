@@ -8,6 +8,12 @@ the E0 and E1 tables in RESULTS.md are filled in.
 **Budget:** compute $15 · vertex $50. Every cloud job goes through
 `ks launch` and is asked for. Gemini runs go pilot → ask → batch.
 
+**Calendar (ADR-013):** GPU jobs must end by 2026-11-10 00:00Z, and M3–M5
+still need that window, so keep M2 to a few days. **No Gemini calls before
+2026-11-13.** The vertex pool is locked until then, so M2 builds and tests
+the Gemini backend and cost meter but does not run them (task 9). Spot
+prices are ~70% above the old plan (BUDGET.md §2).
+
 **Read first:** `docs/EVALS.md`, TRAINING.md §1–3 and §8, BUDGET.md §6,
 RESEARCH.md §2. Check that M0's smoke run passed. If it's "pending quota",
 finish it first.
@@ -53,16 +59,24 @@ finish it first.
    base model.
 9. **E1** (EVALS.md §5). Random and Stockfish (1 node, 1k nodes) on test2000
    (laptop). The chosen base model zero-shot on test2000 (laptop or L4).
-   **Gemini:**
-   - list the current GA model ids on Vertex (Flash-Lite, Flash, Pro);
-   - put live prices into `prices.yaml → gemini`;
-   - run a 20-puzzle pilot per model and extrapolate the cost;
-   - ask the user with the numbers, then run batch jobs (Flash-Lite and
-     Flash on test2000, Pro on test500);
-   - log a ledger `charge` per job.
+   **Gemini (build now, run after 2026-11-13):**
+   - list the current GA model ids on Vertex (Flash-Lite, Flash, Pro). On
+     2026-10-21 the GA list included gemini-2.5-flash-lite/flash/pro and
+     gemini-3.x flash models; re-check;
+   - put live prices into `prices.yaml → gemini` (Catalog API, Vertex
+     service `C7E2-9256-1C43`; e.g. 2.5 Flash Lite was $0.10/M in and
+     $0.40/M out);
+   - the cost meter refuses calls before the vertex pool's `usable_from`;
+   - unit-test the backend with recorded responses, with no live calls in M2.
 
-   Stay inside $50. If the extrapolation says Pro won't fit, drop Pro to
-   test-200 or skip it, and note that.
+   **In the first session on or after 2026-11-13:** a 1-cent scope test.
+   The next day, the user checks Billing → Reports that it was covered by
+   credit (net $0). If it shows net cost, the vertex pool goes to $0 and the
+   Gemini rows are dropped with a note. Otherwise: a 20-puzzle pilot per
+   model, extrapolate, ask the user with the numbers, then batch jobs
+   (Flash-Lite and Flash on test2000, Pro on test500), with a ledger
+   `charge` per job. Stay inside $50. If the extrapolation says Pro won't
+   fit, drop Pro to test-200 or skip it, and note that.
 10. **Write up:** the E0 and E1 tables in RESULTS.md, and short notes on what
     stands out (legal rate, per-bin shape, how Gemini compares with Chess-R1's
     numbers).
@@ -73,7 +87,9 @@ finish it first.
   `results/eval/`.
 - ADR-011 is accepted, `configs/models/<main>.yaml` exists, and the image is
   pushed with its digest recorded.
-- The E0 base row and the E1 table are in RESULTS.md.
+- The E0 base row and the E1 table are in RESULTS.md. The Gemini rows are
+  marked "pending (after 2026-11-13, ADR-013)" and get their own small PR
+  later.
 - Spend is ≤ $15 compute and ≤ $50 vertex, the ledger is reconciled,
   `make sweep` is clean, the PLAN.md row is updated, and the PR has the
   `make costs` output.
