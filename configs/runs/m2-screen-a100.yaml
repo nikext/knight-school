@@ -1,0 +1,23 @@
+# M2 screening on one spot A100 80GB (task M2 §5, §6, §8): dev500 zero-shot for every
+# candidate and thinking mode, a 5-step GRPO + LoRA + vLLM-colocate smoke per base model, and
+# E0 (probe500) per base model. Planned for an L4 (~1.5 h, ~$0.70); the user chose the A100 for
+# about half the wall time (~45 min, ~$2.50), 2026-10-21.
+# Results: gs://BUCKET/runs/m2-screen-a100/attempts/<n>/out/
+id: m2-screen-a100
+milestone: M2
+description: "dev500 screening, GRPO compatibility smoke, E0 probes for the candidate models"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-a, us-central1-c]
+max_hours: 1.5
+max_attempts: 2
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:1c90a398eb0e@sha256:8117583df873c30032b571391f1331f2e6744db7a19165de28e833df411015e3
+command: "bash configs/jobs/m2-screen.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.040"
+  VLLM_USE_FLASHINFER_SAMPLER: "0"  # its sampler JITs with nvcc; the torch sampler is fine here
+  SCREEN_MODELS: "qwen3.5-2b qwen3-1.7b gemma4-e2b qwen3.5-2b-native qwen3-1.7b-native"
+  SMOKE_MODELS: "qwen3.5-2b qwen3-1.7b gemma4-e2b"
+  PROBE_MODELS: "qwen3.5-2b qwen3-1.7b gemma4-e2b"
+  RL_TRAIN: "gs://knight-school-nt26-knight-school/data/v1/positions/rl_train.parquet"
