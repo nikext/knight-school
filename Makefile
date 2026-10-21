@@ -49,7 +49,8 @@ PROJECT = $(shell grep -E '^GOOGLE_CLOUD_PROJECT=' .env | cut -d= -f2 | cut -d' 
 GIT_SHA = $(shell git rev-parse --short=12 HEAD)
 IMAGE = us-central1-docker.pkg.dev/$(PROJECT)/knight-school/train
 
-image: ## build and push train:<git-sha> with Cloud Build (billable: ask first; clean tree only)
-	@test -z "$$(git status --porcelain -- ks configs docker evals pyproject.toml)" || { echo "commit first: the tag is the git sha"; exit 1; }
-	$(GCLOUD) builds submit --project $(PROJECT) --region us-central1 --config docker/cloudbuild.yaml \
-		--substitutions _IMAGE=$(IMAGE),_GIT_SHA=$(GIT_SHA) .
+image: ## build and push train:<git-sha> with Cloud Build from `git archive HEAD` (billable: ask first)
+	@test -z "$$(git status --porcelain --untracked-files=no -- ks configs docker evals pyproject.toml)" || { echo "commit first: the tag is the git sha"; exit 1; }
+	git archive --format=tar.gz -o /tmp/ks-src-$(GIT_SHA).tgz HEAD
+	$(GCLOUD) builds submit /tmp/ks-src-$(GIT_SHA).tgz --project $(PROJECT) --region us-central1 \
+		--config docker/cloudbuild.yaml --substitutions _IMAGE=$(IMAGE),_GIT_SHA=$(GIT_SHA)
