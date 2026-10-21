@@ -1,18 +1,105 @@
-# Hourly prices per whole machine (GPU + vCPU + RAM), spot, USD.
-# PLACEHOLDERS from third-party sites (2026-10). M0 replaces them with
-# Cloud Billing Catalog API figures via `ks prices` and sets verified: true.
-# ks launch refuses to run while verified is false.
-verified: false
-fetched_on: null
-source: "third-party estimates, not authoritative"
-region: us-central1
+# Hourly prices per whole machine (GPU + vCPU + RAM + bundled local SSD), spot, USD.
+# Written by `ks prices`. The boot disk is added per run from `disk`.
+# ks launch refuses to run while verified is false or the file is > 30 days old.
+verified: true  # user cross-checked g2-standard-8 spot us-central1 (~$0.51/h) in the console, 2026-10-21
+fetched_on: 2026-10-21 13:16:01+00:00
+source: Cloud Billing Catalog API, service 6F81-5844-456A, list prices in USD
 gce_spot:
-  g2-standard-8:  {gpu: nvidia-l4,         gpus: 1, usd_per_hour: 0.30}
-  a2-ultragpu-1g: {gpu: nvidia-a100-80gb,  gpus: 1, usd_per_hour: 1.80}
-  a3-highgpu-1g:  {gpu: nvidia-h100-80gb,  gpus: 1, usd_per_hour: 3.00}
+  us-central1:
+    g2-standard-8:
+      gpu: nvidia-l4
+      gpus: 1
+      vcpus: 8
+      memory_gib: 32.0
+      local_ssd_gib: 0
+      usd_per_hour: 0.510832
+      skus:
+        core: 59A6-9C49-BDDB Spot Preemptible G2 Instance Core running in Americas
+        ram: BF80-650A-78E6 Spot Preemptible G2 Instance Ram running in Americas
+        gpu: AEC2-3D5C-61BF Nvidia L4 GPU attached to Spot Preemptible VMs running in Americas
+    a2-ultragpu-1g:
+      gpu: nvidia-a100-80gb
+      gpus: 1
+      vcpus: 12
+      memory_gib: 170.0
+      local_ssd_gib: 375
+      usd_per_hour: 3.039953
+      skus:
+        core: 3178-715E-CFB6 Spot Preemptible A2 Instance Core running in Americas
+        ram: 65A3-16DB-D57A Spot Preemptible A2 Instance Ram running in Americas
+        gpu: DD90-547C-2AAA Nvidia Tesla A100 80GB GPU attached to Spot Preemptible VMs running in Americas
+        local_ssd: E725-3CC5-D4BE SSD backed Local Storage attached to Spot Preemptible VMs
+    a3-highgpu-1g:
+      gpu: nvidia-h100-80gb
+      gpus: 1
+      vcpus: 26
+      memory_gib: 234.0
+      local_ssd_gib: 750
+      usd_per_hour: 6.273933
+      skus:
+        core: EEE5-1DA5-D9CF Spot Preemptible A3 Instance Core running in Americas
+        ram: F619-87C3-D3BA Spot Preemptible A3 Instance Ram running in Americas
+        gpu: 7A6D-F74C-B0A3 Nvidia H100 80GB GPU attached to Spot Preemptible VMs running in Americas
+        local_ssd: E725-3CC5-D4BE SSD backed Local Storage attached to Spot Preemptible VMs
+    e2-standard-2:
+      gpu: none
+      gpus: 0
+      vcpus: 2
+      memory_gib: 8.0
+      local_ssd_gib: 0
+      usd_per_hour: 0.040212
+      skus:
+        core: F179-E1EA-D97A Spot Preemptible E2 Instance Core running in Americas
+        ram: 9B1F-1E62-4061 Spot Preemptible E2 Instance Ram running in Americas
+  europe-west4:
+    g2-standard-8:
+      gpu: nvidia-l4
+      gpus: 1
+      vcpus: 8
+      memory_gib: 32.0
+      local_ssd_gib: 0
+      usd_per_hour: 0.538252
+      skus:
+        core: 28A2-9207-5A67 Spot Preemptible G2 Instance Core running in Netherlands
+        ram: 4A7F-C13E-5293 Spot Preemptible G2 Instance Ram running in Netherlands
+        gpu: 5038-EF2D-3652 Nvidia L4 GPU attached to Spot Preemptible VMs running in Netherlands
+    a2-ultragpu-1g:
+      gpu: nvidia-a100-80gb
+      gpus: 1
+      vcpus: 12
+      memory_gib: 170.0
+      local_ssd_gib: 375
+      usd_per_hour: 3.099473
+      skus:
+        core: E540-EA28-2318 Spot Preemptible A2 Instance Core running in Netherlands
+        ram: D847-3FF3-B717 Spot Preemptible A2 Instance Ram running in Netherlands
+        gpu: 9353-708C-35DF Nvidia Tesla A100 80GB GPU attached to Spot Preemptible VMs running in Netherlands
+        local_ssd: 8D0B-EA58-9E35 SSD backed Local Storage attached to Spot Preemptible VMs in Netherlands
+    a3-highgpu-1g:
+      gpu: nvidia-h100-80gb
+      gpus: 1
+      vcpus: 26
+      memory_gib: 234.0
+      local_ssd_gib: 750
+      usd_per_hour: 8.437073
+      skus:
+        core: 91F8-8802-95B4 Spot Preemptible A3 Instance Core running in Netherlands
+        ram: 251D-6925-C671 Spot Preemptible A3 Instance Ram running in Netherlands
+        gpu: 9D2A-5124-7078 Nvidia H100 80GB GPU attached to Spot Preemptible VMs running in Netherlands
+        local_ssd: 8D0B-EA58-9E35 SSD backed Local Storage attached to Spot Preemptible VMs in Netherlands
+    e2-standard-2:
+      gpu: none
+      gpus: 0
+      vcpus: 2
+      memory_gib: 8.0
+      local_ssd_gib: 0
+      usd_per_hour: 0.044268
+      skus:
+        core: D55E-4C77-A49B Spot Preemptible E2 Instance Core running in Netherlands
+        ram: 7A8F-09E3-523C Spot Preemptible E2 Instance Ram running in Netherlands
 disk:
-  pd-balanced_usd_per_gb_month: 0.10
+  pd-balanced_usd_per_gb_month: 0.11
 storage:
   gcs_standard_usd_per_gb_month: 0.02
-vertex_training_spot: {}   # filled in M0 only if the vertex credit covers custom training
-gemini: {}                 # filled in M2 from the live Vertex pricing page
+vertex_training_spot: {}
+gemini: {}

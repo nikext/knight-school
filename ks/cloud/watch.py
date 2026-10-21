@@ -35,7 +35,7 @@ def watch(
     approved: str,
     interval: float = 300,
     ledger_path: Path = LEDGER_PATH,
-    clock: Callable[[], datetime] = utcnow,
+    clock: Callable[[], datetime] = lambda: utcnow().replace(microsecond=0),
     sleep: Callable[[float], None] = time.sleep,
     log: Callable[[str], None] = print,
 ) -> str:

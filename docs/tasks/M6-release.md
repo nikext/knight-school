@@ -7,6 +7,14 @@ teardown with a final cost line.
 
 **Budget:** compute $9 · vertex $4. Mostly egress and a final eval or two.
 
+**Calendar (ADR-013):** the compute credit expires 2026-11-12. The final
+GPU evals must end by 2026-11-10 00:00Z (gate), and the bucket and registry
+must be emptied by 2026-11-11, unless the Marketing-credit scope test showed
+that it covers storage. So the **compute half of M6** (final evals,
+downloads, storage teardown) runs right after M5. The publishing half (HF,
+site, blog, CV) and the post-Nov-13 Gemini rows can come later, with no
+compute spend.
+
 **Read first:** RESULTS.md (all of it), README.md, GCP.md §8. Every step
 that publishes something needs the user's yes (CLAUDE.md).
 

@@ -1,14 +1,25 @@
 # Money caps. Machine-readable form of docs/BUDGET.md §1. ks.cloud reads it.
 # Only the user changes ceilings and allocations (CLAUDE.md, money rules).
+# Credit facts are what the user read in Billing -> Credits (there is no API).
 currency: USD
 
 pools:
   compute:
-    credit: 400        # stated by the user 2026-10-21
-    ceiling: 360       # never planned past; M0 sets min(360, 0.9 x remaining)
+    credit: "Google Developer Program premium benefit (CREDIT_TYPE_ANNUAL)"
+    scope: "all of Google Cloud Platform and Google Maps APIs (list pricing)"
+    remaining_usd: 440.94          # shared with the user's other projects
+    checked_on: 2026-10-21T13:00:00Z
+    expires: 2026-11-12            # gate: jobs must end 48 h before (ADR-013)
+    ceiling: 360                   # min(360, 0.9 x 440.94 = 396.85)
   vertex:
-    credit: 200
-    ceiling: 180
+    credit: "Marketing - GDP Premium Support 4"
+    scope: "UNVERIFIED: 'certain usage'; assumed Vertex AI generative AI (Gemini) only"
+    remaining_usd: 209.26
+    checked_on: 2026-10-21T13:00:00Z
+    expires: 2027-04-08
+    usable_from: 2026-11-13        # Gemini waits until the compute credit is gone (ADR-013)
+    covers_custom_training: false  # assumed; the vertex M5 line is dead
+    ceiling: 180                   # min(180, 0.9 x 209.26 = 188.33)
 
 # Per-milestone allocations. They must sum to each pool's ceiling.
 allocations:
@@ -21,14 +32,6 @@ limits:
   spot_only: true
   worst_case_factor: 1.05
   prices_max_age_days: 30
-
-# Filled in M0 from Billing -> Credits (the user reads it; there is no API).
-verified:
-  checked_on: null
-  compute_credit_remaining: null
-  compute_credit_expiry: null
-  compute_credit_scope: null
-  vertex_credit_remaining: null
-  vertex_credit_expiry: null
-  vertex_credit_scope: null
-  vertex_covers_custom_training: null   # false -> vertex M5 line is dead
+  credit_reserve_factor: 0.9       # plan at most 90% of what the credit has left
+  credit_check_max_age_days: 7     # the credits are shared: re-read them weekly
+  expiry_margin_hours: 48

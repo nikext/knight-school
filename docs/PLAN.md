@@ -9,7 +9,7 @@ merged PR whose description lists what was verified, the numbers, and the
 
 | # | Milestone | Task file | compute $ | vertex $ | Status | PR / notes |
 |---|---|---|---|---|---|---|
-| M0 | Bootstrap and money guardrails | [M0](tasks/M0-bootstrap.md) | 5 | 1 | ⬜ todo | |
+| M0 | Bootstrap and money guardrails | [M0](tasks/M0-bootstrap.md) | 5 | 1 | ✅ done | PR #1 · spent $0.08 compute, $0.000001 vertex · L4 smoke passed (r2); kill switch tested |
 | M1 | Data: puzzles, splits, Stockfish rewards, primer | [M1](tasks/M1-data.md) | 1 | 0 | ⬜ todo | |
 | M2 | Eval harness, container, model choice, baselines (E0, E1) | [M2](tasks/M2-evals-baselines.md) | 15 | 50 | ⬜ todo | |
 | M3 | GRPO pipeline, RL on base (E2), re-plan | [M3](tasks/M3-grpo.md) | 70 | 0 | ⬜ todo | |
@@ -21,9 +21,26 @@ merged PR whose description lists what was verified, the numbers, and the
 
 Legend: ⬜ todo · 🟨 in progress · ✅ done · ⏭️ skipped (say why)
 
+## Calendar (ADR-013)
+
+The compute credit expires **2026-11-12**. The gate refuses any job that
+could still run after **2026-11-10 00:00Z**. Gemini may only spend from
+2026-11-13, on the second credit. Target dates, with sessions every 2–3 days:
+
+| Milestone | Target | Hard limit |
+|---|---|---|
+| M1 data (laptop) | Oct 22–23 | — |
+| M2 harness, container, model choice, open-model baselines | Oct 24–26 | Gemini rows wait for Nov 13 |
+| M3 GRPO + E2 + re-plan | Oct 27–31 | |
+| M4 primer → GRPO (E3) | Nov 1–5 | |
+| M5 scaling / ablations, whatever fits | Nov 5–9 | GPU jobs end by Nov 10 00:00Z |
+| M6a final evals, downloads, empty bucket and registry | Nov 9–11 | storage gone by Nov 11 |
+| E1-Gemini (scope test → pilot → batch) | from Nov 13 | vertex pool only |
+| M6b HF release, site, blog, CV | after | no compute spend |
+
 \* Only if the Vertex credit covers Vertex AI custom training (checked in M0).
 
-Spent to date: compute $0 · vertex $0 (update from `make costs` in each PR).
+Spent to date: compute $0.08 · vertex $0.00 (update from `make costs` in each PR).
 
 ---
 
