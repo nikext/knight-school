@@ -22,12 +22,25 @@ RUN (python3 -m pip check > /tmp/check-base.txt 2>&1 || true) \
  && { comm -13 /tmp/a /tmp/b | tee /tmp/new-conflicts.txt; ! grep -q . /tmp/new-conflicts.txt; } \
  && python3 -c "import torch, vllm, trl, peft, transformers, numpy; print('torch', torch.__version__, 'vllm', vllm.__version__, 'trl', trl.__version__, 'peft', peft.__version__, 'transformers', transformers.__version__, 'numpy', numpy.__version__)"
 
+# The base ships a torchcodec built for CUDA 13 (it loads libnvrtc.so.13, absent from this
+# cu129 image), and `datasets` imports it, which breaks `trl.GRPOTrainer` on import (found in
+# the first screening run). We never decode audio or video, so it goes.
+RUN python3 -m pip uninstall -y torchcodec \
+ && python3 -c "from trl import GRPOConfig, GRPOTrainer; from vllm import LLM, SamplingParams; import datasets, peft; print('imports ok')"
+
 COPY pyproject.toml README.md LICENSE ./
 COPY ks ./ks
 COPY configs ./configs
 COPY costs ./costs
 COPY evals ./evals
-RUN python3 -m pip install --no-cache-dir --no-deps . && mkdir -p /out
+# Editable, so ks.cloud.config.REPO resolves to /app (configs/, evals/, costs/) and not to
+# site-packages; the first screening run failed on exactly that. The smoke below runs the
+# CPU paths the GPU jobs depend on, so a packaging bug fails the build instead of a GPU run.
+RUN python3 -m pip install --no-cache-dir --no-deps -e . && mkdir -p /out \
+ && ks eval random --set dev500 --limit 5 --out /tmp/smoke \
+ && ks eval random --set probe500 --limit 8 --out /tmp/smoke \
+ && python3 -c "from ks.eval import profile; [profile.load(m) for m in ('qwen3-1.7b', 'qwen3.5-2b', 'gemma4-e2b')]" \
+ && python3 -m ks.train.grpo_smoke --help > /dev/null && rm -rf /tmp/smoke
 
 ARG GIT_SHA=unknown
 ENV KS_GIT_SHA=${GIT_SHA}
