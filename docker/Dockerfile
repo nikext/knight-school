@@ -11,13 +11,15 @@ ENV PYTHONUNBUFFERED=1 HF_HUB_ENABLE_HF_TRANSFER=0
 # vLLM, triton, FlashInfer, numpy, numba and opentelemetry versions are constraints: the first
 # build let pip upgrade numpy to 2.5 under numba's <2.5 pin. Freezing the whole base was too
 # strict (its fsspec is newer than any `datasets` allows). The build fails if `pip check`
-# reports anything the base image didn't.
+# reports a conflict the base image didn't have. Fewer is fine: the base's own conflict
+# (nvidia-nccl-cu12 2.30.7 vs torch's ==2.29.7 pin) goes away when pip installs torch's pin.
 COPY docker/requirements.txt /tmp/requirements.txt
 RUN (python3 -m pip check > /tmp/check-base.txt 2>&1 || true) \
  && python3 -m pip freeze | grep -iE '^(torch|torchvision|torchaudio|vllm|triton|flashinfer-[a-z-]+|numpy|numba|llvmlite|xformers|opentelemetry-[a-z-]+)==' > /tmp/constraints.txt \
  && python3 -m pip install --no-cache-dir -c /tmp/constraints.txt -r /tmp/requirements.txt \
  && (python3 -m pip check > /tmp/check-after.txt 2>&1 || true) \
- && diff /tmp/check-base.txt /tmp/check-after.txt \
+ && sort /tmp/check-base.txt > /tmp/a && sort /tmp/check-after.txt > /tmp/b \
+ && { comm -13 /tmp/a /tmp/b | tee /tmp/new-conflicts.txt; ! grep -q . /tmp/new-conflicts.txt; } \
  && python3 -c "import torch, vllm, trl, peft, transformers, numpy; print('torch', torch.__version__, 'vllm', vllm.__version__, 'trl', trl.__version__, 'peft', peft.__version__, 'transformers', transformers.__version__, 'numpy', numpy.__version__)"
 
 COPY pyproject.toml README.md LICENSE ./
