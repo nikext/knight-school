@@ -1,7 +1,8 @@
 #!/bin/bash
 # M2 screening job (task M2 §5, §6), run inside the train image on a spot L4.
 #   1. dev500 zero-shot for every candidate profile given in SCREEN_MODELS;
-#   2. a 5-step GRPO + LoRA + vLLM-colocate smoke for each of SMOKE_MODELS.
+#   2. a 5-step GRPO + LoRA + vLLM-colocate smoke for each of SMOKE_MODELS;
+#   3. the E0 probe (probe500) for each of PROBE_MODELS.
 # Every step runs even if an earlier one fails; results land in /out (synced to GCS).
 set -u
 cd /app
@@ -17,8 +18,13 @@ done
 for m in ${SMOKE_MODELS}; do
   echo "[screen] $(date -u +%FT%TZ) grpo smoke $m"
   python3 -m ks.train.grpo_smoke --model "$m" --steps 5 --data "${RL_TRAIN}" --out /out/grpo-smoke \
-    > "/out/grpo-smoke-$m.log" 2>&1 || { echo "[screen] grpo smoke $m FAILED"; status=1; }
+    --vllm-mem "${SMOKE_VLLM_MEM:-0.45}" > "/out/grpo-smoke-$m.log" 2>&1 || { echo "[screen] grpo smoke $m FAILED"; status=1; }
   tail -5 "/out/grpo-smoke-$m.log"
+done
+for m in ${PROBE_MODELS:-}; do
+  echo "[screen] $(date -u +%FT%TZ) probe $m"
+  ks eval "$m" --set probe500 --out /out/eval > "/out/probe-$m.log" 2>&1 || { echo "[screen] probe $m FAILED"; status=1; }
+  tail -12 "/out/probe-$m.log"
 done
 echo "[screen] $(date -u +%FT%TZ) done, status $status"
 exit $status

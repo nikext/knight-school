@@ -2,7 +2,7 @@
 UV ?= $(HOME)/.local/bin/uv
 KS := $(UV) run ks
 
-.PHONY: help setup lint test costs reconcile sweep prices data upload-data eval
+.PHONY: help setup lint test costs reconcile sweep prices data upload-data eval image
 
 help:
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
@@ -44,3 +44,12 @@ upload-data: ## M1: copy data/ (minus raw/, logs/, reward shards) to the bucket 
 SET ?= dev500
 eval: ## run the eval harness: MODEL=<profile> SET=dev500|test2000|test500|chessbench1k|probe500 [CKPT=gs://...] [ARGS=...]
 	$(KS) eval $(MODEL) --set $(SET) $(if $(CKPT),--ckpt $(CKPT),) $(ARGS)
+
+PROJECT = $(shell grep -E '^GOOGLE_CLOUD_PROJECT=' .env | cut -d= -f2 | cut -d' ' -f1)
+GIT_SHA = $(shell git rev-parse --short=12 HEAD)
+IMAGE = us-central1-docker.pkg.dev/$(PROJECT)/knight-school/train
+
+image: ## build and push train:<git-sha> with Cloud Build (billable: ask first; clean tree only)
+	@test -z "$$(git status --porcelain -- ks configs docker evals pyproject.toml)" || { echo "commit first: the tag is the git sha"; exit 1; }
+	$(GCLOUD) builds submit --project $(PROJECT) --region us-central1 --config docker/cloudbuild.yaml \
+		--substitutions _IMAGE=$(IMAGE),_GIT_SHA=$(GIT_SHA) .
