@@ -8,6 +8,7 @@ where it stopped.
 
 from __future__ import annotations
 
+import json
 import os
 import time
 from collections.abc import Callable
@@ -130,7 +131,11 @@ def run_shards(
     workers: int,
     log: Callable[[str], None],
 ) -> list[Path]:
-    """Resumable: shard inputs are (re)written only if missing, outputs skipped if present."""
+    """Resumable: shard inputs are (re)written only if missing, outputs skipped if present.
+
+    Each shard's engine seconds go to `secs.json` beside the outputs, so the total
+    cost survives a resumed or skipped run (see `shard_seconds`).
+    """
     version = sf_version()
     inputs, outputs = work_dir / "in", work_dir / f"out-n{nodes}"
     inputs.mkdir(parents=True, exist_ok=True)
@@ -149,6 +154,7 @@ def run_shards(
         with get_context("spawn").Pool(workers, initializer=_init) as pool:
             for name, rows, secs in pool.imap_unordered(_run_shard, jobs):
                 done += 1
+                _record_secs(outputs, name, secs)
                 el = time.perf_counter() - t0
                 eta = el / done * (len(jobs) - done)
                 log(
@@ -156,6 +162,19 @@ def run_shards(
                     f"elapsed {el / 60:.1f} min, eta {eta / 60:.1f} min"
                 )
     return sorted(outputs.glob("shard-*.parquet"))
+
+
+def _record_secs(outputs: Path, name: str, secs: float) -> None:
+    path = outputs / "secs.json"
+    table = json.loads(path.read_text()) if path.exists() else {}
+    table[name] = round(secs, 1)
+    path.write_text(json.dumps(table, indent=0, sort_keys=True))
+
+
+def shard_seconds(outputs: Path) -> dict[str, float]:
+    """Engine seconds per finished shard (one worker, one thread each)."""
+    path = outputs / "secs.json"
+    return json.loads(path.read_text()) if path.exists() else {}
 
 
 # --- agreement and the mismatch filter ----------------------------------------------

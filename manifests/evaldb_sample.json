@@ -5,9 +5,9 @@
     "data/evaldb/sample.parquet"
   ],
   "sha256": "64d76832e24bbf34c77bf0850cc1d6f68b0c338c29ac21a54cc23ca201649170",
-  "fingerprint": "00a37880151ffdf081876edc70f2612cd9fd8562e2ad8e5c82bfd6adfa2b5436",
-  "git_sha": "8f12a34ee9df-dirty",
-  "built_at": "2026-10-21T14:12:48+00:00",
+  "fingerprint": "558a572b3fbe0ca6f191fa028bbe67efda2d6489986a13866da3c5e23841c3ba",
+  "git_sha": "50ac834f45c0",
+  "built_at": "2026-10-21T17:39:05+00:00",
   "source": "https://database.lichess.org/lichess_db_eval.jsonl.zst",
   "source_version": "Fri, 02 Oct 2026 20:16:33 GMT|22423777007",
   "lines_read": 30000000,

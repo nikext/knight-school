@@ -64,8 +64,8 @@ straddle splits. All split files are deterministic given the seed.
 | `test500` | 500 ⊂ test2000 | stratified subset, for expensive models (Gemini Pro) | yes, ids |
 | `dev500` | 500 puzzles | stratified the same way; for curves during training | yes, full rows |
 | `probe500` | 500 items | E0 diagnostic (EVALS.md §4), from held-out eval-DB positions | yes |
-| `rl_train` | ~60k positions | from the remaining puzzles, stratified by rating | manifest only |
-| `primer_pool` | the rest | puzzle positions available to the primer | manifest only |
+| `rl_train` | 66,008 positions (29,927 puzzles) | from the remaining puzzles, stratified by rating | manifest only |
+| `primer_pool` | the rest (3,281,538 puzzles) | puzzle positions available to the primer | manifest only |
 
 `rl_train` and `primer_pool` come from **disjoint puzzle sets**. That keeps
 RL's contribution separable from the primer's (RESEARCH.md H5).
@@ -200,6 +200,7 @@ data/
   positions/rl_train_candidates.parquet
   positions/rl_train.parquet          # expanded + reward tables, after the mismatch filter
   positions/rewards/{in,out-n1000000}/shard-*.parquet   # resumable work dir, not uploaded
+  positions/rewards/out-n1000000/secs.json   # engine seconds per shard → cpu_hours
   primer/{S,M}/shard-*.jsonl.zst      # L, rules-M in M5
 manifests/*.json                      # committed
 evals/sets/{test2000,dev500,probe500,chessbench1k}.csv, test500.ids,
@@ -213,14 +214,34 @@ hashes, parameters, module source) matches and its outputs still hash to
 what the manifest says. `make upload-data` copies `data/` (minus raw, logs and
 reward shards) to `gs://$BUCKET/data/v1/`.
 
-## 9. Data card (fill in during M1)
+## 9. Data card (M1, built 2026-10-21)
+
+All numbers come from `manifests/*.json`. The data lives in
+`gs://knight-school-nt26-knight-school/data/v1/` (everything under `data/` except
+`raw/`, `logs/` and the per-shard reward files).
 
 | Item | Value |
 |---|---|
-| Puzzles downloaded / after each filter | |
-| Games in test / dev | |
-| rl_train positions / dropped as solution-vs-engine mismatch | |
-| Stockfish version, nodes N, total CPU hours | |
-| Stockfish-top-move = solution rate | |
-| Primer S / M: examples, tokens per task | |
-| Contamination hits (must be 0) | |
+| Puzzles downloaded / after each filter | 6,157,341 → NbPlays ≥ 200: 4,024,575 → RatingDeviation ≤ 90: 3,383,515 → Popularity ≥ 50: 3,375,981 → rating 400–2800: 3,375,110 → ≤ 4 solver moves: **3,313,967** (each from a different game) |
+| Games in test / dev | 2,000 / 500 (one puzzle per game, disjoint, all in `blocklist.games.txt`) |
+| Blocklist | 14,819 position keys (test2000 11,368, dev500 2,826, probe500 625) and 2,500 games |
+| rl_train positions / dropped as solution-vs-engine mismatch | 66,008 positions from 29,927 puzzles / **1** dropped (Δwp > 0.15). Before that: 1 blocklist hit and 13 duplicate keys dropped from 66,023 candidates |
+| Stockfish version, nodes N, total CPU hours | Stockfish 19 (sf_19, x86-64 build, NNUE `nn-1a298aa575a0`), **N = 1,000,000**, 1 thread and 64 MB hash per position, MultiPV over all legal moves. 3.2 h wall on 18 workers (i7-12700H); **56.5 engine-hours** (`cpu_hours` in `manifests/rl_train.json`, summed from the per-shard seconds in `secs.json`). Timing sample: `manifests/rewards_timing.json` |
+| Stockfish-top-move = solution rate | **99.7%** (99.94% counting "both moves mate" as agreement) |
+| Primer S / M: examples | S 130,000 (3 shards) / M 1,300,000 (26 shards); S is the first 130k of M |
+| Primer per task (S / M examples; est. tokens S / M) | T1 12,987 / 130,502 (1.3M / 13.0M) · T2 19,678 / 195,590 (3.0M / 29.6M) · T3 19,541 / 195,136 (2.6M / 26.2M) · T4 13,141 / 130,107 (1.2M / 12.2M) · T5 38,697 / 389,918 (7.6M / 76.2M) · T6 13,053 / 129,617 (1.2M / 12.2M) · T7 12,903 / 129,130 (1.3M / 12.6M) · **total ~18M / ~182M** |
+| Primer sources (M) | eval DB 779,356, puzzle positions 520,644; 235 items dropped for touching the blocklist, 351 for touching rl_train |
+| Eval-DB sample | 2,000,000 positions, reservoir over the first 30M lines of `lichess_db_eval.jsonl.zst` (Last-Modified 2026-10-02, 22,423,777,007 bytes); 13.9% mate scores |
+| chessbench1k | 1,000 puzzles from the Searchless Chess 10k, 568 excluded for touching training data; mean rating 1458 vs 1461 for the 10k |
+| Contamination hits (must be 0) | **0** in every manifest (rl_train_candidates, rl_train, primer_S, primer_M, chessbench1k) |
+
+Token counts are estimates: the per-task mean from a 3k-example sample with
+Qwen3's tokenizer (ChatML framing included) times the example count. M2
+records exact counts with the chosen model's tokenizer.
+
+**Reproducibility.** `make data` is deterministic given its inputs (seed 2026),
+and a second full run on 2026-10-21 reproduced all ten manifests' output hashes. Two inputs are
+mutable upstream: Lichess republishes the puzzle and eval databases monthly.
+The manifests record each source's sha256 or Last-Modified/size. A rebuild
+after a refresh produces different splits, so the GCS copy of `data/v1/` is
+the canonical version.

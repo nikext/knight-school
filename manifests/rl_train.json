@@ -1,0 +1,26 @@
+{
+  "name": "rl_train",
+  "data_version": "v1",
+  "outputs": [
+    "data/positions/rl_train.parquet"
+  ],
+  "sha256": "c8027e48cf375edf1073994fb7e07b270b26cd62063a830226faca0361aef725",
+  "fingerprint": "7399e696e3e1671fab051bed189feaad115645aff835636eb40d48a10cd8933d",
+  "git_sha": "50ac834f45c0-dirty",
+  "built_at": "2026-10-21T18:01:49+00:00",
+  "rows": 66008,
+  "analysed": 66009,
+  "mismatch_dropped": 1,
+  "mismatch_threshold_wp": 0.15,
+  "sf_best_eq_solution": 0.997,
+  "sf_best_eq_solution_or_both_mate": 0.9994,
+  "sf_version": "Stockfish 19",
+  "nodes": 1000000,
+  "threads": 1,
+  "hash_mb": 64,
+  "workers": 18,
+  "wall_hours_this_run": 0.0,
+  "cpu_hours": 56.5,
+  "shards_timed": "265/265",
+  "contamination_hits": 0
+}

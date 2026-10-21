@@ -5,9 +5,9 @@
     "data/primer/M"
   ],
   "sha256": "2464b1323ba5106dc276ed447cf3bd8eb3af105f35eeb6e111d880ac9ec6c4ff",
-  "fingerprint": "a8d129722e35e52e18e25c80b947a127888be9b2a51586259892e3fbe1512d9f",
-  "git_sha": "277cc3ef7d27",
-  "built_at": "2026-10-21T14:52:25+00:00",
+  "fingerprint": "51cc0bab05da9fa67eaaa2823b1da1dab4eea53cfdbf6e494324825f200b8934",
+  "git_sha": "50ac834f45c0",
+  "built_at": "2026-10-21T18:00:44+00:00",
   "examples": 1300000,
   "shards": 26,
   "per_task": {

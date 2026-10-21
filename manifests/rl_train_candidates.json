@@ -7,9 +7,9 @@
     "data/positions/rl_train_candidates.parquet"
   ],
   "sha256": "8871188bfc4d4c37d4e2b76e58004aefa5d7f8924ed814ea2a0a101c90038e7b",
-  "fingerprint": "47e8487f5a1ff3a9bd4fb215f9dad16e2cc7c644e43f305fbb6e8f47025342fe",
-  "git_sha": "8f12a34ee9df-dirty",
-  "built_at": "2026-10-21T14:13:45+00:00",
+  "fingerprint": "28e697415b685ff63453f3d29d38c31c3907b8ad267536b614c46a343d8feefc",
+  "git_sha": "50ac834f45c0",
+  "built_at": "2026-10-21T17:39:45+00:00",
   "rl_train_puzzles": 29929,
   "rl_train_positions": 66009,
   "primer_pool_puzzles": 3281538,

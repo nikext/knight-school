@@ -327,6 +327,7 @@ def step_rewards(log: Log, force: bool = False) -> None:
     block = bl.Blocklist.load(mf.SETS)
     hits = block.hits_fens(kept["fen"].to_list())
     n = full.height
+    secs = rewards.shard_seconds(POSITIONS / "rewards" / f"out-n{REWARD_NODES}")
     mf.write(
         "rl_train",
         fp,
@@ -343,6 +344,8 @@ def step_rewards(log: Log, force: bool = False) -> None:
         hash_mb=rewards.HASH_MB,
         workers=rewards.WORKERS,
         wall_hours_this_run=round(wall / 3600, 2),
+        cpu_hours=round(sum(secs.values()) / 3600, 1),
+        shards_timed=f"{len(secs)}/{len(shards)}",
         contamination_hits=hits,
     )
     log(f"rewards: {kept.height:,} kept of {n:,} ({dropped:,} mismatches dropped)")

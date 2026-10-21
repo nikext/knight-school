@@ -94,6 +94,16 @@ def test_agreement_and_mismatch_filter():
     assert dropped == 1 and kept.height == 3
 
 
+def test_shard_seconds_accumulate_across_runs(tmp_path):
+    assert rewards.shard_seconds(tmp_path) == {}
+    rewards._record_secs(tmp_path, "shard-0000.parquet", 12.34)
+    rewards._record_secs(tmp_path, "shard-0001.parquet", 5.0)
+    assert rewards.shard_seconds(tmp_path) == {
+        "shard-0000.parquet": 12.3,
+        "shard-0001.parquet": 5.0,
+    }
+
+
 def test_blocklist_round_trip_and_hits(tmp_path):
     fen = "r6k/pp2r2p/4Rp1Q/3p4/8/1N1P2R1/PqP2bPP/7K b - - 0 24"
     keys = bl.puzzle_keys(pl.DataFrame([{"FEN": fen, "Moves": "f2g3 e6e7"}]))
