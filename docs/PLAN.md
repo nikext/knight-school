@@ -10,7 +10,7 @@ merged PR whose description lists what was verified, the numbers, and the
 | # | Milestone | Task file | compute $ | vertex $ | Status | PR / notes |
 |---|---|---|---|---|---|---|
 | M0 | Bootstrap and money guardrails | [M0](tasks/M0-bootstrap.md) | 5 | 1 | ✅ done | PR #1 · spent $0.08 compute, $0.000001 vertex · L4 smoke passed (r2); kill switch tested |
-| M1 | Data: puzzles, splits, Stockfish rewards, primer | [M1](tasks/M1-data.md) | 1 | 0 | ⬜ todo | |
+| M1 | Data: puzzles, splits, Stockfish rewards, primer | [M1](tasks/M1-data.md) | 1 | 0 | ✅ done | PR #2 · spent $0.02 compute (GCS storage) · 66,008 rl_train positions, SF19 N=1M, 99.7% agree · primer S 130k / M 1.3M · 0 contamination |
 | M2 | Eval harness, container, model choice, baselines (E0, E1) | [M2](tasks/M2-evals-baselines.md) | 15 | 50 | ⬜ todo | |
 | M3 | GRPO pipeline, RL on base (E2), re-plan | [M3](tasks/M3-grpo.md) | 70 | 0 | ⬜ todo | |
 | M4 | Primer SFT → GRPO, the main result (E3) | [M4](tasks/M4-primer.md) | 100 | 0 | ⬜ todo | |

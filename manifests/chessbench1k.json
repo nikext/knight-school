@@ -1,0 +1,38 @@
+{
+  "name": "chessbench1k",
+  "data_version": "v1",
+  "outputs": [
+    "evals/sets/chessbench1k.csv"
+  ],
+  "sha256": "8a4d3f1edc2d456d5292d76c5d67e99b33623309f932062a45bf902a801b5863",
+  "fingerprint": "a734dd2316160f30a2df85590f646c083f493fd215ae19555dc03376482e285f",
+  "git_sha": "277cc3ef7d27-dirty",
+  "built_at": "2026-10-21T14:56:22+00:00",
+  "source": "https://storage.googleapis.com/searchless_chess/data/puzzles.csv",
+  "source_sha256": "099d54e681a07b9e82b4462aaf5436a6e833edc6f56b92ea7c2d2413f7efbe48",
+  "license": "CC0 (lichess.org) / CC-BY 4.0 (Ruoss et al. 2024, google-deepmind/searchless_chess)",
+  "rows": 1000,
+  "excluded_touching_training_data": 568,
+  "stratified": "12 bins of 200 Elo (clipped to 400-2800), quotas proportional to the full 10k",
+  "per_bin": [
+    23,
+    62,
+    139,
+    150,
+    122,
+    126,
+    104,
+    88,
+    76,
+    61,
+    36,
+    13
+  ],
+  "rating_mean": {
+    "chessbench1k": 1458.2,
+    "full_10k": 1460.8
+  },
+  "seed": 2026,
+  "contamination_hits": 0,
+  "note": "filtered against rl_train and primer-M (v1); not in the blocklist"
+}

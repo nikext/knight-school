@@ -1,0 +1,45 @@
+{
+  "name": "primer_S",
+  "data_version": "v1",
+  "outputs": [
+    "data/primer/S"
+  ],
+  "sha256": "6bba9404e36a404f944a5fa2884646aa5f31d9936be8d42061775aee7e8e4be5",
+  "fingerprint": "51cc0bab05da9fa67eaaa2823b1da1dab4eea53cfdbf6e494324825f200b8934",
+  "git_sha": "50ac834f45c0",
+  "built_at": "2026-10-21T18:00:58+00:00",
+  "examples": 130000,
+  "shards": 3,
+  "per_task": {
+    "T1": 12987,
+    "T2": 19678,
+    "T3": 19541,
+    "T4": 13141,
+    "T5": 38697,
+    "T6": 13053,
+    "T7": 12903
+  },
+  "per_source": {
+    "evaldb": 77772,
+    "puzzle": 52228
+  },
+  "nested_in": "primer_M",
+  "contamination_hits": 0,
+  "tokens": "counted in M2 with the chosen tokenizer",
+  "seed": 2026,
+  "weights": {
+    "T1": 0.1,
+    "T2": 0.15,
+    "T3": 0.15,
+    "T4": 0.1,
+    "T5": 0.3,
+    "T6": 0.1,
+    "T7": 0.1
+  },
+  "puzzle_share": 0.5,
+  "blocklist_drops": 235,
+  "rl_train_drops": 351,
+  "skipped_no_item": 890,
+  "evaldb_positions_used": 786568,
+  "puzzle_positions_used": 521014
+}

@@ -33,6 +33,10 @@ The M4 ADR may reorder these. If it does, follow it.
 
 1. Generate primer-L and primer-rules-M on the laptop (DATA.md §7). Count
    their tokens, write the manifests (0 contamination hits), and upload.
+   Besides the blocklist, these sets must also drop every position on a
+   `chessbench1k` line (M1 left it out of the blocklist; see EVALS.md §1).
+   primer-L needs ~3× M's positions, so stream a larger eval-DB sample
+   (`EVALDB_K`), or allow reuse and say so in an ADR.
 2. Before starting, show the user the priority table with current cost
    estimates and the remaining line. Agree on which arms to attempt.
 3. For each arm, in order:
