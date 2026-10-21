@@ -9,6 +9,7 @@ import random
 import time
 from collections.abc import Callable
 from pathlib import Path
+from typing import cast
 
 import polars as pl
 import requests
@@ -50,6 +51,10 @@ def _remote_version(url: str) -> str:
     return f"{h.get('last-modified')}|{h.get('content-length')}"
 
 
+def _mean(s: pl.Series, digits: int = 1) -> float:
+    return round(cast(float, s.mean()), digits)
+
+
 def _sets_csv(name: str) -> Path:
     return mf.SETS / f"{name}.csv"
 
@@ -70,7 +75,7 @@ def step_puzzles(log: Log, force: bool = False) -> None:
         raw.with_suffix(".tmp").rename(raw)
     outs = [FILTERED, _sets_csv("test2000"), _sets_csv("dev500"), mf.SETS / "test500.ids"]
     params = {"seed": puzzles.SEED, "sizes": EVAL_SIZES, "test500": TEST500}
-    fp = mf.fingerprint({"raw": mf.sha256_file(raw)}, params, [puzzles, kb])
+    fp = mf.fingerprint({"raw": mf.sha256_file(raw)}, params, [puzzles, kb, step_puzzles])
     if not force and mf.up_to_date("puzzles", fp, outs):
         log("puzzles: up to date")
         return
@@ -115,7 +120,9 @@ def step_puzzles(log: Log, force: bool = False) -> None:
 
 def step_evaldb(log: Log, force: bool = False) -> None:
     params = {"k": EVALDB_K, "max_lines": EVALDB_MAX_LINES, "seed": evaldb.SEED}
-    fp = mf.fingerprint({"lichess_db_eval": _remote_version(evaldb.URL)}, params, [evaldb])
+    fp = mf.fingerprint(
+        {"lichess_db_eval": _remote_version(evaldb.URL)}, params, [evaldb, step_evaldb]
+    )
     if not force and mf.up_to_date("evaldb_sample", fp, [EVALDB_SAMPLE]):
         log("evaldb: up to date")
         return
@@ -141,7 +148,9 @@ def step_evaldb(log: Log, force: bool = False) -> None:
 def step_probe(log: Log, force: bool = False) -> None:
     out = _sets_csv("probe500")
     fp = mf.fingerprint(
-        {"evaldb_sample": mf.output_sha("evaldb_sample")}, {"seed": probe.SEED}, [probe, pr, kb]
+        {"evaldb_sample": mf.output_sha("evaldb_sample")},
+        {"seed": probe.SEED},
+        [probe, pr, kb, step_probe],
     )
     if not force and mf.up_to_date("probe500", fp, [out]):
         log("probe: up to date")
@@ -165,7 +174,9 @@ def step_probe(log: Log, force: bool = False) -> None:
 def step_blocklist(log: Log, force: bool = False) -> None:
     sets = {n: _sets_csv(n) for n in ["test2000", "dev500", "probe500"]}
     outs = [mf.SETS / bl.EPD_FILE, mf.SETS / bl.GAMES_FILE]
-    fp = mf.fingerprint({n: mf.sha256_file(p) for n, p in sets.items()}, {}, [bl, puzzles, kb])
+    fp = mf.fingerprint(
+        {n: mf.sha256_file(p) for n, p in sets.items()}, {}, [bl, puzzles, kb, step_blocklist]
+    )
     if not force and mf.up_to_date("blocklist", fp, outs):
         log("blocklist: up to date")
         return
@@ -196,7 +207,7 @@ CANDIDATES = POSITIONS / "rl_train_candidates.parquet"
 def step_rltrain(log: Log, force: bool = False) -> None:
     outs = [RL_PUZZLES, POOL, CANDIDATES]
     inputs = {"puzzles": mf.output_sha("puzzles"), "blocklist": mf.output_sha("blocklist")}
-    fp = mf.fingerprint(inputs, {"target": RL_TARGET}, [puzzles, kb])
+    fp = mf.fingerprint(inputs, {"target": RL_TARGET}, [puzzles, kb, step_rltrain])
     if not force and mf.up_to_date("rl_train_candidates", fp, outs):
         log("rltrain: up to date")
         return
@@ -242,7 +253,7 @@ def step_timing(log: Log, force: bool = False) -> None:
     params = {"n": TIMING_POSITIONS, "nodes": TIMING_NODES, "workers": rewards.WORKERS}
     version = rewards.sf_version()
     inputs = {"candidates": mf.output_sha("rl_train_candidates"), "stockfish": version}
-    fp = mf.fingerprint(inputs, params, [rewards])
+    fp = mf.fingerprint(inputs, params, [rewards, step_timing])
     m = mf.load("rewards_timing")
     if not force and m and m["fingerprint"] == fp:
         log("timing: up to date")
@@ -300,7 +311,7 @@ def step_rewards(log: Log, force: bool = False) -> None:
         "hash": rewards.HASH_MB,
         "mismatch": rewards.MISMATCH_WP,
     }
-    fp = mf.fingerprint(inputs, params, [rewards, kb])
+    fp = mf.fingerprint(inputs, params, [rewards, kb, step_rewards])
     if not force and mf.up_to_date("rl_train", fp, [RL_TRAIN]):
         log("rewards: up to date")
         return
@@ -324,8 +335,8 @@ def step_rewards(log: Log, force: bool = False) -> None:
         analysed=n,
         mismatch_dropped=dropped,
         mismatch_threshold_wp=rewards.MISMATCH_WP,
-        sf_best_eq_solution=round(full["sf_agrees"].mean(), 4),  # type: ignore[arg-type]
-        sf_best_eq_solution_or_both_mate=round((full["sf_agrees"] | full["both_mate"]).mean(), 4),  # type: ignore[arg-type]
+        sf_best_eq_solution=_mean(full["sf_agrees"], 4),
+        sf_best_eq_solution_or_both_mate=_mean(full["sf_agrees"] | full["both_mate"], 4),
         sf_version=version,
         nodes=REWARD_NODES,
         threads=rewards.THREADS,
@@ -380,7 +391,7 @@ def step_primer(log: Log, force: bool = False) -> None:
         "blocklist": mf.output_sha("blocklist"),
     }
     params = {"sizes": PRIMER_SIZES, "seed": PRIMER_SEED, "shard": PRIMER_SHARD}
-    fp = mf.fingerprint(inputs, params, [pr, kb, puzzles])
+    fp = mf.fingerprint(inputs, params, [pr, kb, puzzles, step_primer])
     if not force and all(mf.up_to_date(f"primer_{n}", fp, [d]) for n, d in dirs.items()):
         log("primer: up to date")
         return
@@ -453,7 +464,9 @@ def step_chessbench(log: Log, force: bool = False) -> None:
         "rl_train_candidates": mf.output_sha("rl_train_candidates"),
         "primer_M": mf.output_sha("primer_M"),
     }
-    fp = mf.fingerprint(inputs, {"n": CHESSBENCH_N, "seed": puzzles.SEED}, [puzzles, kb])
+    fp = mf.fingerprint(
+        inputs, {"n": CHESSBENCH_N, "seed": puzzles.SEED}, [puzzles, kb, step_chessbench]
+    )
     if not force and mf.up_to_date("chessbench1k", fp, [out]):
         log("chessbench: up to date")
         return
@@ -471,7 +484,30 @@ def step_chessbench(log: Log, force: bool = False) -> None:
         .map_elements(lambda p: puzzles.order_key(puzzles.SEED, p), return_dtype=pl.String)
         .alias("order")
     )
-    picked = pool.sort("order").head(CHESSBENCH_N).sort("Rating", "PuzzleId")
+
+    # Stratify by 200-Elo bin to the full 10k's proportions (largest remainder), so
+    # excluding puzzles that touch training data doesn't shift the difficulty.
+    def with_bin(df: pl.DataFrame) -> pl.DataFrame:
+        return df.with_columns(
+            pl.col("Rating")
+            .clip(puzzles.RATING_LO, puzzles.RATING_HI)
+            .map_elements(puzzles.rating_bin, return_dtype=pl.Int64)
+            .alias("rating_bin")
+        )
+
+    full_bins = with_bin(cb)["rating_bin"].value_counts().sort("rating_bin")
+    shares = {b: n * CHESSBENCH_N / cb.height for b, n in full_bins.iter_rows()}
+    quotas = {b: int(x) for b, x in shares.items()}
+    for b in sorted(shares, key=lambda b: shares[b] - quotas[b], reverse=True)[
+        : CHESSBENCH_N - sum(quotas.values())
+    ]:
+        quotas[b] += 1
+    pool = with_bin(pool).sort("order")
+    picked = pl.concat(
+        pool.filter(pl.col("rating_bin") == b).head(q) for b, q in sorted(quotas.items())
+    ).sort("Rating", "PuzzleId")
+    if picked.height != CHESSBENCH_N:
+        raise ValueError(f"chessbench: a bin ran dry ({picked.height} of {CHESSBENCH_N})")
     picked.select("PuzzleId", "Rating", "FEN", "Moves", "Solution").write_csv(out)
     hits = sum(
         bool(train_keys.intersection(puzzles.line_keys(f, m)))
@@ -486,6 +522,9 @@ def step_chessbench(log: Log, force: bool = False) -> None:
         license="CC0 (lichess.org) / CC-BY 4.0 (Ruoss et al. 2024, google-deepmind/searchless_chess)",
         rows=picked.height,
         excluded_touching_training_data=cb.height - pool.height,
+        stratified="12 bins of 200 Elo (clipped to 400-2800), quotas proportional to the full 10k",
+        per_bin=[quotas[b] for b in sorted(quotas)],
+        rating_mean={"chessbench1k": _mean(picked["Rating"]), "full_10k": _mean(cb["Rating"])},
         seed=puzzles.SEED,
         contamination_hits=hits,
         note="filtered against rl_train and primer-M (v1); not in the blocklist",

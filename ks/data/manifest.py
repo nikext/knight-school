@@ -10,9 +10,10 @@ commit, which must not re-run four hours of Stockfish).
 from __future__ import annotations
 
 import hashlib
+import inspect
 import json
 import subprocess
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from datetime import UTC, datetime
 from pathlib import Path
 from types import ModuleType
@@ -53,13 +54,18 @@ def git_sha() -> str:
     return sha + ("-dirty" if run("status", "--porcelain", "--", "ks") else "")
 
 
-def fingerprint(inputs: dict[str, str], params: dict[str, Any], code: list[ModuleType]) -> str:
-    """inputs: name -> sha256. code: the modules whose source decides the output."""
+def fingerprint(
+    inputs: dict[str, str], params: dict[str, Any], code: list[ModuleType | Callable[..., Any]]
+) -> str:
+    """inputs: name -> sha256. code: the modules and functions whose source decides the output."""
     h = hashlib.sha256()
     h.update(json.dumps({"inputs": inputs, "params": params}, sort_keys=True).encode())
-    for mod in code:
-        assert mod.__file__
-        h.update(Path(mod.__file__).read_bytes())
+    for obj in code:
+        if isinstance(obj, ModuleType):
+            assert obj.__file__
+            h.update(Path(obj.__file__).read_bytes())
+        else:
+            h.update(inspect.getsource(obj).encode())
     return h.hexdigest()
 
 
