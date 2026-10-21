@@ -7,12 +7,17 @@ ENTRYPOINT []
 WORKDIR /app
 ENV PYTHONUNBUFFERED=1 HF_HUB_ENABLE_HF_TRANSFER=0
 
-# Training libraries and our runtime deps, pinned (pyproject `train` extra). The constraints
-# file keeps pip from touching the base image's torch and vLLM.
+# Training libraries and our runtime deps (pyproject `train` extra). Everything the base image
+# already has is frozen as a constraint, except the four libraries we pin ourselves, so pip
+# can't upgrade numpy, opentelemetry, ... under vLLM (the first build did, and broke numba's
+# numpy<2.5 pin). The build fails if `pip check` reports anything the base image didn't.
 COPY docker/requirements.txt /tmp/requirements.txt
-RUN python3 -m pip freeze | grep -iE '^(torch|vllm|torchvision|torchaudio|triton|flashinfer-python)==' > /tmp/constraints.txt \
+RUN (python3 -m pip check > /tmp/check-base.txt 2>&1 || true) \
+ && python3 -m pip freeze | grep -viE '^(transformers|trl|peft|accelerate)==' | grep -v ' @ ' > /tmp/constraints.txt \
  && python3 -m pip install --no-cache-dir -c /tmp/constraints.txt -r /tmp/requirements.txt \
- && python3 -c "import torch, vllm, trl, peft, transformers; print('torch', torch.__version__, 'vllm', vllm.__version__, 'trl', trl.__version__, 'peft', peft.__version__, 'transformers', transformers.__version__)"
+ && (python3 -m pip check > /tmp/check-after.txt 2>&1 || true) \
+ && diff /tmp/check-base.txt /tmp/check-after.txt \
+ && python3 -c "import torch, vllm, trl, peft, transformers, numpy; print('torch', torch.__version__, 'vllm', vllm.__version__, 'trl', trl.__version__, 'peft', peft.__version__, 'transformers', transformers.__version__, 'numpy', numpy.__version__)"
 
 COPY pyproject.toml README.md LICENSE ./
 COPY ks ./ks

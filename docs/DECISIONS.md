@@ -238,3 +238,29 @@ engine.
 **Consequences:** All of these are frozen with data v1. Changing any of
 them means data v2 and new manifests. M2's prompt builder and grader must
 import `ks.chess.board` rather than re-implementing it.
+
+### ADR-016: M2 stack pins, one image built by Cloud Build, open-model evals on the L4
+**Status:** accepted (2026-10-21)
+**Context:** ADR-004 asked for torch, vLLM and TRL to be pinned together.
+On 2026-10-21 PyPI had vLLM 0.32.0, but TRL 1.16.0 declares
+`vllm>=0.22.0,<=0.31.0`; vLLM 0.31.0 pins torch 2.13.0 and wants
+transformers `>=5.10.4,<5.18`. The plan also hoped to screen ≤ 2B models on
+the laptop. In practice the RTX 3060 (6 GB, shared with the desktop) left
+vLLM 0.39 GiB of KV cache for Qwen3-1.7B in bf16: about 1.4 concurrent
+sequences, so dev500 would take hours. vLLM's FlashInfer sampler also
+JIT-compiles with nvcc, which the laptop doesn't have.
+**Decision:**
+- Pins: vLLM 0.31.0, torch 2.13.0, transformers 5.17.0, TRL 1.16.0, PEFT
+  0.21.2, accelerate 1.15.0 (the `train` extra; `docker/requirements.txt`).
+- One image `train:<git-sha>` on `vllm/vllm-openai:v0.31.0-x86_64-cu129`
+  (pinned by digest), built by Cloud Build from `git archive HEAD`
+  (`make image`), so an image is exactly one commit. Free tier: 2,500
+  e2-standard-2 minutes a month, then $0.006/min.
+- The laptop runs wiring smokes only (Qwen3-0.6B, `enforce_eager`,
+  `VLLM_USE_FLASHINFER_SAMPLER=0`) plus the free engine baselines. Every
+  open-model number comes from a `ks launch` eval job on a spot L4. No
+  quantized screening, so screening and headline numbers come from the same
+  bf16 weights.
+**Consequences:** About $0.5–1 per L4 eval job instead of $0. Bumping TRL
+past 1.16 later means re-checking its vLLM range and rebuilding the image,
+which needs a new ADR.

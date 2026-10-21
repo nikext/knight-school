@@ -238,6 +238,21 @@ def eval_(
     typer.echo(paths[1].read_text())
 
 
+@app.command("primer-tokens")
+def primer_tokens(
+    model: Annotated[str, typer.Argument(help="Profile of the chosen main model.")],
+) -> None:
+    """Count primer S/M tokens with the model's tokenizer and record them in the manifests."""
+    from ks.data.tokens import count, write_manifests
+
+    counts = count(model)
+    write_manifests(counts)
+    for name, c in counts.items():
+        typer.echo(
+            f"primer-{name}: {c['examples']:,} examples, {c['total']:,} tokens, {c['answer']:,} answer tokens"
+        )
+
+
 def _fetch_ckpt(ckpt: str) -> str:
     """A gs:// checkpoint is copied to a local temp dir; a local path is used as is."""
     if not ckpt.startswith("gs://"):

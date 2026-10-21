@@ -12,7 +12,7 @@ from ks.cloud.config import REPO
 from ks.data.puzzles import BIN_WIDTH, RATING_LO
 
 RESULTS_DIR = REPO / "results" / "eval"
-GZIP_OVER_BYTES = 5_000_000
+GZIP_OVER_BYTES = 1_000_000  # the repo's pre-commit hook refuses files over 1 MB
 EXAMPLE_CHARS = 700
 
 
@@ -24,7 +24,7 @@ def write(
     h = result["header"]
     d = out_dir / h["set"]
     d.mkdir(parents=True, exist_ok=True)
-    blob = json.dumps(result, ensure_ascii=False, indent=1).encode()
+    blob = (json.dumps(result, ensure_ascii=False, separators=(",", ":")) + "\n").encode()
     for stale in (d / f"{h['run']}.json", d / f"{h['run']}.json.gz"):
         stale.unlink(missing_ok=True)
     if len(blob) > GZIP_OVER_BYTES:

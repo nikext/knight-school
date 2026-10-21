@@ -37,8 +37,8 @@ the difference and its CI. Put both in every results table.
 
 - `make eval MODEL=<profile> SET=dev500|test2000|… [CKPT=gs://…]` writes
   `results/eval/<set>/<run>.json` (per-item outputs, parsed moves and
-  scores) and a `.md` summary. Commit both. For Gemini, gzip the per-item
-  file if it's over 5 MB.
+  scores) and a `.md` summary. Commit both. Per-item files over 1 MB are
+  gzipped (`.json.gz`).
 - **Backends:**
   - `vllm`: open models and our checkpoints, offline batch generation. Runs
     locally for ≤ 2B models on the 6 GB GPU if it fits (quantize for
@@ -71,7 +71,8 @@ the difference and its CI. Put both in every results table.
   Batch JSONL is built and parsed by `batch_requests` / `parse_batch_output`.
 - **Files:** `<run>.json` holds the header (profile, git SHA, prompt hash,
   cost), the summary and every item with its completion text; it is gzipped
-  as `<run>.json.gz` when over 5 MB, for any backend.
+  as `<run>.json.gz` when over 1 MB (the pre-commit large-file limit), for
+  any backend.
 
 ## 4. E0 probe (`probe500`)
 

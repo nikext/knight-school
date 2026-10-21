@@ -21,14 +21,23 @@ Stockfish 1k nodes on 100 puzzles (87%).
 
 | Model | Predicted solve | Solve rate | Move acc | Legal rate | Puzzle rating | $ / 1k puzzles |
 |---|---|---|---|---|---|---|
-| random legal | ~1% | | | 100% | | 0 |
-| Stockfish 1 node | 30–45% (rating ~1000–1300) | | | 100% | | 0 |
-| Stockfish 1k nodes | 85–92% (rating > 2400) | | | 100% | | 0 |
+| random legal | ~1% | 0.8% [0.4, 1.2] | 7.0% [6.3, 7.8] | 100% | below range | 0 |
+| Stockfish 1 node | 30–45% (rating ~1000–1300) | **68.6%** [66.6, 70.6] | 83.6% [82.6, 84.7] | 100% | 2109 [2059, 2160] | 0 |
+| Stockfish 1k nodes | 85–92% (rating > 2400) | 88.8% [87.5, 90.2] | 94.8% [94.1, 95.4] | 100% | above range (57% in the 2600–2799 bin) | 0 |
 | base model (zero-shot) | 2–8%, legal 60–90%, rating below range | | | | | |
 | Gemini Flash-Lite | 5–15% | | | | | |
 | Gemini Flash | 15–35% | | | | | |
 | Gemini Pro (test500) | 30–55% | | | | | |
 | Chess-R1, Qwen2.5-7B dense (reported, different set) | | | ~25–30% | | | — |
+
+Engine rows: laptop, 2026-10-21, `results/eval/test2000/{random,stockfish-1node,stockfish-1k}.md`.
+**Stockfish at 1 node missed the prediction by a wide margin** (68.6% vs
+30–45%): `go nodes 1` is not one node. Stockfish always finishes its
+depth-1 iteration (with quiescence search) before it checks the limit; on a
+Scholar's-mate position it reported depth 2, seldepth 3, 48 nodes and found
+the mate. That already resolves most short tactics.
+Its per-bin solve rate falls from 99% (400–599) to 18% (2600–2799). That makes
+"1-node Stockfish" a strong bar, not a weak one.
 
 ## E2 / E3: the main comparison (test2000)
 
