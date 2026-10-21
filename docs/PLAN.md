@@ -1,0 +1,90 @@
+# Build plan
+
+Work top to bottom, **one milestone per fresh Claude Code session**. Each
+milestone has a self-contained task file in `docs/tasks/`. Each one ends in a
+merged PR whose description lists what was verified, the numbers, and the
+`make costs` output. Update this table in the same PR.
+
+## Status
+
+| # | Milestone | Task file | compute $ | vertex $ | Status | PR / notes |
+|---|---|---|---|---|---|---|
+| M0 | Bootstrap and money guardrails | [M0](tasks/M0-bootstrap.md) | 5 | 1 | ⬜ todo | |
+| M1 | Data: puzzles, splits, Stockfish rewards, primer | [M1](tasks/M1-data.md) | 1 | 0 | ⬜ todo | |
+| M2 | Eval harness, container, model choice, baselines (E0, E1) | [M2](tasks/M2-evals-baselines.md) | 15 | 50 | ⬜ todo | |
+| M3 | GRPO pipeline, RL on base (E2), re-plan | [M3](tasks/M3-grpo.md) | 70 | 0 | ⬜ todo | |
+| M4 | Primer SFT → GRPO, the main result (E3) | [M4](tasks/M4-primer.md) | 100 | 0 | ⬜ todo | |
+| M5 | Scaling and ablations (E4, E5) | [M5](tasks/M5-scaling-ablations.md) | 110 | 110* | ⬜ todo | |
+| M6 | Release and showcase | [M6](tasks/M6-release.md) | 9 | 4 | ⬜ todo | |
+| | contingency (user approval only) | | 50 | 15 | | |
+| | **ceiling** | | **360** | **180** | | |
+
+Legend: ⬜ todo · 🟨 in progress · ✅ done · ⏭️ skipped (say why)
+
+\* Only if the Vertex credit covers Vertex AI custom training (checked in M0).
+
+Spent to date: compute $0 · vertex $0 (update from `make costs` in each PR).
+
+---
+
+## Milestone summaries
+
+Details, tasks and "Done when" live in the task files. These summaries are
+for orientation only.
+
+**M0: Bootstrap and money guardrails.** Tooling (uv, ruff, pyright, pytest,
+CI). The user picks the GCP project and reads the remaining credits.
+`infra/setup.sh` creates the bucket, registry and service accounts. GPU quota
+is requested at 1. Real prices are fetched into `costs/prices.yaml`. Then the
+`ks.cloud` gate (ledger, launcher, sweep, reconcile) is built with unit tests,
+followed by the budgets and the tested kill switch. It ends with a 15-minute
+L4 spot smoke VM that deletes itself and closes cleanly in the ledger.
+**No experiment code yet.**
+
+**M1: Data (laptop only).** Pinned Stockfish. Lichess puzzle DB → filtered →
+test2000 / dev500 / train splits, split by game. Puzzles are
+expanded into solver positions. Stockfish MultiPV reward tables are built for
+the training positions on the laptop's 18 threads. The primer generators
+(T1–T7) are built and the S and M primer sets generated. The contamination
+filter and data card are committed. Datasets are uploaded to GCS.
+
+**M2: Eval harness, container, model choice, baselines.** Prompt builder,
+answer parser, rewards, metrics with bootstrap CIs, puzzle-rating fit, and the
+E0 diagnostic probe. The pinned vLLM + TRL container is built and pushed.
+Candidate ~2B models are screened on dev500 (on the laptop where they fit,
+otherwise on a spot L4), plus a 5-step GRPO compatibility smoke on an L4.
+The main model is chosen (ADR). Then E1 baselines: random, weak Stockfish,
+the open candidates, and Gemini (pilot → ask → batch).
+
+**M3: GRPO pipeline and RL on the base model.** The `ks.train.grpo` entry
+point (TRL GRPOTrainer, vLLM colocate, LoRA), GCS checkpoints with resume,
+and a preemption test. Smoke on an L4. A throughput measurement picks A100
+vs H100 by $/step, and the GRPO config is frozen. E2: sparse vs dense reward
+on the base model, evaluated on test2000. A **re-plan checkpoint** then
+prices every remaining run with the measured $/step, and the user approves
+it.
+
+**M4: Primer SFT → GRPO (E3, the main result).** `ks.train.sft` (full
+fine-tune, completion-only loss) on primer-M. The primer-only control is
+evaluated, then GRPO sparse and dense from the primer checkpoint with
+configs identical to E2. Learning curves are overlaid and the hypothesis
+verdict goes in an ADR.
+
+**M5: Scaling and ablations.** In priority order, until the line runs out:
+primer-S / primer-L → RL (E4 scaling curve), rules-only primer (E5a), no
+legal-move list (E5b), and a ~4B model with the best recipe (E5c). Skipped
+items get a reason.
+
+**M6: Release and showcase.** Hugging Face models and datasets with cards,
+a static "puzzle browser" site showing reasoning before and after RL, README
+results, a blog draft, CV bullets, and an optional portfolio entry. Final
+teardown and a cost reconciliation ("spent $X of $600").
+
+## Stretch backlog (only after M6, budget permitting)
+
+- Local play in `chess-lab`: a GGUF build of the final model as a third
+  "player" next to Stockfish and Jev (ask before touching that repo).
+- Full games vs Stockfish at fixed skill levels → an Elo estimate, offline
+  only and never on Lichess against humans.
+- verl instead of TRL, if M3 showed TRL's throughput was the bottleneck.
+- Curriculum by puzzle rating vs uniform sampling.

@@ -1,0 +1,41 @@
+# secrets / local config
+.env
+.env.*
+!.env.example
+*-key.json
+*credentials*.json
+application_default_credentials.json
+
+# data and training artefacts (rebuilt by `make data`, stored in GCS)
+data/
+checkpoints/
+outputs/
+wandb/
+runs/*/tb/
+*.parquet
+*.safetensors
+*.gguf
+*.zst
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# node (M6 puzzle browser)
+node_modules/
+site/dist/
+
+# editors / OS
+.idea/
+.vscode/
+.DS_Store
+*.log

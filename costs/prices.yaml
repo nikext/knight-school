@@ -1,0 +1,18 @@
+# Hourly prices per whole machine (GPU + vCPU + RAM), spot, USD.
+# PLACEHOLDERS from third-party sites (2026-10). M0 replaces them with
+# Cloud Billing Catalog API figures via `ks prices` and sets verified: true.
+# ks launch refuses to run while verified is false.
+verified: false
+fetched_on: null
+source: "third-party estimates, not authoritative"
+region: us-central1
+gce_spot:
+  g2-standard-8:  {gpu: nvidia-l4,         gpus: 1, usd_per_hour: 0.30}
+  a2-ultragpu-1g: {gpu: nvidia-a100-80gb,  gpus: 1, usd_per_hour: 1.80}
+  a3-highgpu-1g:  {gpu: nvidia-h100-80gb,  gpus: 1, usd_per_hour: 3.00}
+disk:
+  pd-balanced_usd_per_gb_month: 0.10
+storage:
+  gcs_standard_usd_per_gb_month: 0.02
+vertex_training_spot: {}   # filled in M0 only if the vertex credit covers custom training
+gemini: {}                 # filled in M2 from the live Vertex pricing page
