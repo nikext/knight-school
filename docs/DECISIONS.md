@@ -322,3 +322,57 @@ this ADR. The base model has no chain of thought to start from. Whether
 GRPO grows one, as prose before the answer, is something to watch in M3
 (completion length). The comparison between arms is unaffected, since
 every arm uses the same contract.
+
+### ADR-018: GRPO implementation (M3): engine, LoRA targets, loss, checkpoints, preemption
+**Status:** accepted (2026-10-22)
+**Context:** TRAINING.md §4 fixed the stack (TRL GRPOTrainer, vLLM colocate, LoRA) and left the
+details to M3. Building `ks.train.grpo` and running the laptop wiring test (Qwen3.5-0.8B) turned up
+several things the plan didn't foresee.
+**Decision:**
+- **Pins unchanged** (ADR-016): TRL 1.16.0 was still the newest release on 2026-10-22. Added to
+  the image and the `train` extra: `flash-linear-attention`/`fla-core` 0.5.2 and `tensorboardX`
+  2.6.5. Without fla, transformers runs Qwen3.5's Gated DeltaNet layers in a reference PyTorch
+  implementation ("correct but much slower"). fla is pure Python plus Triton, so the base
+  image's torch and triton stay. `causal-conv1d` is source-only (it needs nvcc) and stays out;
+  its fallback is one convolution.
+- **Engine:** TRL 1.16 builds the colocated vLLM engine itself and passes neither
+  `language_model_only` nor `enforce_eager`. `ks.train.grpo` passes both from the model profile.
+  Without `language_model_only`, vLLM loads the vision tower and reserves memory for dummy image
+  inputs, which left the 0.8B no KV cache at all on the laptop's 6 GB. The trainer and vLLM both
+  load a local snapshot at the pinned revision, so model, tokenizer and engine match.
+- **LoRA targets:** TRL loads Qwen3.5 as the full VLM class (`Qwen3_5ForConditionalGeneration`),
+  so `target_modules="all-linear"` would also adapt the vision tower. The adapter goes on every
+  `nn.Linear` of the language model instead: attention, DeltaNet projections and MLP, but not
+  the LM head and not the vision tower. That's 21.6M parameters on the 0.8B, and the 2B count
+  is in its run.json.
+- **Loss and sampling:** TRL 1.16 defaults, recorded here because they differ from Chess-R1's
+  verl setup. `loss_type: dapo` (token-level normalisation over the whole generation batch, no
+  length bias), `scale_rewards: group`, ε = 0.2, one iteration per batch. The vLLM importance-
+  sampling correction is on (`sequence_mask`, cap 3). The KL term is TRL's default
+  bias-corrected estimator at β = 1e-3. `mask_truncated_completions: false`, because a
+  completion that runs out of tokens has given no answer, and reward 0 is correct for it.
+- **Rewards:** the task reward and `format` have weight 1. `legal` and the other task
+  components have weight 0, so they're logged but don't train. Each completion is parsed once
+  per step.
+- **Dev eval** (every 25 steps, dev500): greedy, on the trainer's colocated engine after a
+  weight sync, through the same harness as `ks eval`. The token limit is the training one.
+- **Checkpoints:** HF Trainer saves every 25 steps (adapter, optimizer, scheduler, RNG, data
+  position). Each one is copied to `gs://BUCKET/runs/<id>/ckpt/checkpoint-<n>/` with a
+  `_COMPLETE` object written last, the newest 2 are kept, and an attempt resumes from the newest
+  complete one. Laptop test: a SIGTERM after checkpoint 2, then a resume, reproduced the
+  uninterrupted run's step-3 and step-4 rewards exactly.
+- **Preemption:** on SIGTERM the job leaves a marker, pushes its metrics and exits 143. The VM's
+  EXIT trap can then write `ended` before the shutdown script writes `preempted`. Before this
+  fix, reconcile would have booked that as `failed`, and the watcher would not have retried.
+  Now the startup script flags `ended` as preempted when the VM's metadata says so, and
+  reconcile also treats a failed exit plus an audit-log preemption as a preemption. A spot
+  create that GCE cancels mid-provisioning (`Operation was canceled`, seen in
+  m3-smoke-l4-r2) moves on to the next zone after checking that no VM was created.
+- **Per-step metrics** (`<out>/metrics/attempt-<n>.jsonl`, TensorBoard via tensorboardX): every
+  reward component's mean and std, legal and format rate, completion length (mean, p95, max,
+  clipped share), prose before `<answer>` (share and characters: the reasoning-emergence
+  signal), KL, entropy, step, generation and training seconds and tokens/s, and $/step plus
+  cumulative $ (wall time × spot price, carried across attempts).
+**Consequences:** One more thing to re-check when TRL is bumped: the `vllm_generation.LLM`
+patch and the `_last_loaded_step` attribute the dev eval sets. A frozen-config test keeps arms
+from changing anything but their factor (`ks.train.config.ARM_KEYS`).
