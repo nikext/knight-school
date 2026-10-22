@@ -35,6 +35,9 @@ train = [
 gemini = [
     "google-genai>=2.32.0",
 ]
+plots = [
+    "matplotlib>=3.10",
+]
 
 [project.scripts]
 ks = "ks.cli:main"
