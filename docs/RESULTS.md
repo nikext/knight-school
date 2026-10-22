@@ -67,11 +67,27 @@ $/1k counts the 105 s of generation only; the job cost $0.13 with boot.
 
 | Arm | Predicted solve | Solve rate | Move acc | Legal | Δ vs E2-dense (paired) | Run $ |
 |---|---|---|---|---|---|---|
-| E2 base → GRPO sparse | | | | | | |
-| E2 base → GRPO dense | | | | | — | |
+| E2 base → GRPO sparse | 4–8% (point 6%); move acc 16–24%, legal ≥ 98% | | | | | |
+| E2 base → GRPO dense | 7–14% (point 10%); move acc 22–32%, legal ≥ 99% | | | | — | |
 | E3 primer-M only | | | | | | |
 | E3 primer-M → GRPO sparse | | | | | | |
 | E3 primer-M → GRPO dense | | | | | | |
+
+**E2 predictions** (written 2026-10-22, before any GRPO run of the main model; the only
+training signal seen so far is M2's 5-step compatibility smoke and the M3 laptop wiring test
+on Qwen3.5-0.8B, whose numbers mean nothing). Base: 4.1% solve, 15.6% move acc, 96.4% legal.
+- **Dense** gains several points, mostly on the easy bins (400–1199), in the first ~100 steps,
+  then flattens: about 10% solve, well below Chess-R1's 25–30% plateau (a 2B model with LoRA,
+  12.8k prompts, and no reasoning to start from).
+- **Sparse** learns a little, unlike Chess-R1's 3B. The base model's per-sample move accuracy
+  (~15%) leaves about half of the 8-sample groups with a correct move, so there's signal. Still,
+  I'd put only even odds on its test2000 CI clearing the base model's. Dense beats sparse
+  (paired Δ > 0).
+- **Reasoning:** prose before `<answer>` stays rare (< 10% of completions at the end), and
+  completions shrink to ~10 tokens. A rambling completion that is cut off gets 0 reward, and
+  neither reward pays for thinking directly. This is the prediction I'm least sure of.
+- **E0 on the dense checkpoint:** no change beyond noise on P1–P4 (RL on move choice doesn't
+  teach board reading).
 
 Figures: dev solve rate vs $ spent, all arms overlaid
 (`results/figures/e2e3_curves.png`), and per-bin solve rate

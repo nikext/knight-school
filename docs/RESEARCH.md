@@ -56,8 +56,21 @@ training data (ADR-008).
   but it falls behind on large SFT datasets. → LoRA for GRPO, full FT for the
   primer (ADR-007). Verify our own way in E5 if the budget allows.
 
-Before M3, re-search for anything newer (from 2026-10 on) on LLM chess and
-RLVR, and add it here.
+- **C1 / "Grounded Chess Reasoning in Language Models via Master Distillation"**,
+  arXiv:2603.20510 (Mar 2026; missed before M3). Qwen3-4B-Instruct-2507, near 0 at the start.
+  SFT on ~39.6k puzzles whose chain of thought Gemini-3-Flash wrote around Stockfish (depth 24)
+  lines, then DAPO with a binary "matches Stockfish's best move" reward (KL kept). The prompt has
+  the FEN, a piece list and the legal moves. On their 900-puzzle set: 40.9% after SFT, 48.1%
+  after RL. RL helps on beginner-to-advanced puzzles, not on expert ones. → The nearest prior
+  result to H1/H2, but **with a teacher**: an LLM wrote the reasoning. Ours stays teacher-free
+  (ADR-008), which keeps the question open. It also shows binary rewards learning after SFT
+  (cf. H2).
+- **VAM: Verbalized Action Masking**, arXiv:2602.16833 (Feb 2026). An exploration method for
+  RL post-training, with chess puzzles as the case study. It repeats that the legal-move list
+  matters. Not a change to the plan.
+
+M3 re-search (2026-10-22, from 2026-10 on): no new LLM-chess RLVR result found. **The plan
+is unchanged.**
 
 ## 3. Hypotheses and what would falsify them
 
