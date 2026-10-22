@@ -1,0 +1,31 @@
+# M3 L4 smoke (task M3 §4): the main model (Qwen3.5-2B), the frozen dense config at full size
+# (64 prompts x 8 completions, max 1024 tokens), 20 steps on one spot L4. Checks: no OOM, the
+# reward components move, format is learnable, completion lengths (to set max_completion), step
+# time. Dev500 every 10 steps; after training a 50-puzzle dev500 eval of the merged model tests
+# the `ks eval --ckpt` path (no test-set eval of a smoke checkpoint).
+# Preemption test (Done-when): after checkpoint 10 is copied, a simulated maintenance event
+# preempts the VM; `ks watch` relaunches attempt 2, which must resume from checkpoint 10.
+# r2: r1 got no VM (L4 spot stockout in us-central1-a/b/c, $0); the user added europe-west4 as
+# the fallback (ADR-009). In Europe the image pull crosses regions (~11 GB, ~$0.25 egress), and
+# the in-job $ figures use the us-central1 price (europe-west4 is 5% more).
+# r3: r2's create in us-central1-a came back "Operation was canceled" (spot capacity lost while
+# provisioning, no VM, $0), which the launcher then treated as fatal; it now tries the next zone.
+id: m3-smoke-l4-r3
+milestone: M3
+description: "GRPO smoke: Qwen3.5-2B, dense, 20 steps, full batch, on an L4; preemption + resume test"
+machine: g2-standard-8
+gpus: 1
+zones: [us-central1-a, us-central1-b, us-central1-c, europe-west4-a, europe-west4-b, europe-west4-c]
+max_hours: 1.75
+max_attempts: 2
+run_budget_usd: 2.5
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:9e386d2f86c1@sha256:231a20d0a33171e73eb31246a962a250d6ff2a1bef7d79d845d2854f30e48b92
+command: "bash configs/jobs/m3-grpo.sh"
+env:
+  KS_PRICE_PER_HOUR: "0.541"
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/grpo_dense.yaml"
+  TRAIN_SETS: "name=m3-smoke-l4-r3 steps=20 eval_every=10 save_every=10"
+  TEST_SET: "dev500"
+  TEST_LIMIT: "50"

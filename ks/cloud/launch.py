@@ -159,6 +159,16 @@ def launch(
         if cr.stockout:
             lines.append(f"stockout in {zone}, trying the next zone")
             continue
+        if cr.cancelled:
+            if ops.instance_exists(name, zone):  # the create went through after all
+                append_event(
+                    CreatedEvent(ts=now, id=run.id, attempt=attempt, instance=name, zone=zone),
+                    ledger_path,
+                )
+                lines.append(f"create of {name} in {zone} reported cancelled, but the VM exists")
+                return LaunchResult(ok=True, lines=lines, instance=name, zone=zone)
+            lines.append(f"create cancelled by GCE in {zone} (spot capacity), trying the next zone")
+            continue
         lines.append(f"create failed in {zone}: {cr.message.strip()[-500:]}")
         break
 

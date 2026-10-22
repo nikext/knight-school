@@ -21,6 +21,8 @@ class FakeCloud:
     jobs: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
     endpoints: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
     stockout_zones: set[str] = field(default_factory=set)
+    cancelled_zones: set[str] = field(default_factory=set)
+    cancelled_but_created: bool = False
     fail_message: str | None = None
     created: list[list[str]] = field(default_factory=list)
     deleted: list[str] = field(default_factory=list)
@@ -32,6 +34,10 @@ class FakeCloud:
         zone = next(a.split("=", 1)[1] for a in args if a.startswith("--zone="))
         if zone in self.stockout_zones:
             return CreateResult(ok=False, stockout=True, message="ZONE_RESOURCE_POOL_EXHAUSTED")
+        if zone in self.cancelled_zones and not self.cancelled_but_created:
+            return CreateResult(
+                ok=False, cancelled=True, message="Operation was canceled by user ''."
+            )
         if self.fail_message:
             return CreateResult(ok=False, message=self.fail_message)
         labels = next(a.split("=", 1)[1] for a in args if a.startswith("--labels="))
@@ -41,6 +47,10 @@ class FakeCloud:
             "status": "RUNNING",
             "labels": dict(kv.split("=") for kv in labels.split(",")),
         }
+        if zone in self.cancelled_zones:
+            return CreateResult(
+                ok=False, cancelled=True, message="Operation was canceled by user ''."
+            )
         return CreateResult(ok=True)
 
     def instance_exists(self, name: str, zone: str) -> bool:

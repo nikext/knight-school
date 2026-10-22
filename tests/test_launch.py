@@ -116,6 +116,21 @@ def test_stockout_tries_the_next_zone(ledger_path):
     assert res.ok and res.zone == "us-central1-b" and len(cloud.created) == 2
 
 
+def test_cancelled_create_tries_the_next_zone(ledger_path):
+    cloud = FakeCloud(cancelled_zones={"us-central1-a"})
+    res = do_launch(cloud, ledger_path)
+    assert res.ok and res.zone == "us-central1-b"
+    assert any("cancelled by GCE" in line for line in res.lines)
+
+
+def test_cancelled_create_that_left_a_vm_counts_as_created(ledger_path):
+    cloud = FakeCloud(cancelled_zones={"us-central1-a"}, cancelled_but_created=True)
+    res = do_launch(cloud, ledger_path)
+    assert res.ok and res.zone == "us-central1-a" and len(cloud.instances) == 1
+    att = load_state(ledger_path).run_attempts("m0-smoke-l4")[0]
+    assert att.created is not None and att.created.zone == "us-central1-a"
+
+
 def test_stockout_everywhere_closes_the_attempt_at_zero(ledger_path):
     cloud = FakeCloud(stockout_zones={"us-central1-a", "us-central1-b"})
     res = do_launch(cloud, ledger_path)

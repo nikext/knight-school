@@ -22,12 +22,17 @@ STOCKOUT_MARKERS = (
     "resource pool exhausted",
     "STOCKOUT",
 )
+# A spot create can also be cancelled by GCE while provisioning when the capacity goes
+# (m3-smoke-l4-r2, us-central1-a). The launcher treats it as a stockout once it has checked
+# that no VM was left behind.
+CANCELLED_MARKERS = ("Operation was canceled",)
 
 
 @dataclass(frozen=True)
 class CreateResult:
     ok: bool
     stockout: bool = False
+    cancelled: bool = False  # GCE cancelled the create; check no VM exists before moving on
     message: str = ""
 
 
@@ -72,7 +77,12 @@ class GcloudOps:
         msg = (p.stderr or "") + (p.stdout or "")
         if p.returncode == 0:
             return CreateResult(ok=True, message=msg)
-        return CreateResult(ok=False, stockout=any(m in msg for m in STOCKOUT_MARKERS), message=msg)
+        return CreateResult(
+            ok=False,
+            stockout=any(m in msg for m in STOCKOUT_MARKERS),
+            cancelled=any(m in msg for m in CANCELLED_MARKERS),
+            message=msg,
+        )
 
     def instance_exists(self, name: str, zone: str) -> bool:
         p = self._run(
