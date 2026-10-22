@@ -38,7 +38,7 @@ def collect(out_dirs: list[Path], dest: Path) -> dict[str, int]:
         dev += km.read_rows(sorted((out / "metrics").glob("dev-attempt-*.jsonl")))
         samples += km.read_rows(sorted((out / "samples").glob("attempt-*.jsonl")))
         for p in sorted((out / "run").glob("attempt-*.json")):
-            (dest / f"run-{p.name}").write_text(p.read_text())
+            (dest / f"run-{p.name}").write_text(p.read_text().rstrip("\n") + "\n")
     steps, dev = km.last_per_step(steps), km.last_per_step(dev)
     if steps:
         pl.DataFrame(steps, infer_schema_length=None).write_csv(dest / "steps.csv")
