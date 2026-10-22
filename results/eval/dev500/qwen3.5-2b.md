@@ -5,6 +5,7 @@
 - git `90bfc56fc862`, prompt hash `c728de49e119`, legal list on
 - decoding: greedy (T=0), max 1024 tokens, think=tags
 - run: 2026-10-22T07:19:54Z, 6 s, cost $0.2274 ($3.040/h)
+- **rescored** 2026-10-22T07:58:47Z at git `f8ae0bebde20`: format no longer requires a think block in the completion when the chat template pre-fills one (ADR-017)
 
 500 puzzles, 1163 positions. 95% bootstrap CIs over puzzles.
 
@@ -13,7 +14,7 @@
 | solve rate | 5.4% [3.4, 7.4] |
 | move accuracy | 15.9% [13.8, 18.1] |
 | legal rate | 96.5% [95.2, 97.6] |
-| format rate | 0.0% [0.0, 0.0] |
+| format rate | 100.0% [100.0, 100.0] |
 | puzzle rating (50% solve) | < range |
 | response tokens mean / p95 | 10 / 10 |
 | prompt tokens mean | 218 |
