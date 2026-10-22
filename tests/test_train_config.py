@@ -17,6 +17,9 @@ def test_base_config_shapes():
     assert cfg.completions_per_step == 512
     assert cfg.grad_accum * cfg.micro_batch == cfg.completions_per_step
     assert cfg.beta == 1e-3 and cfg.generations == 8 and cfg.steps == 200
+    # v2 (ADR-021): the one learning change after v1 collapsed
+    assert cfg.entropy_adaptive and cfg.entropy_target == 0.2 and cfg.entropy_coef_delta == 0.02
+    assert cfg.learning_rate == 1e-5 and cfg.temperature == 1.0 and cfg.loss_type == "dapo"
 
 
 @pytest.mark.parametrize("path", ARMS, ids=lambda p: p.stem)

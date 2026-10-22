@@ -296,6 +296,10 @@ def main(
         beta=cfg.beta,
         loss_type=cfg.loss_type,
         mask_truncated_completions=cfg.mask_truncated,
+        entropy_coef=cfg.entropy_coef,
+        use_adaptive_entropy=cfg.entropy_adaptive,
+        entropy_target=cfg.entropy_target,
+        entropy_coef_delta=cfg.entropy_coef_delta,
         reward_weights=weights,
         bf16=True,
         gradient_checkpointing=cfg.gradient_checkpointing,
@@ -449,7 +453,19 @@ def main(
         resume = str(kc.pull(store, ckpt_root, step, work / "resume"))
         log(f"resuming from checkpoint {step}")
     info["resumed_from"] = step
-    trainer.train(resume_from_checkpoint=resume)
+    if resume is not None and step is not None and step >= cfg.steps:
+        # Preempted between the last checkpoint and the final save. trainer.train() would run
+        # one step past max_steps here (seen in the laptop smoke), so load the adapter and skip.
+        from peft import set_peft_model_state_dict  # type: ignore[import-not-found]
+        from safetensors.torch import load_file
+
+        set_peft_model_state_dict(
+            trainer.model, load_file(str(Path(resume) / "adapter_model.safetensors"))
+        )
+        trainer.state.global_step = step
+        log(f"checkpoint {step} is the last step; saving the final model without training")
+    else:
+        trainer.train(resume_from_checkpoint=resume)
 
     final = work / "final"
     trainer.save_model(str(final / "adapter"))

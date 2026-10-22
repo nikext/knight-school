@@ -1,6 +1,9 @@
 # GRPO hyperparameters for every arm (TRAINING.md §4). Starting values adapted from Chess-R1;
-# tuned only in the M3 smoke and throughput tests, then frozen (ADR-019). Arms set `base: grpo.yaml`
-# and may change only the factor under test (ks.train.config.ARM_KEYS; enforced by a test).
+# tuned only in the M3 smoke and throughput tests, then frozen (ADR-019). Revised once (v2,
+# ADR-021): v1 collapsed by step 25 in m3-e2-dense (token entropy 0.88 -> 0.06, ~75% of groups
+# with zero reward spread from step 40), so v2 adds adaptive entropy control; nothing else that
+# shapes learning changed. Arms set `base: grpo.yaml` and may change only the factor under test
+# (ks.train.config.ARM_KEYS; enforced by a test).
 name: grpo
 model: qwen3.5-2b
 task_reward: dense
@@ -24,12 +27,15 @@ temperature: 1.0
 beta: 1.0e-3             # Chess-R1
 loss_type: dapo          # TRL 1.16 default
 mask_truncated: false    # a truncated answer is a wrong answer
+entropy_adaptive: true   # v2 (ADR-021): Skywork-OR1 adaptive entropy bonus, as in TRL 1.16
+entropy_target: 0.2      # v1 was still healthy here (steps 15-17: short answers, ~9% dead groups)
+entropy_coef_delta: 0.02 # v1 fell from 0.2 to 0.06 in 6 steps; TRL's 0.005 would reach only 0.03
 steps: 200
 
 eval_set: dev500
-eval_every: 25
+eval_every: 10           # v2: finer dev curve (~12 s each, ~$0.2/run); was 25
 eval_at_start: true
-save_every: 25
+save_every: 10           # v2: lose <= ~6 min to a preemption (~10 s per save); was 25
 keep_last: 2
 
 vllm_mem: 0.45

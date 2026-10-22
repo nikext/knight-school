@@ -56,6 +56,13 @@ class GrpoConfig(BaseModel):
     beta: float = 1e-3
     loss_type: str = "dapo"  # TRL 1.16's default, recorded in ADR-018
     mask_truncated: bool = False
+    # Entropy bonus (TRL's entropy_coef). Adaptive (Skywork-OR1, ADR-021): the coefficient
+    # rises by entropy_coef_delta each step the mean token entropy is <= entropy_target,
+    # falls otherwise, and applies only at or below the target.
+    entropy_coef: float = 0.0
+    entropy_adaptive: bool = False
+    entropy_target: float = 0.2
+    entropy_coef_delta: float = 0.005
     steps: int = 200
 
     eval_set: str = "dev500"

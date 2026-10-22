@@ -27,6 +27,7 @@ KEYS = {
     "frac_reward_zero_std": "frac_zero_std",
     "kl": "kl",
     "entropy": "entropy",
+    "entropy_coef": "entropy_coef",
     "completions/mean_length": "len_mean",
     "completions/p95_length": "len_p95",
     "completions/max_length": "len_max",
