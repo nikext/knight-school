@@ -30,7 +30,9 @@ LOG=$WORK/job.log
 ENV_FILE=$WORK/job.env
 mkdir -p "$OUT"
 attr ks-env | base64 -d > "$ENV_FILE" || : > "$ENV_FILE"
-printf 'KS_RUN_ID=%s\nKS_ATTEMPT=%s\nKS_OUT=/out\nKS_GCS_PREFIX=%s\n' "$RUN_ID" "$ATTEMPT" "$PREFIX" >> "$ENV_FILE"
+MACHINE=$(md machine-type | awk -F/ '{print $NF}')
+printf 'KS_RUN_ID=%s\nKS_ATTEMPT=%s\nKS_OUT=/out\nKS_GCS_PREFIX=%s\nKS_IMAGE=%s\nKS_ZONE=%s\nKS_MACHINE=%s\n' \
+  "$RUN_ID" "$ATTEMPT" "$PREFIX" "$IMAGE" "$ZONE" "$MACHINE" >> "$ENV_FILE"
 
 put() { printf '%s\n' "$2" | gcloud storage cp - "$PREFIX/$1" --quiet; }
 self_delete() { gcloud compute instances delete "$NAME" --zone "$ZONE" --quiet; }
@@ -66,9 +68,16 @@ fi
 
 RC=1
 finish() {
+  # A preempted job exits on SIGTERM, and this trap can run before the shutdown script.
+  # Say so in `ended`, so reconcile books a preemption (and the watcher retries) not a failure.
+  local pre=false
+  [[ "$(md preempted)" == "TRUE" ]] && pre=true
+  if [[ $pre == true ]]; then
+    put ended "{\"ts\":\"$(stamp)\",\"exit_code\":$RC,\"preempted\":true}" || true
+  fi
   gcloud storage rsync -r "$OUT" "$PREFIX/out" --quiet || true
   gcloud storage cp "$LOG" "$PREFIX/job.log" --quiet || true
-  put ended "{\"ts\":\"$(stamp)\",\"exit_code\":$RC}" || true
+  [[ $pre == true ]] || put ended "{\"ts\":\"$(stamp)\",\"exit_code\":$RC}" || true
   self_delete
 }
 trap finish EXIT

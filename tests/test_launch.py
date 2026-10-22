@@ -190,6 +190,45 @@ def test_reconcile_preempted_marker(ledger_path):
     assert closed(ledger_path).status == "preempted"
 
 
+def test_failed_exit_on_a_preemption_counts_as_preempted(ledger_path):
+    # the job exits 143 on SIGTERM and `ended` lands before the shutdown script's marker
+    cloud = launched(ledger_path)
+    cloud.vm_finishes(
+        "ks-m0-smoke-l4-a1",
+        "us-central1-a",
+        prefix(),
+        ended={"ts": (NOW + timedelta(minutes=3)).isoformat(), "exit_code": 143},
+    )
+    cloud.preemptions.add("ks-m0-smoke-l4-a1")
+    R.reconcile(cloud, BUCKET, NOW + timedelta(minutes=20), ledger_path)
+    assert closed(ledger_path).status == "preempted"
+
+
+def test_ended_marker_flagged_preempted_counts_as_preempted(ledger_path):
+    cloud = launched(ledger_path)
+    cloud.vm_finishes(
+        "ks-m0-smoke-l4-a1",
+        "us-central1-a",
+        prefix(),
+        ended={"ts": (NOW + timedelta(minutes=3)).isoformat(), "exit_code": 143, "preempted": True},
+    )
+    R.reconcile(cloud, BUCKET, NOW + timedelta(minutes=20), ledger_path)
+    assert closed(ledger_path).status == "preempted"
+
+
+def test_clean_exit_stays_done_even_if_preempted_later(ledger_path):
+    cloud = launched(ledger_path)
+    cloud.vm_finishes(
+        "ks-m0-smoke-l4-a1",
+        "us-central1-a",
+        prefix(),
+        ended={"ts": (NOW + timedelta(minutes=3)).isoformat(), "exit_code": 0},
+    )
+    cloud.preemptions.add("ks-m0-smoke-l4-a1")
+    R.reconcile(cloud, BUCKET, NOW + timedelta(minutes=20), ledger_path)
+    assert closed(ledger_path).status == "done"
+
+
 def test_reconcile_shutdown_at_the_time_limit_is_a_timeout(ledger_path):
     cloud = launched(ledger_path)
     cloud.vm_finishes(
