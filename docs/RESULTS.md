@@ -2,16 +2,29 @@
 
 Write **predictions before running** each experiment (CLAUDE.md), in the
 "Predicted" column, committed before the launch. Measured values carry 95%
-bootstrap CIs. Arm-vs-arm differences use a paired bootstrap. Model: _(set
-in M2)_.
+bootstrap CIs. Arm-vs-arm differences use a paired bootstrap. Model:
+**Qwen3.5-2B**, non-thinking template (ADR-011, ADR-017).
 
 ## E0: knowledge probe (probe500, exact match %)
 
 | Checkpoint | P1 square | P2 legal count | P3 FEN after move | P4 in check | Predicted |
 |---|---|---|---|---|---|
-| base (zero-shot) | | | | | P1 40–60%, P2 2–8%, P3 0–2%, P4 55–75% (written 2026-10-21, before any run) |
+| base (zero-shot) | 4.8% [1.6, 8.8] | 4.0% [0.8, 8.0] | 0.0% | 50.4% [41.6, 59.2] | P1 40–60%, P2 2–8%, P3 0–2%, P4 55–75% (written 2026-10-21, before any run) |
 | primer-M | | | | | |
 | primer-M → GRPO dense | | | | | |
+
+Base row: `m2-screen-a100-r4`, `results/eval/probe500/qwen3.5-2b.md`. **It
+mostly measures copying of the format hint, not knowledge.** Qwen3.5-2B
+answers P1 with the hint's own example, `white knight`, on 106 of 125 items,
+and P4 with `yes, by Qe7`, the P4 example, on all 125. P4 grades only the
+yes/no word on a balanced set, so any constant answer scores about 50%
+(Gemma 4 E2B says `no` on 121 and scores 48.0%). P1 missed the prediction by
+a wide margin. The other screened models, for comparison: Qwen3-1.7B P1 11.2%,
+P2 2.4%, P4 50.4%; Gemma 4 E2B P1 36.8%, P2 0.8%, P4 48.0%; P3 0% for all.
+The primer-trained rows answer in the primer's formats, so they won't copy
+the hint. Their gain over the base row is therefore partly a format gain.
+Read E0 deltas with that in mind, or re-run the base row with example-free
+hints (proposed for M3).
 
 ## E1: baselines (test2000 unless noted)
 
@@ -24,10 +37,10 @@ Stockfish 1k nodes on 100 puzzles (87%).
 | random legal | ~1% | 0.8% [0.4, 1.2] | 7.0% [6.3, 7.8] | 100% | below range | 0 |
 | Stockfish 1 node | 30–45% (rating ~1000–1300) | **68.6%** [66.6, 70.6] | 83.6% [82.6, 84.7] | 100% | 2109 [2059, 2160] | 0 |
 | Stockfish 1k nodes | 85–92% (rating > 2400) | 88.8% [87.5, 90.2] | 94.8% [94.1, 95.4] | 100% | above range (57% in the 2600–2799 bin) | 0 |
-| base model (zero-shot) | 2–8%, legal 60–90%, rating below range | | | | | |
-| Gemini Flash-Lite | 5–15% | | | | | |
-| Gemini Flash | 15–35% | | | | | |
-| Gemini Pro (test500) | 30–55% | | | | | |
+| base model (zero-shot): Qwen3.5-2B | 2–8%, legal 60–90%, rating below range | 4.1% [3.2, 5.0] | 15.6% [14.6, 16.6] | 96.4% [95.8, 97.0] | below range | 0.03 (L4 generation only) |
+| Gemini Flash-Lite | 5–15% | pending (after 2026-11-13, ADR-013) | | | | |
+| Gemini Flash | 15–35% | pending (after 2026-11-13, ADR-013) | | | | |
+| Gemini Pro (test500) | 30–55% | pending (after 2026-11-13, ADR-013) | | | | |
 | Chess-R1, Qwen2.5-7B dense (reported, different set) | | | ~25–30% | | | — |
 
 Engine rows: laptop, 2026-10-21, `results/eval/test2000/{random,stockfish-1node,stockfish-1k}.md`.
@@ -38,6 +51,17 @@ Scholar's-mate position it reported depth 2, seldepth 3, 48 nodes and found
 the mate. That already resolves most short tactics.
 Its per-bin solve rate falls from 99% (400–599) to 18% (2600–2799). That makes
 "1-node Stockfish" a strong bar, not a weak one.
+
+Base row: `m2-test2000-qwen35-l4` (spot L4, 2026-10-22),
+`results/eval/test2000/qwen3.5-2b.md`, format re-graded under ADR-017
+(format rate 100%). Solve rate is inside the prediction, and the legal rate
+beat it: with the move list in the prompt, the model almost always copies a
+legal move. It answers directly, in about 10 tokens, with no reasoning. Its
+solve rate falls from 11–16% in the 400–799 bins to about 0 above 1800, so
+it is close to random (0.8%) on hard puzzles and does better on easy ones,
+where a check or capture from the list is often the answer. Move accuracy
+of 15.6% against random's 7.0% means its picks are better than chance.
+$/1k counts the 105 s of generation only; the job cost $0.13 with boot.
 
 ## E2 / E3: the main comparison (test2000)
 
