@@ -376,3 +376,46 @@ several things the plan didn't foresee.
 **Consequences:** One more thing to re-check when TRL is bumped: the `vllm_generation.LLM`
 patch and the `_last_loaded_step` attribute the dev eval sets. A frozen-config test keeps arms
 from changing anything but their factor (`ks.train.config.ARM_KEYS`).
+
+### ADR-019: GRPO config frozen for every arm; A100 by $/step; padding trimmed, micro-batches sorted
+**Status:** accepted (2026-10-22; max_completion and the throughput runs chosen by the user in the M3 session)
+**Context:** Task M3 §4–5: smoke the main model, measure A100 vs H100 by $ per step, tune the
+memory and batch split, then freeze the config. Measured on Qwen3.5-2B, dense reward, the full
+64 × 8 batch (`m3-smoke-a100`, `m3-tput-a100`, `m3-tput-h100`; `results/train/`):
+- **The base model rambles when sampled.** At temperature 1.0, 42% of completions ran into the
+  1024-token cap, mostly prose that decodes the FEN character by character (cf. ADR-017). The
+  legal rate was 53% (96.5% greedy). RL trained it away within ~10 steps: by step 13 the mean
+  length was 18 tokens, legal 87%, format 99.6%, prose before `<answer>` < 1%.
+- **Padding, not generation, set the step time.** Generation took 7–30 s a step. TRL pads all
+  512 completions to the longest, and ~1% still hit the cap at step 13, so a step stayed at
+  ~127 s on the A100 at an 18-token mean.
+- **A100 vs H100**, same image, config and seed, before sorting (micro_batch 8, trimming on):
+  steps 2–7 took 159 s vs 87 s ($0.138 vs $0.153 a step), and steps 8–10 took 98 s vs 55 s
+  ($0.085 vs $0.097). The H100 is 1.8× faster at 2.05× the price. Trainer init took 218 s vs 86 s.
+  With trimming, the A100's step at an ~20-token mean fell from 127 s to 62 s.
+- Memory on the A100 80GB: peak ~40 GiB (mostly vLLM's 45% reservation), 44.5 GiB in use.
+**Decision:**
+- **Machine: `a2-ultragpu-1g` (A100 80GB spot)**, 10–13% cheaper per step. The H100 is the
+  fallback when the A100 is stocked out or the calendar is tight (1.8× faster per step).
+  Zones: us-central1-a/-c, then europe-west4-a/-b.
+- **Frozen config** (`configs/train/grpo.yaml`; arms may change only `ARM_KEYS`, enforced by
+  `tests/test_train_config.py`). It is TRAINING.md §4's starting point, unchanged:
+  LoRA r = 32, α = 64 on the language model's linear layers (ADR-018); lr 1e-5, 10 warmup steps,
+  then constant; 64 prompts × 8 completions; temperature 1.0; β = 1e-3; `loss_type: dapo`;
+  **max_completion 1024** (the user's choice, so that reasoning can still emerge in any arm);
+  200 steps; dev500 every 25 steps; checkpoints every 25; seed 2026.
+- **Efficiency only, exact:** `micro_batch: 32` (was 8); `vllm_mem: 0.45`. Each log-prob pass
+  drops the right padding of its chunk (`ks.train.trim`; tested equal to TRL's log-probs and
+  entropies). The step's micro-batches are cut from the batch sorted by completion length,
+  in place of TRL's random shuffle. Under `dapo`, each micro-batch's loss is its token sum over
+  the whole generation batch's token count, so the accumulated gradient doesn't depend on the
+  grouping. The sorted, larger micro-batch is first measured in E2. If it runs out of memory,
+  micro_batch drops back to 16 or 8 for every arm; that doesn't change the arms' math.
+- Per run (A100, before the sorting gain is measured): ~14 min to the first step, ~25 min for
+  the first ~10 (rambling) steps, then 190 steps at 20–60 s. That's **~2–4 h and $6–13 a run**,
+  against BUDGET.md §2's $17–34. If an arm grows long reasoning, its steps go back toward the
+  early ~150 s ($0.14 a step); `max_hours` caps that.
+**Consequences:** M3 underruns its line. The re-plan (PLAN.md) prices M4/M5 with these numbers.
+Changing anything in `grpo.yaml` after E2 starts invalidates the comparisons and needs a new ADR.
+TRL's padding and shuffling are now patched (`ks.train.trim`), so a TRL bump must re-run
+`tests/test_train_trim.py`.
