@@ -14,14 +14,15 @@ merged PR whose description lists what was verified, the numbers, and the
 | M2 | Eval harness, container, model choice, baselines (E0, E1) | [M2](tasks/M2-evals-baselines.md) | 15 | 50 | ✅ done | PR #3 · spent $4.85 compute, $0 vertex · main model Qwen3.5-2B, non-thinking (ADR-011, ADR-017) · E1 base 4.1% solve, 96.4% legal · Stockfish 1 node 68.6% · Gemini rows pending until 2026-11-13 |
 | M3 | GRPO pipeline, RL on base (E2), re-plan | [M3](tasks/M3-grpo.md) | 70 | 0 | 🟨 in progress | branch `m3-grpo` · pipeline, smoke, throughput, frozen config (ADR-018/019) and re-plan done · E2 runs in progress |
 
-> **Next up (M3, 2026-10-22 night):** config v2 (ADR-021, adaptive entropy) **passed** its
-> step-50 check in `m3-e2-dense-v2` and is now the frozen config. dense-v2 runs to step 200
-> (~21:50Z), and `m3-e2-sparse-v2` (approved by the user) is chained to launch right after it.
-> Stockouts are waited out for up to 12 h (ADR-020). If a session restarts mid-run, re-attach with
-> `uv run ks watch configs/runs/<id>.yaml` (only one watcher per run). After each run:
-> `ks train-report <id>`, pull `attempts/*/out/eval/test2000/*` (and dense's `probe500/*`) into
-> `results/eval/`, then figures (`ks train-figures m3-e2-sparse-v2 m3-e2-dense-v2 m3-e2-dense
-> --name e2 --base-solve 0.054`), the E2 rows and reading in RESULTS.md, the PLAN row, and the PR.
+> **Next up (M3, 2026-10-23 night):** config v2 (ADR-021) is the frozen config. `m3-e2-dense-v2`
+> is done (test2000 27.2%, results committed). `m3-e2-sparse-v2` (approved by the user) launched
+> 22:17Z on 2026-10-22, chained after dense-v2, in us-central1-c. Stockouts are waited out for up
+> to 12 h (ADR-020). If a session restarts mid-run, re-attach with
+> `uv run ks watch configs/runs/m3-e2-sparse-v2.yaml` (one watcher per run). When it ends:
+> `ks train-report m3-e2-sparse-v2`, pull `attempts/*/out/eval/test2000/*` into `results/eval/`,
+> figures (`ks train-figures m3-e2-sparse-v2 m3-e2-dense-v2 m3-e2-dense --name e2
+> --base-solve 0.054`), the sparse row, the paired Δ vs dense v2 and its reading in RESULTS.md,
+> the PLAN row, and the PR.
 | M4 | Primer SFT → GRPO, the main result (E3) | [M4](tasks/M4-primer.md) | 100 | 0 | ⬜ todo | |
 | M5 | Scaling and ablations (E4, E5) | [M5](tasks/M5-scaling-ablations.md) | 110 | 110* | ⬜ todo | |
 | M6 | Release and showcase | [M6](tasks/M6-release.md) | 9 | 4 | ⬜ todo | |

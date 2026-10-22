@@ -494,3 +494,11 @@ E2 costs one more dense run (~$8). `entropy_coef` is logged each step. Risk to w
 bonus applies to every completion token, so it could show up as noise on the format tokens
 or prose before `<answer>`; format, legal, length and prose_frac are in the step-50 check or
 next to it.
+**Observed in `m3-e2-dense-v2`** (RESULTS.md, E2 dense v2): the risk showed up after `</answer>`,
+where none of those metrics look. From about step 85, 0.5–2% of completions ran on to the
+1024-token cap after a valid answer. TRL's controller measures a token-weighted entropy over the
+whole step, and these completions carried ~40% of the tokens. They held it above target, so the
+coefficient sat near 0 for steps 94–135, and dead groups climbed back to 70–80%. Test2000 was
+still 27.2% (+3.4 [1.8, 4.8] paired vs v1) on the same dev plateau. v2 stays frozen so the
+E2/E3 arms stay comparable. The fix, if a later milestone has the budget: a `</answer>` stop
+string, or masking post-answer tokens from the loss and the controller.
