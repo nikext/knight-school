@@ -16,6 +16,10 @@ from typing import Literal
 from ks.cloud.config import Caps, Prices, RunConfig
 from ks.cloud.ledger import LedgerState
 
+# Ledger attempts of one run, $0 stockout retries included: 12 h of retries every
+# 15 min is 48, plus max_attempts (<= 10) VMs.
+MAX_LEDGER_ATTEMPTS = 60
+
 
 @dataclass(frozen=True)
 class Ok:
@@ -208,8 +212,16 @@ def check(
             reasons.append(
                 f"attempt {attempt} of {run.id} does not follow attempt {previous[-1].start.attempt}"
             )
-        if attempt > run.max_attempts:
-            reasons.append(f"attempt {attempt} exceeds max_attempts {run.max_attempts}")
+        # $0 stockout attempts don't use up max_attempts (ADR-020); a hard cap on all
+        # attempts still stops a retry loop that has gone wrong.
+        vms = sum(a.made_vm for a in previous)
+        if vms >= run.max_attempts:
+            reasons.append(
+                f"attempt {attempt} would be VM {vms + 1}, which exceeds max_attempts "
+                f"{run.max_attempts}"
+            )
+        if attempt > MAX_LEDGER_ATTEMPTS:
+            reasons.append(f"attempt {attempt} exceeds the hard cap of {MAX_LEDGER_ATTEMPTS}")
         approved = previous[0].start.run_budget_usd if previous else None
         budget = approved if approved is not None else worst * run.max_attempts
     run_spent, run_running = ledger.run_cost(run.id)

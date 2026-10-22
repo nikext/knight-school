@@ -88,10 +88,10 @@ def launch(
         approved=approved,
     )
     _echo(res.lines)
-    if not res.ok:
+    if watch and (res.ok or (res.stockout and run.stockout_wait_hours > 0)):
+        _watch(run, interval, approved)  # it also waits out a first-attempt stockout (ADR-020)
+    elif not res.ok:
         raise typer.Exit(2)
-    if watch:
-        _watch(run, interval, approved)
 
 
 def _watch(run: cfg.RunConfig, interval: float, approved: str) -> None:

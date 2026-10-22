@@ -10,7 +10,9 @@ Events, one JSON object per line in costs/ledger.jsonl:
 - ``charge``: a cost with no lifetime (Gemini calls, storage, ...).
 
 A preemption retry is a new ``start`` with the same ``id`` and the next
-``attempt`` number.
+``attempt`` number. So is a stockout retry (ADR-020): an attempt that found no
+capacity in any zone ends at once as ``not-created`` at $0 with
+``note: stockout``.
 """
 
 from __future__ import annotations
@@ -26,6 +28,11 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
 from ks.cloud.config import LEDGER_PATH
+
+# The status of an attempt the launcher closed at $0 because no VM was created, and the
+# note that says it was for lack of capacity (retryable) rather than a create error.
+NOT_CREATED = "not-created"
+STOCKOUT_NOTE = "stockout"
 
 
 class LedgerError(ValueError):
@@ -145,6 +152,15 @@ class Attempt:
     @property
     def running_worst_usd(self) -> float:
         return self.start.worst_case_usd if self.end is None else 0.0
+
+    @property
+    def made_vm(self) -> bool:
+        """False only for an attempt the launcher closed at $0 because nothing was created."""
+        return not (self.end and self.end.status == NOT_CREATED)
+
+    @property
+    def stocked_out(self) -> bool:
+        return bool(self.end and self.end.status == NOT_CREATED and self.end.note == STOCKOUT_NOTE)
 
 
 @dataclass

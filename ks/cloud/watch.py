@@ -5,6 +5,10 @@ attempt (reconcile). Only a ``preempted`` attempt is retried, and only
 through the gate, which enforces ``max_attempts`` and the approved run
 budget. A VM that outlives its ``ended`` marker or its ``max_hours`` is
 deleted here as a second line of defence.
+
+A stockout (no capacity in any zone, a $0 attempt) is retried every
+``STOCKOUT_RETRY`` for up to the run's ``stockout_wait_hours``, counted from
+the first stockout in a row (ADR-020). A create error is not retried.
 """
 
 from __future__ import annotations
@@ -18,10 +22,11 @@ from ks.cloud import reconcile
 from ks.cloud.config import LEDGER_PATH, Caps, Prices, RunConfig, utcnow
 from ks.cloud.gcp import CloudOps
 from ks.cloud.launch import launch
-from ks.cloud.ledger import append_event, load_state
+from ks.cloud.ledger import Attempt, append_event, load_state
 
 ENDED_GRACE = timedelta(minutes=10)
 OVERTIME_GRACE = timedelta(minutes=15)
+STOCKOUT_RETRY = timedelta(minutes=15)
 
 
 def watch(
@@ -62,11 +67,21 @@ def watch(
             assert cur.end is not None
             status = cur.end.status
 
-        if status != "preempted":
+        if cur.stocked_out:
+            since = _stockout_since(attempts)
+            if clock() >= since + timedelta(hours=run.stockout_wait_hours):
+                log(f"{run.id}: no capacity since {since:%H:%MZ}; stockout_wait_hours over")
+                return "stockout"
+            log(f"{label}: no capacity in any zone; retrying in {STOCKOUT_RETRY}")
+            sleep(STOCKOUT_RETRY.total_seconds())
+            why = "stockout retry"
+        elif status != "preempted":
             return status
-        if cur.start.attempt >= run.max_attempts:
-            log(f"{run.id}: preempted {cur.start.attempt} times, max_attempts reached; stopping")
+        elif sum(a.made_vm for a in attempts) >= run.max_attempts:
+            log(f"{run.id}: max_attempts ({run.max_attempts} VMs) reached; stopping")
             return "preempted"
+        else:
+            why = "preemption retry"
 
         res = launch(
             run,
@@ -79,17 +94,28 @@ def watch(
             attempt=cur.start.attempt + 1,
             confirm=True,
             use_contingency=cur.start.contingency,
-            approved=f"{approved} (preemption retry, covered by the run's approval)",
+            approved=f"{approved} ({why}, covered by the run's approval)",
             ledger_path=ledger_path,
         )
         for line in res.lines:
             log(line)
-        if not res.ok:
+        if not res.ok and not (res.stockout and run.stockout_wait_hours > 0):
             return (
                 "retry-refused"
                 if any(x.startswith("REFUSED") for x in res.lines)
                 else "retry-failed"
             )
+
+
+def _stockout_since(attempts: list[Attempt]) -> datetime:
+    """When the trailing run of stockout attempts began."""
+    since = None
+    for a in reversed(attempts):
+        if not a.stocked_out or a.end is None:
+            break
+        since = a.end.ts
+    assert since is not None
+    return since
 
 
 def _enforce_limits(cur, ops: CloudOps, bucket: str, now: datetime, log) -> None:
