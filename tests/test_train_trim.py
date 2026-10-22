@@ -50,4 +50,23 @@ def test_trimmed_matches_trl_on_ragged_padding():
     assert torch.allclose(got[1][cmask], ref[1][cmask], atol=1e-5)
     t = stub(Trim)
     Trim._get_per_token_logps_and_entropies(t, model, ids, mask, comp, 2, False)
-    assert t.trimmed_columns == 2 * (12 - 3) + 2 * (12 - 4) and t.total_columns == b * comp
+    # sorted by completion length: (12, 4) | (3, 2) | (2, 1) -> chunks need 12, 3, 2 columns
+    assert t.trimmed_columns == 2 * (12 - 3) + 2 * (12 - 2) and t.total_columns == b * comp
+
+
+def test_sort_by_length_permutes_every_field_in_unison():
+    from ks.train.trim import sort_by_length
+
+    cm = torch.tensor([[1, 0, 0], [1, 1, 1], [1, 1, 0]])
+    out = sort_by_length(
+        {
+            "completion_mask": cm,
+            "adv": torch.tensor([0.0, 1.0, 2.0]),
+            "id": ["a", "b", "c"],
+            "n": torch.tensor(5),
+            "x": None,
+        }
+    )
+    assert out["completion_mask"].sum(-1).tolist() == [3, 2, 1]
+    assert out["adv"].tolist() == [1.0, 2.0, 0.0] and out["id"] == ["b", "c", "a"]
+    assert int(out["n"]) == 5 and out["x"] is None

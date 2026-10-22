@@ -18,7 +18,7 @@ max_grad_norm: 1.0
 
 prompts_per_step: 64
 generations: 8           # Chess-R1
-micro_batch: 8           # completions per forward/backward (memory only; not a hyperparameter)
+micro_batch: 32          # completions per forward/backward; efficiency only (length-sorted, dapo: ADR-019)
 max_completion: 1024     # revisit from the smoke's p95 (TRAINING.md §4)
 temperature: 1.0
 beta: 1.0e-3             # Chess-R1

@@ -35,7 +35,7 @@ from ks.train import ckpt as kc
 from ks.train import metrics as km
 from ks.train.config import GrpoConfig, load
 from ks.train.rewards import RewardFns
-from ks.train.trim import trimmed
+from ks.train.trim import install_sorted_batches, trimmed
 
 COLUMNS = ["fen", "solution_uci", "is_last", "legal_san", "wp"]
 
@@ -314,6 +314,7 @@ def main(
         seed=cfg.seed,
     )
     t0 = time.monotonic()
+    install_sorted_batches()  # micro-batches by completion length (exact under dapo, ADR-019)
     trainer: Any = trimmed(GRPOTrainer)(  # drops right padding per chunk (ADR-019)
         model=model,
         reward_funcs=reward_funcs,  # type: ignore[arg-type]
@@ -428,8 +429,16 @@ def main(
 
         def on_save(self, args: Any, state: Any, control: Any, **kw: Any) -> None:
             local = Path(args.output_dir) / f"checkpoint-{state.global_step}"
-            n = kc.push(store, local, ckpt_root, cfg.keep_last)
-            log(f"checkpoint {state.global_step}: {n} files to {ckpt_root}")
+            try:
+                n = kc.push(store, local, ckpt_root, cfg.keep_last)
+            except (
+                Exception
+            ) as e:  # the next checkpoint tries again; a retry resumes from an older one
+                log(
+                    f"checkpoint {state.global_step}: copy to {ckpt_root} FAILED ({e}); training on"
+                )
+            else:
+                log(f"checkpoint {state.global_step}: {n} files to {ckpt_root}")
             push_out()
 
     trainer.add_callback(Hooks())

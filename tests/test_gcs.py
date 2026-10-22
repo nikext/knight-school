@@ -83,3 +83,61 @@ def test_push_keeps_relative_paths(tmp_path: Path, monkeypatch):
         "runs/x/attempts/2/out/eval/dev500/m.json",
     ]
     assert all(p[0].endswith("/upload/storage/v1/b/bkt/o") for p in s.posts)
+
+
+class FlakySession(WriteSession):
+    """Drops the first `fails` POSTs, as a server closing a kept-alive connection does."""
+
+    def __init__(self, fails: int) -> None:
+        super().__init__()
+        self.fails = fails
+
+    def post(self, url: str, params: dict[str, str], data: Any, **kw: Any) -> Resp:
+        import requests
+
+        if self.fails:
+            self.fails -= 1
+            data.read()  # the failed try consumed the stream
+            raise requests.exceptions.ConnectionError("Remote end closed connection")
+        return super().post(url, params, data, **kw)
+
+
+def test_upload_retries_a_dropped_connection_with_a_fresh_stream(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr(gcs, "_sleep", lambda s: None)
+    f = tmp_path / "adapter.bin"
+    f.write_bytes(b"weights")
+    s = FlakySession(fails=2)
+    gcs.upload(f, "gs://bkt/runs/x/ckpt/checkpoint-10/adapter.bin", s)
+    assert len(s.posts) == 1 and s.posts[0][2] == b"weights"
+
+
+def test_retry_gives_up_eventually(monkeypatch):
+    import requests
+
+    monkeypatch.setattr(gcs, "_sleep", lambda s: None)
+    calls = []
+
+    def boom():
+        calls.append(1)
+        raise requests.exceptions.ConnectionError("down")
+
+    with pytest.raises(requests.exceptions.ConnectionError):
+        gcs._retry(boom)
+    assert len(calls) == gcs.RETRIES
+
+
+def test_retry_does_not_retry_a_client_error(monkeypatch):
+    import requests
+
+    monkeypatch.setattr(gcs, "_sleep", lambda s: None)
+    calls = []
+
+    def forbidden():
+        calls.append(1)
+        r = requests.Response()
+        r.status_code = 403
+        raise requests.exceptions.HTTPError(response=r)
+
+    with pytest.raises(requests.exceptions.HTTPError):
+        gcs._retry(forbidden)
+    assert len(calls) == 1
