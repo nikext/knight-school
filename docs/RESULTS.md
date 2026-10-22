@@ -11,6 +11,7 @@ bootstrap CIs. Arm-vs-arm differences use a paired bootstrap. Model:
 |---|---|---|---|---|---|
 | base (zero-shot) | 4.8% [1.6, 8.8] | 4.0% [0.8, 8.0] | 0.0% | 50.4% [41.6, 59.2] | P1 40–60%, P2 2–8%, P3 0–2%, P4 55–75% (written 2026-10-21, before any run) |
 | base → GRPO dense (E2, config v1) | 1.6% [0.0, 4.0] | 3.2% [0.8, 6.4] | 0.0% | 50.4% [41.6, 59.2] | no change beyond noise (E2 predictions) |
+| base → GRPO dense (E2, config v2) | 3.2% [0.8, 6.4] | 4.0% [0.8, 8.0] | 0.0% | 50.4% [41.6, 59.2] | no change beyond noise (E2 predictions) |
 | primer-M | | | | | |
 | primer-M → GRPO dense | | | | | |
 
@@ -70,7 +71,7 @@ $/1k counts the 105 s of generation only; the job cost $0.13 with boot.
 |---|---|---|---|---|---|---|
 | E2 base → GRPO sparse, v1 | 4–8% (point 6%); move acc 16–24%, legal ≥ 98% | not run: v1 dropped (ADR-021) | | | | $6.13, preempted to step 20 |
 | E2 base → GRPO dense, v1 | 7–14% (point 10%); move acc 22–32%, legal ≥ 99% | **23.8% [21.9, 25.7]** | 41.8% [40.3, 43.3] | 100.0% | — | $7.84 + $0.29 eval |
-| E2 base → GRPO dense, v2 | 22–33% (point 28%); see below | | | | (reference for v2 arms) | |
+| E2 base → GRPO dense, v2 | 22–33% (point 28%); see below | **27.2% [25.2, 29.1]** | 43.6% [42.1, 45.2] | 100.0% | reference for v2 arms; vs dense v1 +3.4 [1.8, 4.8] | $9.22 with both evals (attempt 1 a $0 stockout) |
 | E2 base → GRPO sparse, v2 | 16–30% (point 24%); see below | | | | | |
 | E3 primer-M only | | | | | | |
 | E3 primer-M → GRPO sparse | | | | | | |
@@ -128,6 +129,39 @@ only main-model GRPO run so far):
 - **Sparse v2** learns, behind dense: 16–30% (point 24%), paired Δ vs dense v2 about −4 points,
   with a CI that may include 0. This drops the original "sparse ≈ flat, replicates Chess-R1"
   expectation (RESEARCH.md E2) on the strength of v1's first 19 steps.
+
+**E2 dense, config v2** (`m3-e2-dense-v2`, ADR-021; `results/eval/test2000/m3-e2-dense-v2.md`,
+`results/train/m3-e2-dense-v2/`). test2000: 27.2% [25.2, 29.1] solve, 43.6% move accuracy, 100%
+legal, puzzle rating 1011 [967, 1053] (v1: 873). Paired against v1 on the same 2000 puzzles the
+gain is +3.4 points [1.8, 4.8]: v2 alone solves 145 puzzles, v1 alone 78. The point prediction
+(28%, about +4) held, but the evidence for it is weaker than the CI suggests:
+- **The dev plateau didn't move.** dev500 averaged 26.4% over steps 150–200 (six evals), and v1
+  averaged 27.0% (steps 150, 175, 200). v1's last checkpoint sat on a dev dip (25.2% at step 200,
+  28.0% at 150) and v2's on a peak (29.0% at 200), so part of the test gap comes from where each
+  run stopped. The paired CI covers puzzle sampling, not seed or checkpoint variance, and each
+  config has one seed. I read this as v2 ≥ v1, not as a 3-point gain.
+- **The gain is in the easy bins**, not in 800–1599 as predicted: +14, +7, +8, +10 and +5 points
+  across the 400–1399 bins, and within ±2 points in every bin from 1400 up.
+- **More learning signal, same ceiling.** Over steps 31–90, v2 held mean entropy at 0.19 with
+  46% dead groups. v1 had 0.04 and 72%. Yet dev500 sat at 22–25% in both runs. So a steady
+  supply of gradient wasn't what held v1 at its plateau. That fits the primer premise: the model
+  is short of board knowledge, and E0 didn't move (P1 3.2%, P2 4.0%, P3 0%, P4 50.4%). It is
+  one run, though.
+- **Known flaw: post-answer rambling switched the bonus off.** From about step 85, 0.5–2% of
+  completions give a valid `<answer>` and then run on to the 1024-token cap with loose
+  "step-by-step" text after `</answer>`. The reward has already scored the answer, so nothing
+  penalises the extra text. TRL's controller measures a token-weighted entropy over the whole
+  step, so this ~1% of completions carries about 40% of the tokens (steps 81–200), and their high
+  entropy reads as above target. On the 40 steps with ≥ 0.5% of completions truncated, the
+  coefficient didn't rise on 37. On the 65 steps with none truncated, it rose on 42. The
+  coefficient stayed near 0 from step 94 to 135, and dead groups climbed to 70–80%. Logged
+  entropy, a per-micro-batch mean, still read 0.11–0.15. The coefficient recovered to 0.38 by
+  step 154 and fell to 0 again from step 190. Mean length stayed ≤ 32 tokens and prose before
+  `<answer>` stayed at 0, so none of the step-50 criteria could catch it. A fix would stop
+  generation at `</answer>` or mask the post-answer tokens. That makes a third config, so v2
+  stays frozen for comparability (ADR-021).
+- **The rest of the predictions:** completions stayed short (mean 10–32 tokens per step), and
+  prose before `<answer>` stayed under 0.1% of completions, so my 25% bet on > 10% lost.
 
 Figures: dev solve rate vs $ spent, all arms overlaid
 (`results/figures/e2e3_curves.png`), and per-bin solve rate
