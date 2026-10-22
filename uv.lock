@@ -754,6 +754,31 @@ wheels = [
 ]
 
 [[package]]
+name = "fla-core"
+version = "0.5.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "einops" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/94/85/20bdc0fbbbaeec27b5b198e0dbbbc51161a267066a4aebd9e4b413637c6c/fla_core-0.5.2.tar.gz", hash = "sha256:9360fc412f784c1c8f05c320ec2902d5d968764178c9b8a92efc919e17a39680", size = 587835, upload-time = "2026-07-27T18:26:19.424Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2d/ed/dfe19c4da779957eb6a42a26812f9b4e2280bf757a17a71933ff59ffcb98/fla_core-0.5.2-py3-none-any.whl", hash = "sha256:5e830c85bad3d0d34677f98ac7074d08687a3756f0f0499d95ceb96eb6920761", size = 819225, upload-time = "2026-07-27T18:26:16.147Z" },
+]
+
+[[package]]
+name = "flash-linear-attention"
+version = "0.5.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "fla-core" },
+    { name = "transformers" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d2/76/c180949eae5161b9fcf4c928cab52f0c257ce84c1a59b4462b1d2b6e5883/flash_linear_attention-0.5.2.tar.gz", hash = "sha256:c053d3a75c8f5b725063f719ae6bce0f4d9dac6da32735be8ae7d485a6c9820f", size = 208110, upload-time = "2026-07-27T18:26:20.536Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/90/d2/2070e3cf2148c5cce99ca4876633c4b7b89ec085323600bd3d47aeacd306/flash_linear_attention-0.5.2-py3-none-any.whl", hash = "sha256:dcf405d81f5426393b59037097aa700d0f4a841465d5028d5aa543f4502f2400", size = 399590, upload-time = "2026-07-27T18:26:17.912Z" },
+]
+
+[[package]]
 name = "flashinfer-python"
 version = "0.7.0.post1"
 source = { registry = "https://pypi.org/simple" }
@@ -1294,7 +1319,10 @@ gemini = [
 ]
 train = [
     { name = "accelerate" },
+    { name = "fla-core" },
+    { name = "flash-linear-attention" },
     { name = "peft" },
+    { name = "tensorboardx" },
     { name = "torch" },
     { name = "transformers" },
     { name = "trl" },
@@ -1313,6 +1341,8 @@ dev = [
 requires-dist = [
     { name = "accelerate", marker = "extra == 'train'", specifier = "==1.15.0" },
     { name = "chess", specifier = ">=1.11.2" },
+    { name = "fla-core", marker = "extra == 'train'", specifier = "==0.5.2" },
+    { name = "flash-linear-attention", marker = "extra == 'train'", specifier = "==0.5.2" },
     { name = "google-cloud-storage", specifier = ">=3.17.1" },
     { name = "google-genai", marker = "extra == 'gemini'", specifier = ">=2.32.0" },
     { name = "numpy", specifier = ">=2.3" },
@@ -1321,6 +1351,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.14.1" },
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "requests", specifier = ">=2.34.2" },
+    { name = "tensorboardx", marker = "extra == 'train'", specifier = "==2.6.5" },
     { name = "torch", marker = "extra == 'train'", specifier = "==2.13.0" },
     { name = "transformers", marker = "extra == 'train'", specifier = "==5.17.0" },
     { name = "trl", marker = "extra == 'train'", specifier = "==1.16.0" },
@@ -3291,6 +3322,21 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/47/c6/ee486fd809e357697ee8a44d3d69222b344920433d3b6666ccd9b374630c/tenacity-9.1.4.tar.gz", hash = "sha256:adb31d4c263f2bd041081ab33b498309a57c77f9acf2db65aadf0898179cf93a", size = 49413, upload-time = "2026-02-07T10:45:33.841Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d7/c1/eb8f9debc45d3b7918a32ab756658a0904732f75e555402972246b0b8e71/tenacity-9.1.4-py3-none-any.whl", hash = "sha256:6095a360c919085f28c6527de529e76a06ad89b23659fa881ae0649b867a9d55", size = 28926, upload-time = "2026-02-07T10:45:32.24Z" },
+]
+
+[[package]]
+name = "tensorboardx"
+version = "2.6.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "packaging" },
+    { name = "protobuf", version = "7.36.1", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine == 's390x'" },
+    { name = "protobuf", version = "7.36.2", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine != 's390x'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/48/a9/fc520ea91ab1f3ba51cbf3fe24f2b6364ed3b49046969e0868d46d6da372/tensorboardx-2.6.5.tar.gz", hash = "sha256:ca176db3997ee8c07d2eb77381225956a3fd1c10c91beafab1f17069adc47017", size = 4770195, upload-time = "2026-04-03T15:40:23.803Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/87/0f/69fbab4c30b2f3a76e6de67585ea72a8eccf381751f5c0046b966fde9658/tensorboardx-2.6.5-py3-none-any.whl", hash = "sha256:c10b891d00af306537cb8b58a039b2ba41571f0da06f433a41c4ca8d6abe1373", size = 87510, upload-time = "2026-04-03T15:40:22.111Z" },
 ]
 
 [[package]]

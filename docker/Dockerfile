@@ -40,7 +40,9 @@ RUN python3 -m pip install --no-cache-dir --no-deps -e . && mkdir -p /out \
  && ks eval random --set dev500 --limit 5 --out /tmp/smoke \
  && ks eval random --set probe500 --limit 8 --out /tmp/smoke \
  && python3 -c "from ks.eval import profile; [profile.load(m) for m in ('qwen3-1.7b', 'qwen3.5-2b', 'gemma4-e2b')]" \
- && python3 -m ks.train.grpo_smoke --help > /dev/null && rm -rf /tmp/smoke
+ && python3 -m ks.train.grpo_smoke --help > /dev/null && python3 -m ks.train.grpo --help > /dev/null \
+ && python3 -c "from ks.train import config; config.load('configs/train/grpo_dense.yaml'); config.load('configs/train/grpo_sparse.yaml')" \
+ && bash -n configs/jobs/m3-grpo.sh && python3 -c 'import tensorboardX' && rm -rf /tmp/smoke
 
 ARG GIT_SHA=unknown
 ENV KS_GIT_SHA=${GIT_SHA}

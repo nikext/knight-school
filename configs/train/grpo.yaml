@@ -1,0 +1,39 @@
+# GRPO hyperparameters for every arm (TRAINING.md §4). Starting values adapted from Chess-R1;
+# tuned only in the M3 smoke and throughput tests, then frozen (ADR-019). Arms set `base: grpo.yaml`
+# and may change only the factor under test (ks.train.config.ARM_KEYS; enforced by a test).
+name: grpo
+model: qwen3.5-2b
+task_reward: dense
+legal_list: true
+data: gs://knight-school-nt26-knight-school/data/v1/positions/rl_train.parquet
+
+lora_r: 32               # ADR-007; on the language model's linear layers only (ADR-018)
+lora_alpha: 64
+lora_dropout: 0.0
+learning_rate: 1.0e-5    # ~10x Chess-R1's full-FT 1e-6 (LoRA Without Regret)
+warmup_steps: 10
+lr_scheduler: constant_with_warmup
+weight_decay: 0.0
+max_grad_norm: 1.0
+
+prompts_per_step: 64
+generations: 8           # Chess-R1
+micro_batch: 8           # completions per forward/backward (memory only; not a hyperparameter)
+max_completion: 1024     # revisit from the smoke's p95 (TRAINING.md §4)
+temperature: 1.0
+beta: 1.0e-3             # Chess-R1
+loss_type: dapo          # TRL 1.16 default
+mask_truncated: false    # a truncated answer is a wrong answer
+steps: 200
+
+eval_set: dev500
+eval_every: 25
+eval_at_start: true
+save_every: 25
+keep_last: 2
+
+vllm_mem: 0.45
+vllm_sleep: false
+gradient_checkpointing: true
+seed: 2026
+samples_per_step: 16

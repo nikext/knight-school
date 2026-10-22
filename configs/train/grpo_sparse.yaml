@@ -1,0 +1,4 @@
+# E2 / E3 sparse arm: task reward = 1 if the move solves the position, else 0 (TRAINING.md §3).
+base: grpo.yaml
+name: grpo-sparse
+task_reward: sparse

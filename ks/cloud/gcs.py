@@ -94,6 +94,14 @@ def upload(path: Path, uri: str, session: Any = None) -> None:
     r.raise_for_status()
 
 
+def delete(uri: str, session: Any = None) -> None:
+    bucket, name = split(uri)
+    s = session or _session(write=True)
+    r = s.delete(f"{API}/b/{bucket}/o/{quote(name, safe='')}", timeout=60)
+    if r.status_code != 404:  # already gone is fine
+        r.raise_for_status()
+
+
 def push(src: Path, uri: str) -> int:
     """Upload every file under src to the gs:// prefix (overwriting). Returns the file count."""
     prefix = uri.rstrip("/")
