@@ -35,6 +35,7 @@ from ks.train import ckpt as kc
 from ks.train import metrics as km
 from ks.train.config import GrpoConfig, load
 from ks.train.rewards import RewardFns
+from ks.train.trim import trimmed
 
 COLUMNS = ["fen", "solution_uci", "is_last", "legal_san", "wp"]
 
@@ -313,7 +314,7 @@ def main(
         seed=cfg.seed,
     )
     t0 = time.monotonic()
-    trainer: Any = GRPOTrainer(
+    trainer: Any = trimmed(GRPOTrainer)(  # drops right padding per chunk (ADR-019)
         model=model,
         reward_funcs=reward_funcs,  # type: ignore[arg-type]
         args=args,
@@ -354,6 +355,7 @@ def main(
         sample
     )
     info["prompt_tokens_mean"] = round(prompt_len, 1)
+    info_path.write_text(json.dumps(info, indent=1))
     puzzles = sets.spread(sets.load_puzzles(cfg.eval_set), cfg.eval_limit) if cfg.eval_every else []
 
     def dev_eval(step: int) -> None:
@@ -405,6 +407,15 @@ def main(
                 prompt_tokens=int(prompt_len * cfg.completions_per_step),
             )
             gen["s"] = 0.0
+            # memory: torch's peak in this step (trainer + the colocated engine, one process)
+            # and the whole device in use now, so micro_batch and vllm_mem can be sized
+            free, total = torch.cuda.mem_get_info()
+            row["mem_peak_gib"] = round(torch.cuda.max_memory_allocated() / 2**30, 2)
+            row["mem_used_gib"] = round((total - free) / 2**30, 2)
+            torch.cuda.reset_peak_memory_stats()
+            if trainer.total_columns:
+                row["trim_frac"] = round(trainer.trimmed_columns / trainer.total_columns, 3)
+            trainer.trimmed_columns = trainer.total_columns = 0
             steps_log.write(row)
             log(
                 f"step {row['step']}: reward {row.get('reward', 0):.3f}, legal {row.get('legal_rate', 0):.3f}, "
