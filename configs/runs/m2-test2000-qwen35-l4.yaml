@@ -1,0 +1,19 @@
+# M2 E1 base row (task M2 §9): Qwen3.5-2B zero-shot on test2000, one spot L4. Generation is about
+# 10 tokens per answer (dev500: 6 s on the A100), so the VM boot and the image pull dominate.
+# The image (90bfc56) predates ADR-017's `template_closes_think`, so the job grades format strictly;
+# the report is re-graded with `ks rescore` afterwards (as dev500 was), which changes format only.
+# Results: gs://BUCKET/runs/m2-test2000-qwen35-l4/attempts/<n>/out/eval/test2000/
+id: m2-test2000-qwen35-l4
+milestone: M2
+description: "E1 base row: Qwen3.5-2B zero-shot on test2000"
+machine: g2-standard-8
+gpus: 1
+zones: [us-central1-a, us-central1-b, us-central1-c]
+max_hours: 0.75
+max_attempts: 2
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:90bfc56fc862@sha256:5750820ecc59b72928dc82f11db31cef6e5b5e404c69d12ac7b345e7437b7e7c
+command: "cd /app && ks eval qwen3.5-2b --set test2000 --out /out/eval"
+env:
+  KS_PRICE_PER_HOUR: "0.541"
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
