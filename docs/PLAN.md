@@ -14,7 +14,7 @@ merged PR whose description lists what was verified, the numbers, and the
 | M2 | Eval harness, container, model choice, baselines (E0, E1) | [M2](tasks/M2-evals-baselines.md) | 15 | 50 | ✅ done | PR #3 · spent $4.85 compute, $0 vertex · main model Qwen3.5-2B, non-thinking (ADR-011, ADR-017) · E1 base 4.1% solve, 96.4% legal · Stockfish 1 node 68.6% · Gemini rows pending until 2026-11-13 |
 | M3 | GRPO pipeline, RL on base (E2), re-plan | [M3](tasks/M3-grpo.md) | 70 | 0 | 🟨 in progress | branch `m3-grpo` · pipeline, smoke, throughput, frozen config (ADR-018/019) and re-plan done · E2 runs in progress |
 
-> **Next up (M3, 2026-10-23 night):** config v2 (ADR-021) is the frozen config. `m3-e2-dense-v2`
+> **Next up (M3, 2026-10-22 night):** config v2 (ADR-021) is the frozen config. `m3-e2-dense-v2`
 > is done (test2000 27.2%, results committed). `m3-e2-sparse-v2` (approved by the user) launched
 > 22:17Z on 2026-10-22, chained after dense-v2, in us-central1-c. Stockouts are waited out for up
 > to 12 h (ADR-020). If a session restarts mid-run, re-attach with
