@@ -165,6 +165,10 @@ each component separately.
 - Files: `docker/Dockerfile`, `docker/cloudbuild.yaml`, `.gcloudignore`
   (uploads only what the image copies). The git SHA is baked in as
   `KS_GIT_SHA`, since the image has no `.git`.
+- **Current image (M2):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:90bfc56fc862@sha256:5750820ecc59b72928dc82f11db31cef6e5b5e404c69d12ac7b345e7437b7e7c`.
+  It ran every M2 cloud number (screening on an A100 80GB, test2000 on an L4). It predates
+  ADR-017's profile flag, so its reports were re-graded with `ks rescore`. M3
+  needs a rebuild for its GRPO code anyway.
 
 ## 9. Run config (`configs/runs/*.yaml`)
 
