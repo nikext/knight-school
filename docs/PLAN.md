@@ -12,7 +12,12 @@ merged PR whose description lists what was verified, the numbers, and the
 | M0 | Bootstrap and money guardrails | [M0](tasks/M0-bootstrap.md) | 5 | 1 | ✅ done | PR #1 · spent $0.08 compute, $0.000001 vertex · L4 smoke passed (r2); kill switch tested |
 | M1 | Data: puzzles, splits, Stockfish rewards, primer | [M1](tasks/M1-data.md) | 1 | 0 | ✅ done | PR #2 · spent $0.02 compute (GCS storage) · 66,008 rl_train positions, SF19 N=1M, 99.7% agree · primer S 130k / M 1.3M · 0 contamination |
 | M2 | Eval harness, container, model choice, baselines (E0, E1) | [M2](tasks/M2-evals-baselines.md) | 15 | 50 | ✅ done | PR #3 · spent $4.85 compute, $0 vertex · main model Qwen3.5-2B, non-thinking (ADR-011, ADR-017) · E1 base 4.1% solve, 96.4% legal · Stockfish 1 node 68.6% · Gemini rows pending until 2026-11-13 |
-| M3 | GRPO pipeline, RL on base (E2), re-plan | [M3](tasks/M3-grpo.md) | 70 | 0 | ⬜ todo | |
+| M3 | GRPO pipeline, RL on base (E2), re-plan | [M3](tasks/M3-grpo.md) | 70 | 0 | 🟨 in progress | branch `m3-grpo` · pipeline, smoke, throughput, frozen config (ADR-018/019) and re-plan done · E2 runs in progress |
+
+> **Next up (M3):** E2 dense (`m3-e2-dense`) was launched 2026-10-22, then E2 sparse
+> (`m3-e2-sparse`, approved). Both are approved by the user. After each: `ks train-report <id>`,
+> pull `attempts/*/out/eval/test2000/*.json` into `results/eval/test2000/`, then figures
+> (`ks train-figures m3-e2-sparse m3-e2-dense --name e2 --base-solve 0.054`), RESULTS.md, and the PR.
 | M4 | Primer SFT → GRPO, the main result (E3) | [M4](tasks/M4-primer.md) | 100 | 0 | ⬜ todo | |
 | M5 | Scaling and ablations (E4, E5) | [M5](tasks/M5-scaling-ablations.md) | 110 | 110* | ⬜ todo | |
 | M6 | Release and showcase | [M6](tasks/M6-release.md) | 9 | 4 | ⬜ todo | |

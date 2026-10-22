@@ -90,7 +90,7 @@ each component separately.
 | learning rate | 1e-5, 10 warmup steps, then constant | about 10× Chess-R1's full-FT 1e-6 (LoRA Without Regret) |
 | prompts per step | 64 | |
 | generations per prompt | 8 | Chess-R1 used 8 |
-| max completion tokens | 1024 | lower it if p95 length is far below |
+| max completion tokens | 1024 | kept at 1024 (user, M3): the p95 was at the cap while the base model rambled, and 1024 leaves room for reasoning to emerge |
 | temperature | 1.0 | |
 | KL β | 1e-3 | Chess-R1; `loss_type` per TRL's current default, recorded in an ADR |
 | steps | 200 | about 12.8k prompts; extend only if the dev curve is still rising and the budget allows |
@@ -117,14 +117,27 @@ each component separately.
   listed by python-chess, still teacher-free). Record it in an ADR. The
   format reward then handles the rest.
 
+**Frozen in M3 (ADR-019):** `configs/train/grpo.yaml` holds exactly the values above,
+plus `micro_batch: 32` and `vllm_mem: 0.45`, which affect speed only. Arms change only the factor
+under test (`ks.train.config.ARM_KEYS`, enforced by a test). Implementation details (engine
+kwargs, LoRA targets, loss, checkpoints, preemption) are in ADR-018. TRL pads every completion
+to the longest one in the batch, so `ks.train.trim` trims each chunk's right padding and cuts
+micro-batches from the length-sorted batch. Both are exact; without them a step stayed at
+~127 s on the A100 once completions were ~20 tokens.
+
+**What the M3 smoke showed (`results/train/m3-smoke-a100`):** sampled at temperature 1.0, the
+base model rambles. 42% of completions hit the cap, and the legal rate was 53% (96.5% greedy).
+RL removed this in ~10 steps: by step 13 the mean length was 18 tokens, legal 87%, and format
+99.6%.
+
 ## 6. Hardware
 
 | Job | Machine | Note |
 |---|---|---|
 | unit tests, parser, rewards, tiny-model smoke | laptop (RTX 3060 6 GB) | free; use a ≤ 1B model for wiring tests |
-| GRPO smoke, small evals | `g2-standard-8` (L4 24 GB) spot | ~$0.30/h |
+| GRPO smoke, small evals | `g2-standard-8` (L4 24 GB) spot | $0.54/h; in M3 the L4 was stocked out in all six zones, so the smoke ran on the A100 |
 | SFT and GRPO runs | `a2-ultragpu-1g` (A100 80 GB) spot | default |
-| | `a3-highgpu-1g` (H100 80 GB) spot | only if M3 measures a lower $/step |
+| | `a3-highgpu-1g` (H100 80 GB) spot | M3: 1.8× faster per step, 10–13% more per step, so it's the fallback for A100 stockouts or a tight calendar (ADR-019) |
 
 ## 7. Checkpointing, preemption, resume
 
@@ -165,7 +178,11 @@ each component separately.
 - Files: `docker/Dockerfile`, `docker/cloudbuild.yaml`, `.gcloudignore`
   (uploads only what the image copies). The git SHA is baked in as
   `KS_GIT_SHA`, since the image has no `.git`.
-- **Current image (M2):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:90bfc56fc862@sha256:5750820ecc59b72928dc82f11db31cef6e5b5e404c69d12ac7b345e7437b7e7c`.
+- **M3 additions** (ADR-018): `flash-linear-attention`/`fla-core` 0.5.2 (Triton kernels for
+  Qwen3.5's DeltaNet layers in training) and `tensorboardX` 2.6.5. TRL 1.16.0 was still the
+  newest release on 2026-10-22, so the pins are unchanged.
+- **Current image (M3, E2 runs):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:25b5dd417d43@sha256:b1127f781cb392cf18aa545759c02d90763c1d2403645a36a4f10c95f5004606`.
+- **Earlier image (M2):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:90bfc56fc862@sha256:5750820ecc59b72928dc82f11db31cef6e5b5e404c69d12ac7b345e7437b7e7c`.
   It ran every M2 cloud number (screening on an A100 80GB, test2000 on an L4). It predates
   ADR-017's profile flag, so its reports were re-graded with `ks rescore`. M3
   needs a rebuild for its GRPO code anyway.
