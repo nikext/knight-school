@@ -1,0 +1,11 @@
+# Qwen3.5-2B with its native thinking mode switched on.
+name: qwen3.5-2b-native
+backend: vllm
+description: Qwen3.5-2B, language model only, native thinking (enable_thinking=true)
+license: apache-2.0
+hf_repo: Qwen/Qwen3.5-2B
+revision: 15852e8c16360a2fea060d615a32b45270f8a8fc
+language_model_only: true
+max_model_len: 2560
+chat_template_kwargs: {enable_thinking: true}
+think: native

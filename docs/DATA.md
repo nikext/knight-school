@@ -175,12 +175,12 @@ reveal a blocklisted or rl_train position are dropped. The examples carry
 
 **Sizes** (tokens counted with the chosen model's tokenizer, in M2):
 
-| Set | Target tokens | Built in |
-|---|---|---|
-| primer-S | ~15M | M1 |
-| primer-M | ~150M | M1 |
-| primer-L | ~450M | M5 (only if E4 runs) |
-| primer-rules-M | T1–T4 only, matched to M's tokens | M5 (E5a) |
+| Set | Target tokens | Measured (Qwen3.5-2B, M2) | Built in |
+|---|---|---|---|
+| primer-S | ~15M | **18.6M** total, 2.8M answer (130k examples) | M1 |
+| primer-M | ~150M | **186.5M** total, 28.1M answer (1.3M examples) | M1 |
+| primer-L | ~450M | | M5 (only if E4 runs) |
+| primer-rules-M | T1–T4 only, matched to M's tokens | | M5 (E5a) |
 
 M1 can't know the final tokenizer yet, so it generates by example count with
 a ~20% margin. A 3k-example sample measured **139 tokens per example** with
@@ -188,6 +188,13 @@ Qwen3's tokenizer (T5 195, T2 151, T3 134, T1 100, T4 94, T6 95, T7 98;
 ChatML framing included). That gives **primer-M = 1.3M examples** (~180M
 tokens) and **primer-S = its first 130k** (nested). M2 records the exact
 token counts per set in the manifests.
+
+**Measured in M2** (`ks primer-tokens qwen3.5-2b`, the non-thinking chat
+template, per-task counts in `manifests/primer_{S,M}.json`): **143 tokens
+per example**. The sets came out 24% over target because no examples
+were trimmed after the margin. Answer tokens are 15% of the total, and
+SFT loss is taken on those only, while compute is paid on all of them.
+Primer-M stays at 1.3M examples, so E3/E4 compare the sets as built.
 
 ## 8. File layout
 

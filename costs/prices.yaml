@@ -102,4 +102,48 @@ disk:
 storage:
   gcs_standard_usd_per_gb_month: 0.02
 vertex_training_spot: {}
-gemini: {}
+# Gemini on Vertex AI, USD per 1M tokens, global endpoint, <= 200k-token prompts.
+# Catalog API, service C7E2-9256-1C43 (Vertex AI), read 2026-10-21 in M2.
+# Thinking tokens bill at the output rate. Batch = 50% of online for every model
+# listed (measured from the SKUs, not assumed). Re-check ids and prices in the
+# first session on/after 2026-11-13, before the scope test (ADR-013).
+gemini:
+  fetched_on: 2026-10-21
+  verified: false  # the harness refuses a live call until a session re-reads these
+  models:
+    gemini-2.5-flash-lite:
+      input: 0.10
+      output: 0.40
+      batch_input: 0.05
+      batch_output: 0.20
+      skus: {input: F91E-007E-3BA1, output: 2D6E-6AC5-B1FD, batch_input: 3C02-7900-3F96, batch_output: 7EA1-B751-FE67}
+    gemini-2.5-flash:
+      input: 0.30
+      output: 2.50
+      batch_input: 0.15
+      batch_output: 1.25
+      skus: {input: FDAB-647C-5A22, output: AF56-1BF9-492A, batch_input: 3C04-D938-E481, batch_output: 029D-4CA0-5876}
+    gemini-2.5-pro:
+      input: 1.25
+      output: 10.00
+      batch_input: 0.625
+      batch_output: 5.00
+      skus: {input: A121-E2B5-1418, output: 5DA2-3F77-1CA5, batch_input: 62D2-A55D-4497, batch_output: A311-2F88-05DA}
+    gemini-3-flash:
+      input: 0.50
+      output: 3.00
+      batch_input: 0.25
+      batch_output: 1.50
+      skus: {input: 7EBE-3B46-F75C, output: 0127-F0B7-365E, batch_input: 18E2-DA15-F6D0, batch_output: 382F-407A-DB0F}
+    gemini-3.1-flash-lite:
+      input: 0.25
+      output: 1.50
+      batch_input: 0.125
+      batch_output: 0.75
+      skus: {input: 7DDF-162F-B3F3, output: DA75-5E07-40DC, batch_input: 2909-8C9F-2D43, batch_output: B8AC-4BEE-5EA4}
+    gemini-3.1-pro:
+      input: 2.00
+      output: 12.00
+      batch_input: 1.00
+      batch_output: 6.00
+      skus: {input: EAC4-305F-1249, output: 2737-2D33-D986, batch_input: 6A92-5141-48A7, batch_output: 8749-6945-306F}

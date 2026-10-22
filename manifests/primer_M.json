@@ -25,7 +25,52 @@
   },
   "nested_in": null,
   "contamination_hits": 0,
-  "tokens": "counted in M2 with the chosen tokenizer",
+  "tokens": {
+    "tokenizer": "Qwen/Qwen3.5-2B@15852e8c1636",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "total": 186470674,
+    "answer": 28113219,
+    "examples": 1300000,
+    "per_task": {
+      "T1": {
+        "examples": 130502,
+        "total": 13463605,
+        "answer": 1759606
+      },
+      "T2": {
+        "examples": 195590,
+        "total": 30561566,
+        "answer": 11845768
+      },
+      "T3": {
+        "examples": 195136,
+        "total": 26798407,
+        "answer": 9087096
+      },
+      "T4": {
+        "examples": 130107,
+        "total": 12643201,
+        "answer": 911670
+      },
+      "T5": {
+        "examples": 389918,
+        "total": 77202902,
+        "answer": 1971612
+      },
+      "T6": {
+        "examples": 129617,
+        "total": 12703356,
+        "answer": 1248895
+      },
+      "T7": {
+        "examples": 129130,
+        "total": 13097637,
+        "answer": 1288572
+      }
+    }
+  },
   "seed": 2026,
   "weights": {
     "T1": 0.1,

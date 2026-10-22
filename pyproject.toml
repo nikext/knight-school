@@ -9,6 +9,7 @@ authors = [{ name = "Nikola T" }]
 dependencies = [
     "chess>=1.11.2",
     "google-cloud-storage>=3.17.1",
+    "numpy>=2.3",
     "polars>=2.0.0",
     "pydantic>=2.14.1",
     "pyyaml>=6.0.3",
@@ -18,8 +19,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# torch, vllm, trl, peft: pinned together in M2/M3, installed in the container only.
-train = []
+# Pinned together (ADR-004, ADR-016): TRL 1.16.0 supports vLLM <= 0.31.0, which pins
+# torch 2.13.0 and transformers < 5.18. The container takes vLLM and torch from its base image.
+train = [
+    "vllm==0.31.0",
+    "torch==2.13.0",
+    "transformers==5.17.0",
+    "trl==1.16.0",
+    "peft==0.21.2",
+    "accelerate==1.15.0",
+]
 gemini = [
     "google-genai>=2.32.0",
 ]

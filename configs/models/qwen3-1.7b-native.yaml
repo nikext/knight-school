@@ -1,0 +1,10 @@
+# Qwen3-1.7B with its native thinking mode (the template default).
+name: qwen3-1.7b-native
+backend: vllm
+description: Qwen3-1.7B, native thinking (enable_thinking=true)
+license: apache-2.0
+hf_repo: Qwen/Qwen3-1.7B
+revision: 70d244cc86ccca08cf5af4e1e306ecf908b1ad5e
+max_model_len: 2560
+chat_template_kwargs: {enable_thinking: true}
+think: native

@@ -117,13 +117,33 @@ local smoke test.
 starts. Precompute takes a few hours of laptop time.
 
 ### ADR-011: The main model is chosen by measurement in M2
-**Status:** proposed (2026-10-21); M2 accepts it with the chosen model
+**Status:** accepted (2026-10-22, the user chose it in the M2 session): the main model is
+**Qwen3.5-2B** (`configs/models/qwen3.5-2b.yaml`, `Qwen/Qwen3.5-2B` @ `15852e8c1636`)
 **Context:** The 2026 small-model landscape (Qwen3.5, Gemma 4) is
 multimodal and partly non-standard (hybrid DeltaNet layers). Tooling
 support for GRPO + LoRA + vLLM colocate isn't guaranteed.
 **Decision:** Screen the candidates in TRAINING.md §1 against the criteria
-there, with Qwen3-1.7B as the fallback.
-**Consequences:** Possibly not the newest model, but one that trains.
+there, with Qwen3-1.7B as the fallback. Screening ran as `m2-screen-a100-r4`
+(one spot A100 80GB, 43 min, $2.22; `results/eval/dev500/`,
+`results/screen/m2-screen-a100-r4/`). dev500, greedy, 1024 tokens, format
+graded per ADR-017:
+
+| Candidate | GRPO smoke (5 steps) | Legal & formatted | Solve | Move acc | Prompt tok | License |
+|---|---|---|---|---|---|---|
+| **Qwen3.5-2B** (tags) | runs, 5.5 s/step, reward std > 0 | **96.5%** | 5.4% | 15.9% | 218 | Apache-2.0 |
+| Qwen3-1.7B (tags) | runs, 3.0 s/step, reward std > 0 | 67.2% | 5.8% | 10.2% | 218 | Apache-2.0 |
+| Gemma 4 E2B (tags) | runs, 9.5 s/step, every completion clipped at 512, reward 0 | 20.5% | 0.4% | 4.0% | 202 | Apache-2.0 |
+| Qwen3.5-2B native thinking | not run | 0% (100% hit 1024 tokens) | 0 | 0 | 211 | |
+| Qwen3-1.7B native thinking | not run | 0% (100% hit 1024 tokens) | 0 | 0 | 209 | |
+
+Qwen3.5-2B wins criteria 1–3 and ties on 4. Gemma 4 E2B fails criterion 2
+and gives GRPO no signal (it reasons past any budget). Qwen3-1.7B stays the
+fallback.
+**Consequences:** The starting policy answers directly in about 10 tokens
+(ADR-017), so RL rollouts are short and cheap, and any reasoning has to
+emerge during RL. Peak GPU memory in the smoke (38.8 GiB) is mostly vLLM's
+45% reservation on the 80 GB card, so it says nothing about fitting an L4;
+M3 measures that.
 
 ### ADR-012: Public repo, pre-registered predictions, negative results reported
 **Status:** accepted (2026-10-21)
@@ -238,3 +258,67 @@ engine.
 **Consequences:** All of these are frozen with data v1. Changing any of
 them means data v2 and new manifests. M2's prompt builder and grader must
 import `ks.chess.board` rather than re-implementing it.
+
+### ADR-016: M2 stack pins, one image built by Cloud Build, open-model evals on the L4
+**Status:** accepted (2026-10-21)
+**Context:** ADR-004 asked for torch, vLLM and TRL to be pinned together.
+On 2026-10-21 PyPI had vLLM 0.32.0, but TRL 1.16.0 declares
+`vllm>=0.22.0,<=0.31.0`; vLLM 0.31.0 pins torch 2.13.0 and wants
+transformers `>=5.10.4,<5.18`. The plan also hoped to screen ≤ 2B models on
+the laptop. In practice the RTX 3060 (6 GB, shared with the desktop) left
+vLLM 0.39 GiB of KV cache for Qwen3-1.7B in bf16: about 1.4 concurrent
+sequences, so dev500 would take hours. vLLM's FlashInfer sampler also
+JIT-compiles with nvcc, which the laptop doesn't have.
+**Decision:**
+- Pins: vLLM 0.31.0, torch 2.13.0, transformers 5.17.0, TRL 1.16.0, PEFT
+  0.21.2, accelerate 1.15.0 (the `train` extra; `docker/requirements.txt`).
+- One image `train:<git-sha>` on `vllm/vllm-openai:v0.31.0-x86_64-cu129`
+  (pinned by digest), built by Cloud Build from `git archive HEAD`
+  (`make image`), so an image is exactly one commit. Free tier: 2,500
+  e2-standard-2 minutes a month, then $0.006/min.
+- The image keeps the base image's torch, vLLM, triton, FlashInfer, numpy,
+  numba and opentelemetry versions (pip constraints), and the build fails if
+  `pip check` reports a conflict the base didn't have. The first build had
+  let pip upgrade numpy to 2.5 under numba's `<2.5` pin; freezing the whole
+  base failed instead, because its fsspec is newer than any `datasets` allows. The base ships
+  google-api-core 2.40 with opentelemetry-api 1.40, which already disagree,
+  so google-cloud-storage is left out of the image; jobs read GCS through
+  `ks.cloud.gcs` (JSON API + google-auth).
+- The laptop runs wiring smokes only (Qwen3-0.6B, `enforce_eager`,
+  `VLLM_USE_FLASHINFER_SAMPLER=0`) plus the free engine baselines. Every
+  open-model number comes from a `ks launch` eval job on a spot L4. No
+  quantized screening, so screening and headline numbers come from the same
+  bf16 weights.
+**Consequences:** About $0.5–1 per L4 eval job instead of $0. Bumping TRL
+past 1.16 later means re-checking its vLLM range and rebuilding the image,
+which needs a new ADR.
+
+### ADR-017: Thinking mode: non-thinking chat template, think block optional in the format rule
+**Status:** accepted (2026-10-22, the user chose it in the M2 session)
+**Context:** TRAINING.md §2 asked for a closed think block before the
+answer and left the native-vs-tags choice to M2. Screening found both
+modes broken as specified. With `enable_thinking=false`, the Qwen3 and
+Qwen3.5 chat templates end the prompt with an empty `<think>\n\n</think>\n\n`.
+The model takes its thinking as done. Qwen3.5-2B answers `<answer>Qxb4</answer>`
+straight away, and Qwen3-1.7B reasons in untagged prose. So the strict
+rule graded 0% format for both, although Qwen3.5-2B's moves were 96.5%
+legal. Native thinking never finished inside 1024 tokens (100% truncated,
+0% answers). The traces spend hundreds of tokens decoding the FEN
+character by character. Making native thinking work would need a budget
+of several thousand tokens per rollout, which would multiply the cost of
+every RL run (BUDGET.md §2 assumes about 10 runs).
+**Decision:** Tags mode with the non-thinking template (`think: tags`,
+`enable_thinking: false`) for every arm. A profile with
+`template_closes_think: true` has its think block in the prompt already, so
+format there means exactly one answer block and no stray tags. Prose
+before `<answer>` is allowed. The prompt text and hash (`c728de49e119`)
+stay frozen. The screening reports were re-graded from their saved texts
+with `ks rescore` ($0); each report records the rescore. Solve rate, move
+accuracy and legal rate don't change, only format does.
+**Consequences:** The prompt's "think inside <think></think>" line no
+longer matches what the model does. It stays because changing it would
+change the frozen hash, and the format reward never required it after
+this ADR. The base model has no chain of thought to start from. Whether
+GRPO grows one, as prose before the answer, is something to watch in M3
+(completion length). The comparison between arms is unaffected, since
+every arm uses the same contract.

@@ -178,6 +178,110 @@ def data(
     run(chosen, log=lambda s: typer.echo(s, err=True), force=force)
 
 
+@app.command("eval")
+def eval_(
+    model: Annotated[str, typer.Argument(help="Profile name in configs/models/ or a YAML path.")],
+    set_name: Annotated[
+        str, typer.Option("--set", help="dev500, test2000, test500, chessbench1k, probe500.")
+    ] = "dev500",
+    limit: Annotated[
+        int | None, typer.Option(help="Only this many puzzles, spread over the bins.")
+    ] = None,
+    n: Annotated[int, typer.Option(help="Samples per prompt (pass@k on dev only).")] = 1,
+    max_usd: Annotated[float | None, typer.Option("--max-usd", help="Stop at this cost.")] = None,
+    ckpt: Annotated[
+        str | None, typer.Option(help="Local dir or gs:// checkpoint instead of the HF repo.")
+    ] = None,
+    run_name: Annotated[
+        str | None, typer.Option("--run", help="Report name; default: the profile name.")
+    ] = None,
+    out: Annotated[Path | None, typer.Option(help="Results dir; default results/eval.")] = None,
+    milestone: Annotated[str, typer.Option(help="Ledger milestone for Gemini charges.")] = "M2",
+) -> None:
+    """Run the eval harness and write results/eval/<set>/<run>.{json,md} (EVALS.md §3)."""
+    from ks.eval import backends, harness, probe, report, sets
+    from ks.eval import profile as prof
+
+    p = prof.load(model)
+    if n > 1 and set_name.startswith("test"):
+        raise typer.BadParameter("pass@k sampling is for dev sets only (EVALS.md §2)")
+    if p.backend == "gemini" and max_usd is None:
+        raise typer.BadParameter("Gemini runs need --max-usd")
+    model_path = _fetch_ckpt(ckpt) if ckpt else None
+    if p.backend == "gemini":
+        from ks.eval.gemini import GeminiBackend
+
+        backend: backends.Backend = GeminiBackend(p, milestone=milestone, max_usd=max_usd)
+    else:
+        backend = backends.make(p, model_path)
+    name = run_name or p.name
+    log = lambda s: typer.echo(f"[eval {name}] {s}", err=True)  # noqa: E731
+    try:
+        if set_name in sets.PROBE_SETS:
+            rows = sets.spread(sets.load_probe().to_dicts(), limit)
+            result = probe.run(p, rows, backend)
+            result["header"]["run"] = name
+            result["header"]["checkpoint"] = ckpt
+            paths = report.write(result, out or report.RESULTS_DIR, probe.markdown)
+        else:
+            puzzles = sets.spread(sets.load_puzzles(set_name), limit)
+            cfg_ = harness.EvalRun(p, set_name, puzzles, n, max_usd, ckpt, name, log)
+            result = harness.run(cfg_, backend)
+            paths = report.write(result, out or report.RESULTS_DIR)
+    finally:
+        charge = getattr(backend, "ledger_charge", None)
+        if charge is not None:
+            charge(f"{milestone.lower()}-gemini-{name}")
+        backend.close()
+    for path in paths:
+        typer.echo(str(path))
+    typer.echo(paths[1].read_text())
+
+
+@app.command("rescore")
+def rescore(
+    result: Annotated[Path, typer.Argument(help="A saved results/eval/<set>/<run>.json[.gz].")],
+    reason: Annotated[str, typer.Option(help="Why, recorded in the report (e.g. an ADR).")],
+    model: Annotated[
+        str | None, typer.Option(help="Profile to grade with; default: the saved one's name.")
+    ] = None,
+) -> None:
+    """Re-grade a saved eval result under the current profile and grading rules ($0)."""
+    from ks.eval import harness, report
+    from ks.eval import profile as prof
+
+    old = report.read(result)
+    p = prof.load(model or old["header"]["profile"]["name"])
+    paths = report.write(harness.rescore(old, p, reason), result.parent.parent)
+    typer.echo(paths[1].read_text())
+
+
+@app.command("primer-tokens")
+def primer_tokens(
+    model: Annotated[str, typer.Argument(help="Profile of the chosen main model.")],
+) -> None:
+    """Count primer S/M tokens with the model's tokenizer and record them in the manifests."""
+    from ks.data.tokens import count, write_manifests
+
+    counts = count(model)
+    write_manifests(counts)
+    for name, c in counts.items():
+        typer.echo(
+            f"primer-{name}: {c['examples']:,} examples, {c['total']:,} tokens, {c['answer']:,} answer tokens"
+        )
+
+
+def _fetch_ckpt(ckpt: str) -> str:
+    """A gs:// checkpoint is copied to a local temp dir; a local path is used as is."""
+    if not ckpt.startswith("gs://"):
+        return ckpt
+    import tempfile
+
+    from ks.cloud.gcs import download_prefix
+
+    return str(download_prefix(ckpt, Path(tempfile.mkdtemp(prefix="ks-ckpt-"))))
+
+
 def main() -> None:
     app()
 

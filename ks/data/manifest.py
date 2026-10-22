@@ -12,6 +12,7 @@ from __future__ import annotations
 import hashlib
 import inspect
 import json
+import os
 import subprocess
 from collections.abc import Callable, Iterable
 from datetime import UTC, datetime
@@ -45,10 +46,17 @@ def sha256_paths(paths: Iterable[Path]) -> str:
 
 
 def git_sha() -> str:
+    """Short HEAD sha (+ `-dirty` if ks/ has changes). Inside the container: KS_GIT_SHA from the build."""
+    if baked := os.environ.get("KS_GIT_SHA"):
+        return baked
+
     def run(*args: str) -> str:
-        return subprocess.run(
-            ["git", *args], cwd=REPO, capture_output=True, text=True, check=False
-        ).stdout.strip()
+        try:
+            return subprocess.run(
+                ["git", *args], cwd=REPO, capture_output=True, text=True, check=False
+            ).stdout.strip()
+        except OSError:
+            return ""
 
     sha = run("rev-parse", "--short=12", "HEAD") or "unknown"
     return sha + ("-dirty" if run("status", "--porcelain", "--", "ks") else "")

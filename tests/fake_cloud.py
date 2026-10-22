@@ -17,6 +17,7 @@ class FakeCloud:
     disks: list[dict[str, Any]] = field(default_factory=list)
     objects: dict[str, str] = field(default_factory=dict)  # gs:// url -> text
     deletions: dict[str, datetime] = field(default_factory=dict)
+    preemptions: set[str] = field(default_factory=set)
     jobs: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
     endpoints: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
     stockout_zones: set[str] = field(default_factory=set)
@@ -61,6 +62,9 @@ class FakeCloud:
 
     def deletion_time(self, name: str) -> datetime | None:
         return self.deletions.get(name)
+
+    def was_preempted(self, name: str) -> bool:
+        return name in self.preemptions
 
     def list_instances(self) -> list[dict[str, Any]]:
         return list(self.instances.values())
