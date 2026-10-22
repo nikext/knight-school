@@ -114,6 +114,13 @@ only main-model GRPO run so far):
   legal ≥ 98%, truncated completions ≤ 2%, and mean completion length ≤ 100 tokens. If any fails,
   the VM is stopped and v1 stays. I give the check about 65%: the controller should hold
   entropy near 0.2, but the bonus may land on format tokens or prose instead of move choice.
+- **Step-50 check result (2026-10-22 20:15Z): PASS** on every criterion. Steps 41–50: mean
+  entropy 0.197 (bar 0.10), zero-spread groups 37% (bar 50%), dev500 solve 22.8% and legal 99.5%
+  at step 50, truncated 0.1%, mean length 10.3. The controller didn't stop the collapse: steps
+  20–27 fell like v1, to entropy ~0.06 and 66% dead groups, while the coefficient ramped 0.02 →
+  0.18. It pulled entropy back from step 28 and settled at a coefficient of 0.46 with entropy at
+  the 0.2 target. dev500: 5.0, 4.8, 19.6, 23.8, 21.6, 22.8% at steps 0–50. v2 becomes the
+  frozen config (ADR-021), and the run continues to step 200.
 - **Dense v2** keeps learning after step 25 instead of flattening: dev500 at step 50 about 21%
   (it may start a little slower than v1), and test2000 22–33% (point 28%), about +4 points over
   v1 (paired). The gain over v1 is mostly in the 800–1599 bins. Completions stay short (mean

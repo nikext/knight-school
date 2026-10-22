@@ -449,7 +449,8 @@ image (saves ~4 min a boot, but adds a billable image to manage), and asking for
 us-east4/us-east5 (3 more zones; the user's call if capacity stays this bad).
 
 ### ADR-021: GRPO config v2: adaptive entropy control (supersedes ADR-019's frozen config)
-**Status:** accepted (2026-10-22; the user chose one bounded revision before M4)
+**Status:** accepted (2026-10-22; the user chose one bounded revision before M4). Step-50 check
+passed 2026-10-22 (RESULTS.md, E2 v2), so v2 is the frozen config for every later arm.
 **Context:** E2 dense under ADR-019 (`m3-e2-dense`) reached 23.8% [21.9, 25.7] on test2000
 (base 4.1%), but the policy collapsed by step 25. Mean token entropy fell from 0.88 (step 1)
 to 0.25 (step 15) and 0.056 (step 25), then to ~0.02. Over steps 41–50 a mean of 74% of the
