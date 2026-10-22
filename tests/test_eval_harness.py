@@ -187,3 +187,25 @@ def test_probe_run_and_markdown(tmp_path: Path):
     _, md = report.write(res, tmp_path, probe.markdown)
     assert "P3 FEN after move" in md.read_text()
     assert chess.Board(rows[0]["fen"])  # rows carry valid FENs
+
+
+def test_template_closes_think_drops_the_think_requirement():
+    assert LLM.require_think
+    assert not LLM.model_copy(update={"template_closes_think": True}).require_think
+    assert not Profile(name="sf", backend="stockfish", nodes=1).require_think
+    assert not load("qwen3.5-2b").require_think and load("qwen3.5-2b-native").require_think
+
+
+def test_rescore_regrades_format_only(puzzles):
+    sol = _solutions(puzzles)
+    res = run(puzzles, lambda r: f"<answer>{sol[r.id]}</answer>")  # no think block
+    assert res["summary"]["format"]["value"] == 0.0 and res["summary"]["move_acc"]["value"] == 1.0
+    closed = LLM.model_copy(update={"template_closes_think": True})
+    new = harness.rescore(res, closed, "ADR-017")
+    assert new["summary"]["format"]["value"] == 1.0
+    assert new["summary"]["solve"] == res["summary"]["solve"]
+    assert new["header"]["rescored"]["reason"] == "ADR-017"
+    assert new["header"]["git_sha"] == res["header"]["git_sha"]
+    assert "rescored" in report.markdown(new)
+    with pytest.raises(ValueError, match="legal_list"):
+        harness.rescore(res, closed.model_copy(update={"legal_list": False}), "x")

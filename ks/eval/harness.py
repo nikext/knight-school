@@ -128,6 +128,56 @@ def run(cfg: EvalRun, backend: Backend) -> dict[str, Any]:
     return {"header": header, "summary": summarise(items, cfg.n, backend.cost_usd), "items": items}
 
 
+# the profile fields that shape generation; a rescore may change any of the others
+_GENERATION_FIELDS = ("hf_repo", "revision", "vertex_model", "think", "legal_list", "max_tokens")
+
+
+def rescore(result: dict[str, Any], profile: Profile, reason: str) -> dict[str, Any]:
+    """Re-grade a saved result's texts under `profile` (a changed grading rule), at no cost.
+
+    Only grading may differ: the generation fields must match the saved profile. The header
+    keeps the original run's git sha and records the rescore.
+    """
+    saved = result["header"]["profile"]
+    now = profile.model_dump(exclude_defaults=False)
+    diff = [f for f in _GENERATION_FIELDS if saved.get(f) != now.get(f)]
+    if diff:
+        raise ValueError(f"profile {profile.name} differs from the saved run in {diff}")
+    items = []
+    for it in result["items"]:
+        board = chess.Board(it["fen"])
+        sol = board.parse_san(it["solution_san"])
+        target = kr.Target(board, sol, it["is_last"])
+        samples = []
+        for s in it["samples"]:
+            r = kr.score(s["text"], target, profile.require_think)
+            samples.append(
+                {
+                    **s,
+                    "status": r.parsed.status,
+                    "san": r.parsed.san,
+                    "correct": bool(r.sparse),
+                    "well_formed": bool(r.format),
+                }
+            )
+        items.append({**it, "samples": samples})
+    header = {
+        **result["header"],
+        "profile": now,
+        "rescored": {
+            "git_sha": git_sha(),
+            "at": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+            "reason": reason,
+        },
+    }
+    cost = result["header"]["cost_usd"]
+    return {
+        "header": header,
+        "summary": summarise(items, header["n_samples"], cost),
+        "items": items,
+    }
+
+
 def _puzzle_table(items: list[dict[str, Any]], n: int) -> dict[str, dict[str, Any]]:
     """Per puzzle: rating, bin, positions, and per sample index whether every position was right."""
     out: dict[str, dict[str, Any]] = {}

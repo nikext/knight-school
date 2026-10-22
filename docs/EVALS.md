@@ -22,7 +22,7 @@ before the run starts.
 | **solve rate** (headline) | share of puzzles where every solver move is right (any mate accepted on the last move); opponent replies from the solution |
 | move accuracy | share of solver positions where the move is right (Chess-R1 style) |
 | legal rate | share of answers that parse to a legal move |
-| format rate | share with exactly one well-formed answer block |
+| format rate | share with exactly one well-formed answer block (and a think block, unless the template closes one; ADR-017) |
 | puzzle rating | rating R at which a logistic fit of P(solve) vs puzzle rating crosses 50%; with a bootstrap CI |
 | per-bin solve rate | solve rate in each of the 12 rating bins (chart) |
 | pass@k (dev only) | k ∈ {1, 4, 8} at T = 1.0, for the RL analysis (Shen et al.) |

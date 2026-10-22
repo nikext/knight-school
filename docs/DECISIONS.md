@@ -117,13 +117,33 @@ local smoke test.
 starts. Precompute takes a few hours of laptop time.
 
 ### ADR-011: The main model is chosen by measurement in M2
-**Status:** proposed (2026-10-21); M2 accepts it with the chosen model
+**Status:** accepted (2026-10-22, the user chose it in the M2 session): the main model is
+**Qwen3.5-2B** (`configs/models/qwen3.5-2b.yaml`, `Qwen/Qwen3.5-2B` @ `15852e8c1636`)
 **Context:** The 2026 small-model landscape (Qwen3.5, Gemma 4) is
 multimodal and partly non-standard (hybrid DeltaNet layers). Tooling
 support for GRPO + LoRA + vLLM colocate isn't guaranteed.
 **Decision:** Screen the candidates in TRAINING.md §1 against the criteria
-there, with Qwen3-1.7B as the fallback.
-**Consequences:** Possibly not the newest model, but one that trains.
+there, with Qwen3-1.7B as the fallback. Screening ran as `m2-screen-a100-r4`
+(one spot A100 80GB, 43 min, $2.22; `results/eval/dev500/`,
+`results/screen/m2-screen-a100-r4/`). dev500, greedy, 1024 tokens, format
+graded per ADR-017:
+
+| Candidate | GRPO smoke (5 steps) | Legal & formatted | Solve | Move acc | Prompt tok | License |
+|---|---|---|---|---|---|---|
+| **Qwen3.5-2B** (tags) | runs, 5.5 s/step, reward std > 0 | **96.5%** | 5.4% | 15.9% | 218 | Apache-2.0 |
+| Qwen3-1.7B (tags) | runs, 3.0 s/step, reward std > 0 | 67.2% | 5.8% | 10.2% | 218 | Apache-2.0 |
+| Gemma 4 E2B (tags) | runs, 9.5 s/step, every completion clipped at 512, reward 0 | 20.5% | 0.4% | 4.0% | 202 | Apache-2.0 |
+| Qwen3.5-2B native thinking | not run | 0% (100% hit 1024 tokens) | 0 | 0 | 211 | |
+| Qwen3-1.7B native thinking | not run | 0% (100% hit 1024 tokens) | 0 | 0 | 209 | |
+
+Qwen3.5-2B wins criteria 1–3 and ties on 4. Gemma 4 E2B fails criterion 2
+and gives GRPO no signal (it reasons past any budget). Qwen3-1.7B stays the
+fallback.
+**Consequences:** The starting policy answers directly in about 10 tokens
+(ADR-017), so RL rollouts are short and cheap, and any reasoning has to
+emerge during RL. Peak GPU memory in the smoke (38.8 GiB) is mostly vLLM's
+45% reservation on the 80 GB card, so it says nothing about fitting an L4;
+M3 measures that.
 
 ### ADR-012: Public repo, pre-registered predictions, negative results reported
 **Status:** accepted (2026-10-21)
@@ -272,3 +292,33 @@ JIT-compiles with nvcc, which the laptop doesn't have.
 **Consequences:** About $0.5–1 per L4 eval job instead of $0. Bumping TRL
 past 1.16 later means re-checking its vLLM range and rebuilding the image,
 which needs a new ADR.
+
+### ADR-017: Thinking mode: non-thinking chat template, think block optional in the format rule
+**Status:** accepted (2026-10-22, the user chose it in the M2 session)
+**Context:** TRAINING.md §2 asked for a closed think block before the
+answer and left the native-vs-tags choice to M2. Screening found both
+modes broken as specified. With `enable_thinking=false`, the Qwen3 and
+Qwen3.5 chat templates end the prompt with an empty `<think>\n\n</think>\n\n`.
+The model takes its thinking as done. Qwen3.5-2B answers `<answer>Qxb4</answer>`
+straight away, and Qwen3-1.7B reasons in untagged prose. So the strict
+rule graded 0% format for both, although Qwen3.5-2B's moves were 96.5%
+legal. Native thinking never finished inside 1024 tokens (100% truncated,
+0% answers). The traces spend hundreds of tokens decoding the FEN
+character by character. Making native thinking work would need a budget
+of several thousand tokens per rollout, which would multiply the cost of
+every RL run (BUDGET.md §2 assumes about 10 runs).
+**Decision:** Tags mode with the non-thinking template (`think: tags`,
+`enable_thinking: false`) for every arm. A profile with
+`template_closes_think: true` has its think block in the prompt already, so
+format there means exactly one answer block and no stray tags. Prose
+before `<answer>` is allowed. The prompt text and hash (`c728de49e119`)
+stay frozen. The screening reports were re-graded from their saved texts
+with `ks rescore` ($0); each report records the rescore. Solve rate, move
+accuracy and legal rate don't change, only format does.
+**Consequences:** The prompt's "think inside <think></think>" line no
+longer matches what the model does. It stays because changing it would
+change the frozen hash, and the format reward never required it after
+this ADR. The base model has no chain of thought to start from. Whether
+GRPO grows one, as prose before the answer, is something to watch in M3
+(completion length). The comparison between arms is unaffected, since
+every arm uses the same contract.

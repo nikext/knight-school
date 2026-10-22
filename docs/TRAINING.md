@@ -14,6 +14,11 @@ names, licenses and tooling support on Hugging Face in M2**:
 | Qwen3-1.7B | Apr 2025, plain text-only transformer, the most battle-tested tooling. This is the fallback if the newer ones fight the stack. |
 | ~4B siblings (E5c) | Qwen3.5-4B / Gemma 4 E4B / Qwen3-4B-Instruct-2507 |
 
+**Chosen in M2 (ADR-011): Qwen3.5-2B**, non-thinking template (ADR-017);
+Qwen3-1.7B is the fallback. Gemma 4 E2B was dropped: it reasons past any
+token budget (69% of dev500 answers truncated at 1024 tokens, every GRPO
+smoke completion clipped at 512, reward 0).
+
 Use **instruct** variants. Chess-R1's sparse-reward runs failed on base
 models, and their instruct models improved more steadily.
 
@@ -38,8 +43,8 @@ user:   Position (FEN): r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w
 ```
 
 - The legal moves are sorted the way DATA.md §4 says. E5b drops that line.
-- Models with native thinking use it in place of `<think>`. Decide once in
-  M2 (ADR) and keep it for every arm.
+- Models with native thinking use it in place of `<think>`. Decided in M2:
+  the non-thinking template for every arm (ADR-017).
 - **Parser** (`ks.chess.parse`, built in M2): take the last
   `<answer>…</answer>` and normalise it: strip whitespace, `**`, backticks and
   quotes, a leading move number (`12.`, `12...`), a trailing period and
@@ -49,7 +54,10 @@ user:   Position (FEN): r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w
   also take long algebraic (`e2e4`) and null moves; the prompt asks for a move
   from the list. Format needs exactly one answer block and no stray tags,
   plus one closed think block before it (a native-thinking template may put
-  the opening `<think>` in the prompt). Unit-tested in `tests/test_chess_parse.py`.
+  the opening `<think>` in the prompt). If the profile says
+  `template_closes_think` (the template pre-fills an empty, closed think
+  block, as Qwen does with `enable_thinking=false`), no think block is
+  needed (ADR-017). Unit-tested in `tests/test_chess_parse.py`.
 - **Frozen in M2:** prompt hash `c728de49e119` (`think: tags`, legal list on)
   and `b371401fde1c` (`think: native`). `tests/test_chess_rewards_prompt.py`
   pins both; changing the text needs an ADR.

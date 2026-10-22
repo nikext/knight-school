@@ -238,6 +238,24 @@ def eval_(
     typer.echo(paths[1].read_text())
 
 
+@app.command("rescore")
+def rescore(
+    result: Annotated[Path, typer.Argument(help="A saved results/eval/<set>/<run>.json[.gz].")],
+    reason: Annotated[str, typer.Option(help="Why, recorded in the report (e.g. an ADR).")],
+    model: Annotated[
+        str | None, typer.Option(help="Profile to grade with; default: the saved one's name.")
+    ] = None,
+) -> None:
+    """Re-grade a saved eval result under the current profile and grading rules ($0)."""
+    from ks.eval import harness, report
+    from ks.eval import profile as prof
+
+    old = report.read(result)
+    p = prof.load(model or old["header"]["profile"]["name"])
+    paths = report.write(harness.rescore(old, p, reason), result.parent.parent)
+    typer.echo(paths[1].read_text())
+
+
 @app.command("primer-tokens")
 def primer_tokens(
     model: Annotated[str, typer.Argument(help="Profile of the chosen main model.")],

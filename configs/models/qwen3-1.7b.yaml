@@ -1,5 +1,6 @@
 # Qwen3-1.7B (Apr 2025), text-only transformer, Apache-2.0. The fallback candidate (TRAINING.md §1).
-# Thinking switched off in the chat template; the prompt asks for <think></think> itself.
+# Thinking switched off in the chat template, which closes an empty think block in the prompt;
+# the model then reasons in untagged prose before <answer> (dev500, M2).
 name: qwen3-1.7b
 backend: vllm
 description: Qwen3-1.7B, prompt-level <think> (enable_thinking=false)
@@ -9,3 +10,4 @@ revision: 70d244cc86ccca08cf5af4e1e306ecf908b1ad5e
 max_model_len: 2560
 chat_template_kwargs: {enable_thinking: false}
 think: tags
+template_closes_think: true  # the template pre-fills <think>\n\n</think>\n\n (ADR-017)

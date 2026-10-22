@@ -32,6 +32,9 @@ class Profile(BaseModel):
     gpu_memory_utilization: float = 0.85
     enforce_eager: bool = False
     chat_template_kwargs: dict[str, Any] = Field(default_factory=dict)
+    # the chat template already ends the prompt with an empty, closed think block (Qwen with
+    # enable_thinking=false), so a completion needs none of its own (ADR-017)
+    template_closes_think: bool = False
 
     # gemini
     vertex_model: str | None = None
@@ -51,8 +54,9 @@ class Profile(BaseModel):
 
     @property
     def require_think(self) -> bool:
-        """Format reward and format rate require a think block for LLMs, not for engines."""
-        return self.backend in ("vllm", "gemini")
+        """Format reward and format rate require a think block for LLMs, not for engines, and
+        not when the chat template has already closed one in the prompt."""
+        return self.backend in ("vllm", "gemini") and not self.template_closes_think
 
 
 def load(name_or_path: str | Path) -> Profile:

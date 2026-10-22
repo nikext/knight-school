@@ -126,6 +126,9 @@ def markdown(result: dict[str, Any]) -> str:
         f"- run: {h['started']}, {h['seconds']:.0f} s, cost ${h['cost_usd']:.4f}"
         + (f" (${h['price_per_hour']:.3f}/h)" if h.get("price_per_hour") else ""),
     ]
+    if h.get("rescored"):
+        r = h["rescored"]
+        lines.append(f"- **rescored** {r['at']} at git `{r['git_sha']}`: {r['reason']}")
     if h.get("stopped"):
         lines.append(f"- **stopped early:** {h['stopped']}")
     if not s.get("puzzles"):

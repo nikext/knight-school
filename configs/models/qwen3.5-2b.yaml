@@ -1,5 +1,6 @@
 # Qwen3.5-2B (Feb 2026), VLM with hybrid Gated DeltaNet + attention layers, Apache-2.0.
-# Served text-only (vLLM --language-model-only). Non-thinking by default; the prompt asks for <think>.
+# Served text-only (vLLM --language-model-only). Non-thinking: the template closes an empty think
+# block in the prompt, so it answers directly (10 tokens on dev500) despite the prompt's <think> line.
 name: qwen3.5-2b
 backend: vllm
 description: Qwen3.5-2B, language model only, prompt-level <think> (enable_thinking=false)
@@ -10,3 +11,4 @@ language_model_only: true
 max_model_len: 2560
 chat_template_kwargs: {enable_thinking: false}
 think: tags
+template_closes_think: true  # the template pre-fills <think>\n\n</think>\n\n (ADR-017)
