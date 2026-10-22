@@ -97,7 +97,7 @@ factor under test changes.
 | E1 | random legal · Stockfish 1 node · candidate base models · Gemini Flash-Lite / Flash (test2000) · Gemini Pro (test500) | test | zero-shot, same prompt |
 | E2 | base → GRPO sparse · base → GRPO dense | test + dev curves | expect sparse ≈ flat (replicates Chess-R1) |
 | E3 | base → primer-M (SFT only) · primer-M → GRPO sparse · primer-M → GRPO dense | test + dev curves | the main result |
-| E4 | primer-S → GRPO dense · primer-L → GRPO dense (M from E3) | test | scaling curve: x = primer tokens (log) |
+| E4 | primer-S → GRPO dense (M from E3; primer-L dropped in the M3 re-plan) | test | scaling curve over none, S, M: x = primer tokens (log) |
 | E5a | rules-only primer (T1–T4, matched tokens to M) → GRPO dense | test | rules vs moves |
 | E5b | E3-dense recipe, no legal-move list in the prompt | test | does the primer replace the crutch? |
 | E5c | best recipe on a ~4B model | test | does it hold at a larger size? |

@@ -88,9 +88,12 @@ configs identical to E2. Learning curves are overlaid and the hypothesis
 verdict goes in an ADR.
 
 **M5: Scaling and ablations.** In priority order, until the line runs out:
-primer-S / primer-L → RL (E4 scaling curve), rules-only primer (E5a), no
-legal-move list (E5b), and a ~4B model with the best recipe (E5c). Skipped
-items get a reason.
+primer-S → RL (E4 scaling curve: none, S, M), rules-only primer (E5a), no
+legal-move list (E5b), LoRA rank (E5d), and a ~4B model with the best recipe
+(E5c, conditional). Skipped items get a reason. **Re-plan (M3, user-approved
+2026-10-22, BUDGET.md §2):** primer-L is dropped, because it needs new data and the
+most expensive SFT. E5c is decided at the start of M5 from the measured SFT cost
+and any reallocated M3/M4 underrun.
 
 **M6: Release and showcase.** Hugging Face models and datasets with cards,
 a static "puzzle browser" site showing reasoning before and after RL, README

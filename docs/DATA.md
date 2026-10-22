@@ -179,7 +179,7 @@ reveal a blocklisted or rl_train position are dropped. The examples carry
 |---|---|---|---|
 | primer-S | ~15M | **18.6M** total, 2.8M answer (130k examples) | M1 |
 | primer-M | ~150M | **186.5M** total, 28.1M answer (1.3M examples) | M1 |
-| primer-L | ~450M | | M5 (only if E4 runs) |
+| primer-L | ~450M | | dropped in the M3 re-plan (BUDGET.md §2) |
 | primer-rules-M | T1–T4 only, matched to M's tokens | | M5 (E5a) |
 
 M1 can't know the final tokenizer yet, so it generates by example count with
