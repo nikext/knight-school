@@ -94,7 +94,12 @@ each component separately.
 | temperature | 1.0 | |
 | KL β | 1e-3 | Chess-R1; `loss_type` per TRL's current default, recorded in an ADR |
 | steps | 200 | about 12.8k prompts; extend only if the dev curve is still rising and the budget allows |
-| dev eval | every 25 steps on dev500, greedy | |
+| dev eval | every 25 steps on dev500, greedy | every 10 from config v2 (ADR-021) |
+| entropy bonus | none (v1, ADR-019) | **v2 (ADR-021):** adaptive (Skywork-OR1, TRL `use_adaptive_entropy`), target 0.2, delta 0.02, because v1 collapsed by step 25 |
+
+- **Frozen config:** `configs/train/grpo.yaml`, v1 by ADR-019, revised once to v2 by
+  ADR-021 (pending its step-50 check in `m3-e2-dense-v2`). Clip-higher (`epsilon_high`)
+  is a no-op in this setup: one optimizer pass per generation batch keeps the PPO ratio at 1.
 
 - **Logging per step:** each reward component (mean and std), legal rate,
   format rate, completion length (mean and p95), KL, entropy, generation and
@@ -197,6 +202,8 @@ backend: gce                  # gce | vertex
 machine: a2-ultragpu-1g
 zones: [us-central1-a, us-central1-b, us-central1-c, us-central1-f]
 max_hours: 12                 # hard VM limit (max-run-duration)
+max_attempts: 6               # attempts that created a VM (ADR-020)
+stockout_wait_hours: 12       # ks watch retries a stockout every 15 min this long (ADR-020; <= 12)
 run_budget_usd: 30            # approved total across preemption retries
 image: train:<git-sha>
 command: [python, -m, ks.train.grpo, --config, configs/train/grpo_dense.yaml]

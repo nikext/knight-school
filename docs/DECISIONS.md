@@ -419,3 +419,77 @@ memory and batch split, then freeze the config. Measured on Qwen3.5-2B, dense re
 Changing anything in `grpo.yaml` after E2 starts invalidates the comparisons and needs a new ADR.
 TRL's padding and shuffling are now patched (`ks.train.trim`), so a TRL bump must re-run
 `tests/test_train_trim.py`.
+
+### ADR-020: A $0 stockout is waited out within the run's approval; A100 zone order
+**Status:** accepted (2026-10-22; the user approved waits of up to 12 h in the M3 session)
+**Context:** On the afternoon of 2026-10-22, E2 sparse used 9 attempts over two run ids
+(`m3-e2-sparse`, `m3-e2-sparse-r2`) and $6.13 and reached step 20. Its VMs lived 4–41 min
+before preemption (about 10 min typically), while a fresh attempt needs ~16 min before its first
+useful step: ~9 min of boot, docker install and image pull, ~3.7 min of trainer init, and a
+~4.7 min first step at the base model's 450-token completions. 7 of the 8 VMs landed in
+us-central1-a, the first zone in the list. Then every zone stocked out, which ended the run, and
+the gate wants a new run id and a new yes for attempt 1. Spot A100 80GB quota exists only in
+us-central1 and europe-west4, where `a2-ultragpu-1g` is offered in us-central1-a, us-central1-c
+and europe-west4-a only. `europe-west4-b`, in every A100 config so far, doesn't offer the machine.
+**Decision:**
+- A stockout in every zone closes the attempt as `not-created` at $0 with `note: stockout`;
+  any other create error gets `note: create failed` and is never retried.
+- `stockout_wait_hours` per run config (default 0, at most 12, the user's limit): `ks watch`
+  retries a stockout every 15 min for that long, counted from the first stockout in a row. It
+  also picks up a first-attempt stockout from `ks launch --watch`. A run's approval covers
+  these $0 retries, as it covers its preemption retries.
+- `max_attempts` counts attempts that created a VM. A hard cap of 60 ledger attempts per run
+  stops a retry loop that has gone wrong. The gate still checks the run budget, `max_hours`
+  and the 2026-11-10 deadline on every retry.
+- A100 zone order: us-central1-c, europe-west4-a, us-central1-a.
+**Consequences:** one approval can run unattended overnight while the laptop stays awake (the
+watcher runs there). That matters most for M4's 7–10 h SFT run. A long stockout leaves up to
+~100 `start`/`end` lines in the ledger; they cost $0. Not done: baking docker into a custom VM
+image (saves ~4 min a boot, but adds a billable image to manage), and asking for A100 quota in
+us-east4/us-east5 (3 more zones; the user's call if capacity stays this bad).
+
+### ADR-021: GRPO config v2: adaptive entropy control (supersedes ADR-019's frozen config)
+**Status:** accepted (2026-10-22; the user chose one bounded revision before M4)
+**Context:** E2 dense under ADR-019 (`m3-e2-dense`) reached 23.8% [21.9, 25.7] on test2000
+(base 4.1%), but the policy collapsed by step 25. Mean token entropy fell from 0.88 (step 1)
+to 0.25 (step 15) and 0.056 (step 25), then to ~0.02. Over steps 41–50 a mean of 74% of the
+8-sample groups had zero reward spread, so zero advantage and no gradient. dev500 went
+5.6% → 22.8% by step 25 and then stayed at 22–28% to step 200: steps 25–200 (~$6 of the
+$7.84) taught little. Answers shrank to ~9 tokens with no reasoning. M4's main result (H1)
+would run every arm under this config, so E3 would measure where each start point collapses,
+and the GRPO baseline would be open to the charge of being undertuned. Chess-R1's 25–30%
+plateau may be the same effect.
+- **Clip-higher can't help here.** `num_iterations` is 1 and generation happens once per
+  optimizer step, so the PPO ratio is exactly 1 and the clip never binds (TRL 1.16:
+  `old_per_token_logps` is the same weights' log-probs). `epsilon_high`, first proposed to the
+  user, was dropped after reading the TRL source.
+- TRL 1.16 has an entropy bonus (`entropy_coef`) with adaptive control from Skywork-OR1
+  (`use_adaptive_entropy`): each step the coefficient rises by `entropy_coef_delta` if mean
+  token entropy is at or below `entropy_target` and falls otherwise, and applies only at or
+  below the target. Chess-R1 used a static entropy bonus of 1e-3; ADR-019 had none.
+**Decision:** v2 = v1 + `entropy_adaptive: true`, `entropy_target: 0.2`,
+`entropy_coef_delta: 0.02`. Nothing else that shapes learning changes (lr 1e-5, 64 × 8,
+T = 1.0, β = 1e-3, dapo, 200 steps, seed 2026).
+- Target 0.2 is TRL's and Skywork's default, and also where v1 was still healthy: at steps
+  15–17 answers were already ~10 tokens with ~9% dead groups. Delta 0.02 is 4× TRL's default
+  because v1 fell from 0.2 to 0.06 in 6 steps; at 0.005 the coefficient would be 0.03 by then.
+  The initial coefficient doesn't matter: above the target it decays to 0 within a few steps.
+- Not learning settings: `eval_every` 25 → 10 (a finer dev curve, ~$0.2 a run) and
+  `save_every` 25 → 10 (a preemption loses ≤ ~6 min).
+- Bounded: one variant and one check. `m3-e2-dense-v2` is checked at step 50 against
+  pre-registered criteria (RESULTS.md, E2). If it fails, the VM is stopped, v2 is dropped,
+  ADR-019 stays frozen and E2 sparse runs under v1. If it passes, it runs to 200 and is E2
+  dense, and E2 sparse and every M4/M5 arm use v2.
+- Checked on the laptop (Qwen3.5-0.8B, forced ramp): the coefficient rises 0.02, 0.04;
+  `entropy_ctrl_state.json` is copied with each checkpoint and restored on resume (0.06,
+  0.08 after resuming from step 2).
+- Found by the same smoke and fixed: resuming from a checkpoint at `max_steps` (a preemption
+  between the last checkpoint and the final save) made `trainer.train()` run one step past
+  it. The trainer now loads that adapter and saves the final model without training (the
+  final adapter equals the checkpoint bit for bit).
+**Consequences:** `m3-e2-dense` stays in the write-up as the v1 data point and the evidence
+for the collapse; it isn't compared with v2 arms as if it were the same config. If v2 passes,
+E2 costs one more dense run (~$8). `entropy_coef` is logged each step. Risk to watch: the
+bonus applies to every completion token, so it could show up as noise on the format tokens
+or prose before `<answer>`; format, legal, length and prose_frac are in the step-50 check or
+next to it.

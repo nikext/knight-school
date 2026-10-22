@@ -10,6 +10,7 @@ bootstrap CIs. Arm-vs-arm differences use a paired bootstrap. Model:
 | Checkpoint | P1 square | P2 legal count | P3 FEN after move | P4 in check | Predicted |
 |---|---|---|---|---|---|
 | base (zero-shot) | 4.8% [1.6, 8.8] | 4.0% [0.8, 8.0] | 0.0% | 50.4% [41.6, 59.2] | P1 40–60%, P2 2–8%, P3 0–2%, P4 55–75% (written 2026-10-21, before any run) |
+| base → GRPO dense (E2, config v1) | 1.6% [0.0, 4.0] | 3.2% [0.8, 6.4] | 0.0% | 50.4% [41.6, 59.2] | no change beyond noise (E2 predictions) |
 | primer-M | | | | | |
 | primer-M → GRPO dense | | | | | |
 
@@ -67,8 +68,10 @@ $/1k counts the 105 s of generation only; the job cost $0.13 with boot.
 
 | Arm | Predicted solve | Solve rate | Move acc | Legal | Δ vs E2-dense (paired) | Run $ |
 |---|---|---|---|---|---|---|
-| E2 base → GRPO sparse | 4–8% (point 6%); move acc 16–24%, legal ≥ 98% | | | | | |
-| E2 base → GRPO dense | 7–14% (point 10%); move acc 22–32%, legal ≥ 99% | | | | — | |
+| E2 base → GRPO sparse, v1 | 4–8% (point 6%); move acc 16–24%, legal ≥ 98% | not run: v1 dropped (ADR-021) | | | | $6.13, preempted to step 20 |
+| E2 base → GRPO dense, v1 | 7–14% (point 10%); move acc 22–32%, legal ≥ 99% | **23.8% [21.9, 25.7]** | 41.8% [40.3, 43.3] | 100.0% | — | $7.84 + $0.29 eval |
+| E2 base → GRPO dense, v2 | 22–33% (point 28%); see below | | | | (reference for v2 arms) | |
+| E2 base → GRPO sparse, v2 | 16–30% (point 24%); see below | | | | | |
 | E3 primer-M only | | | | | | |
 | E3 primer-M → GRPO sparse | | | | | | |
 | E3 primer-M → GRPO dense | | | | | | |
@@ -88,6 +91,36 @@ on Qwen3.5-0.8B, whose numbers mean nothing). Base: 4.1% solve, 15.6% move acc, 
   neither reward pays for thinking directly. This is the prediction I'm least sure of.
 - **E0 on the dense checkpoint:** no change beyond noise on P1–P4 (RL on move choice doesn't
   teach board reading).
+
+**E2 dense, config v1** (`m3-e2-dense`, ADR-019; test2000 from `m3-e2-dense-eval-r3`,
+`results/eval/test2000/m3-e2-dense.md`). The solve prediction missed badly on the low side:
+23.8% against a predicted 7–14%, close to Chess-R1's 25–30% plateau rather than well below it.
+Nearly all of the gain came in the first 25 steps (dev500 5.6% → 22.8%, then 22–28% to step
+200). By bin, 74% of 400–599 puzzles and 21% of 1200–1399 are solved, falling to ~1–2% above
+2400. The other predictions held: answers shrank to ~9 tokens with no prose, legal reached 100%,
+and E0 didn't move (P1 1.6%, P2 3.2%, P3 0%, P4 50.4%, all within noise of the base row).
+**The plateau is a collapse, not a ceiling:** mean token entropy fell from 0.88 to 0.056 by
+step 25, and over steps 41–50 a mean of 74% of the 8-sample groups had zero reward spread, so
+they gave no gradient (`results/train/m3-e2-dense/steps.csv`). That led to config v2 (ADR-021).
+E2 sparse under v1 got to step 20 before preemptions ended it. Its training move-match rate
+tracked dense's step for step (0.059 → 0.268 against 0.059 → 0.266 over steps 1–19), so the
+"sparse learns little" prediction was already in doubt.
+
+**E2 v2 predictions** (written 2026-10-22, before `m3-e2-dense-v2` launched; v1 dense is the
+only main-model GRPO run so far):
+- **Step-50 check, pre-registered** (ADR-021). Over steps 41–50 of `m3-e2-dense-v2`, v2 passes
+  only if all of these hold: mean token entropy ≥ 0.10 (v1: 0.042), mean share of zero-spread
+  groups ≤ 0.50 (v1: 0.74), dev500 solve at step 50 ≥ 19% (v1: 22.4% [18.8, 26.2]), dev500
+  legal ≥ 98%, truncated completions ≤ 2%, and mean completion length ≤ 100 tokens. If any fails,
+  the VM is stopped and v1 stays. I give the check about 65%: the controller should hold
+  entropy near 0.2, but the bonus may land on format tokens or prose instead of move choice.
+- **Dense v2** keeps learning after step 25 instead of flattening: dev500 at step 50 about 21%
+  (it may start a little slower than v1), and test2000 22–33% (point 28%), about +4 points over
+  v1 (paired). The gain over v1 is mostly in the 800–1599 bins. Completions stay short (mean
+  ≤ 20 tokens). I'd put 25% on prose before `<answer>` reaching > 10% of completions by the end.
+- **Sparse v2** learns, behind dense: 16–30% (point 24%), paired Δ vs dense v2 about −4 points,
+  with a CI that may include 0. This drops the original "sparse ≈ flat, replicates Chess-R1"
+  expectation (RESEARCH.md E2) on the strength of v1's first 19 steps.
 
 Figures: dev solve rate vs $ spent, all arms overlaid
 (`results/figures/e2e3_curves.png`), and per-bin solve rate

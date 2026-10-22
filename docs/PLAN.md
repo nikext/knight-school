@@ -14,10 +14,15 @@ merged PR whose description lists what was verified, the numbers, and the
 | M2 | Eval harness, container, model choice, baselines (E0, E1) | [M2](tasks/M2-evals-baselines.md) | 15 | 50 | ✅ done | PR #3 · spent $4.85 compute, $0 vertex · main model Qwen3.5-2B, non-thinking (ADR-011, ADR-017) · E1 base 4.1% solve, 96.4% legal · Stockfish 1 node 68.6% · Gemini rows pending until 2026-11-13 |
 | M3 | GRPO pipeline, RL on base (E2), re-plan | [M3](tasks/M3-grpo.md) | 70 | 0 | 🟨 in progress | branch `m3-grpo` · pipeline, smoke, throughput, frozen config (ADR-018/019) and re-plan done · E2 runs in progress |
 
-> **Next up (M3):** E2 dense (`m3-e2-dense`) was launched 2026-10-22, then E2 sparse
-> (`m3-e2-sparse`, approved). Both are approved by the user. After each: `ks train-report <id>`,
-> pull `attempts/*/out/eval/test2000/*.json` into `results/eval/test2000/`, then figures
-> (`ks train-figures m3-e2-sparse m3-e2-dense --name e2 --base-solve 0.054`), RESULTS.md, and the PR.
+> **Next up (M3, 2026-10-22 evening):** E2 dense v1 is done (test2000 23.8% [21.9, 25.7]) but
+> collapsed by step 25, so the GRPO config was revised once to **v2** (ADR-021: adaptive entropy
+> control). `m3-e2-dense-v2` (approved) runs with a pre-registered **step-50 check**
+> (RESULTS.md, E2 v2). If it fails, stop the VM (`make sweep DELETE=1`), keep v1, and ask to run
+> sparse under v1. If it passes, let it finish, then ask for `m3-e2-sparse-v2` (same config,
+> `grpo_sparse.yaml`). Stockouts are waited out for up to 12 h on one approval (ADR-020). After
+> each: `ks train-report <id>`, pull `attempts/*/out/eval/test2000/*` into
+> `results/eval/test2000/`, then figures (`ks train-figures m3-e2-sparse-v2 m3-e2-dense-v2
+> m3-e2-dense --name e2 --base-solve 0.054`), RESULTS.md, and the PR.
 | M4 | Primer SFT → GRPO, the main result (E3) | [M4](tasks/M4-primer.md) | 100 | 0 | ⬜ todo | |
 | M5 | Scaling and ablations (E4, E5) | [M5](tasks/M5-scaling-ablations.md) | 110 | 110* | ⬜ todo | |
 | M6 | Release and showcase | [M6](tasks/M6-release.md) | 9 | 4 | ⬜ todo | |
