@@ -77,8 +77,8 @@ than 30 days.
 
 Rough job costs at the measured prices (M3 measures the real ones): a GRPO
 run on a ~2B model is **$17–34** (was $10–20), a GRPO run on a ~4B model is
-**$42–59** (was $25–35), and primer SFT of a 2B model on 150M tokens is
-**$9–17** (was $5–10). The $360 compute ceiling buys at most ~118 A100-hours.
+**$42–59** (was $25–35), and primer SFT of a 2B model on primer-M (186M tokens
+measured in M2, planned as 150M) is **$11–21** (was $5–10; $9–17 at 150M). The $360 compute ceiling buys at most ~118 A100-hours.
 M3's re-plan will almost certainly cut M5. Gemini baselines are still about
 $30–50 in total.
 
