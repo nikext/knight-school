@@ -110,6 +110,11 @@ dropped**: it needs new data plus the most expensive SFT, so E4 becomes a 3-poin
 if the user moves the M3/M4 underruns to M5. No allocation changes for now. Calendar: the
 core plan is ~55 GPU-hours, one job at a time, before 2026-11-10.
 
+**M3 update (2026-10-22, ADR-020/021):** $23.43 spent, of which ~$6.4 went to preemptions and
+stockouts (E2 sparse under v1 reached step 20 for $6.13). Config v2 adds one dense run (~$8).
+M3 is now expected at ~$40–48 of its $70: dense v2 and sparse v2 at ~$8–9 each plus preemption
+overhead. No allocation changes.
+
 ## 3. Guardrails, outermost first
 
 1. **Burn-rate cap via quota.** The project's GPU quota is 1
