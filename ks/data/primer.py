@@ -270,6 +270,28 @@ def t7_line(pos: Pos, rng: Rng) -> Item | None:
     return Item("T7", "line", pos.board, "Best line, 3 moves?", " ".join(sans), after=after)
 
 
+# T8 (TRAINING.md §5, ADR-024): the fallback for a primer that breaks the RL answer format. A
+# copy of a T5 example asked with the RL prompt's instruction instead of "Best move?", answered
+# with the same move in the RL answer tags. The caller renders the RL user turn
+# (`ks.chess.prompt.user_text`, which imports this module).
+T8_SHARE = 0.02  # of primer-M's example count
+
+
+def t8_from_t5(t5: dict[str, Any], rl_user_text: str, ex_id: str) -> dict[str, Any]:
+    system, _, answer = t5["messages"]
+    return {
+        **t5,
+        "id": ex_id,
+        "task": "T8",
+        "variant": "rl-format",
+        "messages": [
+            system,
+            {"role": "user", "content": rl_user_text},
+            {"role": "assistant", "content": f"<answer>{answer['content']}</answer>"},
+        ],
+    }
+
+
 Gen = Callable[[Pos, Rng], Item | None]
 VARIANTS: dict[str, list[Gen]] = {
     "T1": [t1_square, t1_pieces],

@@ -119,6 +119,31 @@ def test_t5_from_engine_pv_with_960_castling_and_from_a_puzzle():
     assert pr.t5_best(pos(CASTLE, line=[]), rng()) is None
 
 
+def test_t8_is_t5_asked_with_the_rl_prompt():
+    from ks.chess import prompt as kp
+    from ks.chess.parse import parse
+
+    item = pr.t5_best(pr.Pos(chess.Board(CASTLE), "puzzle", solution_san="Rxa8+"), rng())
+    assert item is not None
+    t5 = {**item.record("M-1", "puzzle"), "keys": item.keys()}
+    rl = kp.user_text(kb.board_from_fen(t5["fen"]))
+    t8 = pr.t8_from_t5(t5, rl, "M-T8-0000000")
+    assert (t8["id"], t8["task"], t8["keys"], t8["fen"]) == (
+        "M-T8-0000000",
+        "T8",
+        t5["keys"],
+        CASTLE,
+    )
+    t5_user, t8_user = t5["messages"][1]["content"], t8["messages"][1]["content"]
+    assert t8_user == kp.user_text(chess.Board(CASTLE))
+    assert t5_user.splitlines()[:-1] == t8_user.splitlines()[:-2]  # only the instruction differs
+    assert t8["messages"][0] == t5["messages"][0]
+    answer = t8["messages"][2]["content"]
+    assert answer == "<answer>Rxa8+</answer>"
+    assert t5["messages"][2]["content"] == "Rxa8+"  # the T5 example is left as it was
+    assert parse(answer, chess.Board(CASTLE)).san == "Rxa8+"
+
+
 @pytest.mark.parametrize(
     ("cp", "mate", "want"),
     [
