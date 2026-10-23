@@ -73,7 +73,7 @@ $/1k counts the 105 s of generation only; the job cost $0.13 with boot.
 | E2 base → GRPO dense, v1 | 7–14% (point 10%); move acc 22–32%, legal ≥ 99% | **23.8% [21.9, 25.7]** | 41.8% [40.3, 43.3] | 100.0% | — | $7.84 + $0.29 eval |
 | E2 base → GRPO dense, v2 | 22–33% (point 28%); see below | **27.2% [25.2, 29.1]** | 43.6% [42.1, 45.2] | 100.0% | reference for v2 arms; vs dense v1 +3.4 [1.8, 4.8] | $9.22 with both evals (attempt 1 a $0 stockout) |
 | E2 base → GRPO sparse, v2 | 16–30% (point 24%); see below | **23.5% [21.6, 25.4]** | 38.7% [37.2, 40.3] | 98.1% | −3.6 [−4.9, −2.4] at step 200; dev500 steps 100–150: −0.3 [−2.0, 1.4] | $12.16 + $5.35 (resumed from step 180 as `-r2`) |
-| E2 base → GRPO dense, v3 | 24–30% (point 27%); see below | | | | **reference for E3 (H1)** | |
+| E2 base → GRPO dense, v3 | 24–30% (point 27%); see below | **25.8% [23.9, 27.8]** | 43.2% [41.7, 44.7] | 100.0% | **reference for E3 (H1)**; vs dense v2 −1.4 [−2.6, −0.1] | $9.99 with both evals (attempt 1 preempted after 4 min, $0.20) |
 | E2 base → GRPO sparse, v3 | 22–29% (point 25.5%); see below | | | | | |
 | E3 primer-M only | 18–42% (point 30%) if the format holds; see below | | | | | |
 | E3 primer-M → GRPO sparse | 25–48% (point 37%) | | | | | |
@@ -205,7 +205,7 @@ stays in GCS until M6.
   may be chance.
 
 **E2 reading.** GRPO on the base model lifts test2000 solve from 4.1% to 23.5–27.2% under every
-reward and config tried (dense v1 23.8%, dense v2 27.2%, sparse v2 23.5%). dev500 reaches its
+reward and config tried (dense v1 23.8%, dense v2 27.2%, sparse v2 23.5%, dense v3 25.8%). dev500 reaches its
 plateau by step ~25 (about $2) and stays at 21.6–29.0% from there to step 200. Neither more learning signal
 (v2's entropy control) nor a denser reward lifted that plateau while the runs were healthy.
 E0 didn't move either. That is the starting point H1 tests. The open problem for M4 is
@@ -228,6 +228,21 @@ the 4-step laptop smoke on Qwen3.5-0.8B, whose numbers mean nothing).
   step 94). Step time 30–45 s after step 20.
 - **Cost:** $7–10 per run with both evals (dense v2 $9.22).
 - **E0 on dense v3:** no change beyond noise from the base row.
+
+**E2 v3 reading (dense, `m4-e2-dense-v3`).** test2000 25.8% [23.9, 27.8], inside the predicted
+24–30%. Paired vs dense v2 it is −1.4 [−2.6, −0.1] (76 puzzles solved only by v3, 103 only by
+v2). That is within the predicted ±3 points, but the CI just excludes 0 where I predicted it
+would include it. With one seed per config I read this as "stopping at `</answer>` doesn't raise
+the plateau", not as v3 being worse. Puzzle rating at 50% solve 973 [930, 1015] (v2 1011).
+dev500 stayed at 23.2–29.0% from step 30 to 200 (predicted 22–29%). Health, as predicted:
+truncation ≤ 0.6% on every step after step 10, prose before `<answer>` 0.03% over steps 180–200,
+mean completion ≤ 14.9 tokens after step 20 (9.7 on average), entropy coefficient > 0 on 86% of
+steps 30–200, median step 32 s (p90 42 s). One miss: zero-spread groups averaged 63% over steps
+50–200 (predicted ≤ 50%). With the tail gone the controller stays on, but in most groups all
+eight samples are still right or all wrong, so there is little signal for it to spread. E0
+didn't move (P1 1.6%, P2 4.0%, P3 0%, P4 50.4%). Cost $9.99 for the attempt that ran, $10.19
+with the preempted one: the top of the $7–10 range. Dense v3 is the E3 reference: the primer
+arms run the same config and differ only in their start point.
 
 **E3 predictions** (written 2026-10-23, before the primer-M SFT launched; no primer-trained 2B
 model exists yet. The only SFT run so far is the laptop wiring test on Qwen3.5-0.8B, with 256
