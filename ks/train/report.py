@@ -173,7 +173,7 @@ def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> l
         ("legal_rate", "legal rate", False),
         ("format_rate", "format rate", False),
         ("len_mean", "completion tokens (mean, log)", True),
-        ("clipped", "share truncated at max tokens", False),
+        ("truncated", "share truncated at max tokens", False),
         ("prose_frac", "share with prose before <answer>", False),
         ("entropy", "mean token entropy", False),
         ("frac_zero_std", "share of groups with no reward spread", False),
@@ -184,8 +184,10 @@ def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> l
         _style(ax)
         for r, d in runs.items():
             s = pl.read_csv(d / "steps.csv")
-            if col in s.columns:
-                ax.plot(s["step"], s[col], color=color[r], lw=1.5, label=r)
+            # before ADR-022, TRL's clipped ratio was the truncated share
+            col_r = "clipped" if col == "truncated" and col not in s.columns else col
+            if col_r in s.columns:
+                ax.plot(s["step"], s[col_r], color=color[r], lw=1.5, label=r)
         if log:
             ax.set_yscale("log")
         ax.set_title(title, color=INK, fontsize=9, loc="left")

@@ -93,15 +93,22 @@ def test_no_answer():
     assert kp.parse("<answer>Nf3", START).status == "no_answer"
 
 
-def test_last_answer_wins_but_two_blocks_are_not_well_formed():
+def test_the_first_closed_answer_ends_the_response():
+    # ADR-022: what a `</answer>` stop string would have generated
     p = kp.parse("<think>x</think><answer>e4</answer> no wait <answer>Nf3</answer>", START)
-    assert p.san == "Nf3" and p.n_answers == 2
-    assert not p.well_formed(require_think=False)
+    assert p.san == "e4" and p.n_answers == 1
+    assert p.well_formed(require_think=False)
+    ramble = "<answer>Nf3</answer> Step 1: the knight " + "<answer>" * 3 + "x" * 4000
+    assert kp.parse(ramble, START).well_formed(require_think=False)
+    assert kp.cut(ramble) == "<answer>Nf3</answer>"
+    assert kp.cut("no tags") == "no tags"
 
 
 def test_stray_answer_tag_is_not_well_formed():
-    p = kp.parse("<think>x</think><answer>Nf3</answer></answer>", START)
-    assert p.legal and p.stray_tags and not p.well_formed(require_think=False)
+    p = kp.parse("<think>x</think><answer> <answer>Nf3</answer>", START)
+    assert p.stray_tags and not p.well_formed(require_think=False)
+    p = kp.parse("<think>x</think></answer><answer>Nf3</answer>", START)
+    assert p.status == "no_answer" and p.stray_tags
 
 
 def test_think_rules():

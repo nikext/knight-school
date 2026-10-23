@@ -56,6 +56,9 @@ class GrpoConfig(BaseModel):
     beta: float = 1e-3
     loss_type: str = "dapo"  # TRL 1.16's default, recorded in ADR-018
     mask_truncated: bool = False
+    # v3 (ADR-022): rollouts stop at the first </answer>, which is kept. Under v2 nothing
+    # stopped generation there, and post-answer rambling ran on to the cap (ADR-021).
+    stop_at_answer: bool = False
     # Entropy bonus (TRL's entropy_coef). Adaptive (Skywork-OR1, ADR-021): the coefficient
     # rises by entropy_coef_delta each step the mean token entropy is <= entropy_target,
     # falls otherwise, and applies only at or below the target.

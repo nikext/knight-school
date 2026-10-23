@@ -51,7 +51,9 @@ the difference and its CI. Put both in every results table.
 - **Decoding:** greedy (T = 0) for pass@1 headline numbers. Max tokens equal
   the training max completion length. Gemini uses its default sampling with
   the thinking setting recorded (greedy isn't meaningful for every Gemini
-  model; say so in the report).
+  model; say so in the report). Every vLLM generation stops at the first
+  `</answer>`, and the grader cuts any response there, so outputs made
+  without the stop grade the same (ADR-022).
 - **Model profiles** live in `configs/models/*.yaml` (HF repo or Vertex
   model id, chat template quirks, thinking mode, max tokens). **No model ID
   literals in code.**
@@ -91,8 +93,8 @@ Built in M1 (`evals/sets/probe500.csv`: `id, task, fen, question, answer,
 move`). **Prompt (M2):** the primer's user turn (FEN, side to move, the
 question, no legal-move list) plus one fixed format line per task, the same
 for every model, because a zero-shot model has never seen the primer's answer
-formats (`ks.eval.probe.FORMAT_HINT`). The grader reads the last `<answer>`
-block if there is one, else the text after `</think>`, else the whole reply. The items come from the primer's own generators (P1 = T1 square,
+formats (`ks.eval.probe.FORMAT_HINT`). The grader reads the `<answer>`
+block if there is one (the reply ends at its first `</answer>`, ADR-022), else the text after `</think>`, else the whole reply. The items come from the primer's own generators (P1 = T1 square,
 P2 = T2 all, P3 = T3, P4 = T4 check), so the reference answers use the
 primer's frozen formats (DATA.md §7). P4 is balanced, with 63 positions in
 check and 62 not. For P4 the grader compares yes/no (the answer's first word).

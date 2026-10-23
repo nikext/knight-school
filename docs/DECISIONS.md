@@ -512,3 +512,49 @@ step and stops learning. The candidate fix, config v3, is v2 plus generation sto
 first launch, and is not adopted here. v3 changes what the loss sees, so a clean H1 comparison
 would need E2 dense re-run under v3 (~$9). Verify first that TRL 1.16 passes stop strings to
 vLLM in colocate mode.
+
+### ADR-022: GRPO config v3: every rollout and every eval stops at the first `</answer>`
+**Status:** accepted (2026-10-23; the user adopted v3 and re-runs of both E2 arms under it in the
+M4 session). Supersedes ADR-021's frozen config.
+**Context:** ADR-021's v2 had a flaw: nothing stopped generation after `</answer>`. In dense v2,
+0.5–2% of completions ran on to the 1024-token cap after a valid answer, which switched its
+entropy controller off. In sparse v2 that tail grew to ~90% of completions after step 150. Steps
+took ~4× longer and the answers froze. Any M4 arm could tip into that regime at random.
+**Decision:**
+- **v3 = v2 + `stop_at_answer: true`.** `ks.train.grpo` passes `generation_kwargs = {stop:
+  ["</answer>"], include_stop_str_in_output: true}`. TRL 1.16's colocate path hands them straight
+  to vLLM's `SamplingParams` (`generation_kwargs.update(self.generation_kwargs)` in
+  `trl/generation/vllm_generation.py`). Laptop smoke (Qwen3.5-0.8B, 4 steps): all 10 sampled
+  completions that contained `</answer>` ended there, and dev eval, checkpoints and the final
+  save ran as before. The tokens after `</answer>` are never generated, so they get no
+  gradient, no entropy bonus and no weight in the controller's entropy. A stopped completion
+  has no EOS. The completion mask comes from the generated lengths, and `mask_truncated` is
+  false, so its tokens still train. Nothing else changes (lr, 64 × 8, T = 1.0, β, dapo, entropy
+  control, 200 steps, seed 2026).
+- **Grading: the response ends at its first `</answer>`** (`ks.chess.parse.cut`, applied by
+  `parse` and by the E0 probe grader). Before, the last answer block counted, and a second block
+  failed the format. Under any decoding, the text up to the first `</answer>` comes out the same
+  with or without the stop string. So under this rule, outputs generated without the stop and
+  outputs generated with it are graded alike.
+- **Every vLLM eval passes the same stop** (test sets, the dev eval in training, pass@k). Under
+  the cut rule this changes no grade and only saves tokens: sparse v2's test2000 took 369 s
+  instead of 26 s. Gemini doesn't use it yet (its stop sequences leave the stop string out of
+  the output). The cut makes Gemini's grades the same anyway. Adding the stop there would only
+  save cost; that is decided in the Gemini session.
+- **Truncation metric.** TRL's `completions/clipped_ratio` counts every completion that doesn't
+  end in EOS, so under v3 it reads ~1. Ours, `completions/truncated` (`truncated` in
+  steps.csv), is "at the token cap with no `</answer>`". The harness's "hit max tokens" uses the
+  same rule.
+- **Re-grade of the committed evals** (dry run over every LLM file in dev500, test2000 and
+  probe500): no solve, move-accuracy or legal rate changes. Sparse v2's test2000 format goes from
+  99.85% to 100%, and its share at the cap from 99.8% to 0%: every one of those answers had
+  closed before the ramble. Gemma 4 E2B and Qwen3-1.7B (dev500 screening) lose ≤ 0.2 points of
+  "hit max tokens". The committed files stay as they are.
+- **E2 is re-run under v3**, both arms (`m4-e2-dense-v3`, `m4-e2-sparse-v3`), with the same
+  data, seed and steps, and booked to M4. They are the comparators for E3 (H1: primer → dense
+  vs `m4-e2-dense-v3`). The v1 and v2 runs stay in the write-up as the history that led here.
+**Consequences:** v1/v2 arms aren't compared to v3 arms as like-for-like. A healthy 200-step
+run should cost ~$7–9 at ADR-019's rates, and the rambling regime can't occur. Long text can
+still grow before `<answer>`, where it is reasoning: a completion that reaches the cap there
+has no answer and gets reward 0. A TRL bump must re-check that `generation_kwargs` reach
+`SamplingParams` in colocate mode.

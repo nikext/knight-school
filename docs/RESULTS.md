@@ -73,6 +73,8 @@ $/1k counts the 105 s of generation only; the job cost $0.13 with boot.
 | E2 base → GRPO dense, v1 | 7–14% (point 10%); move acc 22–32%, legal ≥ 99% | **23.8% [21.9, 25.7]** | 41.8% [40.3, 43.3] | 100.0% | — | $7.84 + $0.29 eval |
 | E2 base → GRPO dense, v2 | 22–33% (point 28%); see below | **27.2% [25.2, 29.1]** | 43.6% [42.1, 45.2] | 100.0% | reference for v2 arms; vs dense v1 +3.4 [1.8, 4.8] | $9.22 with both evals (attempt 1 a $0 stockout) |
 | E2 base → GRPO sparse, v2 | 16–30% (point 24%); see below | **23.5% [21.6, 25.4]** | 38.7% [37.2, 40.3] | 98.1% | −3.6 [−4.9, −2.4] at step 200; dev500 steps 100–150: −0.3 [−2.0, 1.4] | $12.16 + $5.35 (resumed from step 180 as `-r2`) |
+| E2 base → GRPO dense, v3 | 24–30% (point 27%); see below | | | | **reference for E3 (H1)** | |
+| E2 base → GRPO sparse, v3 | 22–29% (point 25.5%); see below | | | | | |
 | E3 primer-M only | | | | | | |
 | E3 primer-M → GRPO sparse | | | | | | |
 | E3 primer-M → GRPO dense | | | | | | |
@@ -209,6 +211,23 @@ plateau by step ~25 (about $2) and stays at 21.6–29.0% from there to step 200.
 E0 didn't move either. That is the starting point H1 tests. The open problem for M4 is
 the post-answer tail in config v2, which cost sparse its last 50 steps and pulled dense v2's
 entropy controller off.
+
+**E2 v3 predictions** (written 2026-10-23, before `m4-e2-dense-v3` launched; config v3 =
+v2 + every rollout and eval stops at the first `</answer>`, ADR-022. The only v3 run so far is
+the 4-step laptop smoke on Qwen3.5-0.8B, whose numbers mean nothing).
+- **Dense v3 ≈ dense v2.** test2000 24–30% (point 27%), paired Δ vs dense v2 within ±3 points
+  with a CI that includes 0. Removing the tail keeps the entropy controller on, but in v2 a
+  steady supply of gradient (steps 31–90) didn't lift the dev plateau, so I don't expect v3 to.
+  dev500 plateau 22–29% from step ~30 to 200, as in v1 and v2.
+- **Sparse v3 tracks dense v3**, as sparse v2 did to step 150: test2000 22–29% (point 25.5%),
+  paired Δ vs dense v3 −1.5 points (range −4 to +1), CI likely including 0.
+- **Health, both arms:** our truncation share ≤ 1% on every step after step 10; prose before
+  `<answer>` < 2% of completions at the end; mean completion ≤ 15 tokens after step 20; entropy
+  coefficient > 0 on ≥ 70% of steps 30–200 (dense v2: it sat near 0 for steps 94–135 and from
+  190); mean share of zero-spread groups over steps 50–200 ≤ 50% (dense v2: ~55–80% after
+  step 94). Step time 30–45 s after step 20.
+- **Cost:** $7–10 per run with both evals (dense v2 $9.22).
+- **E0 on dense v3:** no change beyond noise from the base row.
 
 Figures (E2): dev500 solve rate vs dollars spent for all three runs
 (`results/figures/e2_dev_vs_usd.png`), and training metrics per step: move-match rate, legal and

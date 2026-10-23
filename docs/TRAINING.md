@@ -45,7 +45,8 @@ user:   Position (FEN): r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w
 - The legal moves are sorted the way DATA.md §4 says. E5b drops that line.
 - Models with native thinking use it in place of `<think>`. Decided in M2:
   the non-thinking template for every arm (ADR-017).
-- **Parser** (`ks.chess.parse`, built in M2): take the last
+- **Parser** (`ks.chess.parse`, built in M2): the response ends at its first
+  `</answer>` (ADR-022; generation stops there too). Take that
   `<answer>…</answer>` and normalise it: strip whitespace, `**`, backticks and
   quotes, a leading move number (`12.`, `12...`), a trailing period and
   `!`/`?` glyphs; tolerate a missing or extra `+`/`#` and `0-0`/`0-0-0`. The
@@ -96,15 +97,17 @@ each component separately.
 | steps | 200 | about 12.8k prompts; extend only if the dev curve is still rising and the budget allows |
 | dev eval | every 25 steps on dev500, greedy | every 10 from config v2 (ADR-021) |
 | entropy bonus | none (v1, ADR-019) | **v2 (ADR-021):** adaptive (Skywork-OR1, TRL `use_adaptive_entropy`), target 0.2, delta 0.02, because v1 collapsed by step 25 |
+| stop | none (v1, v2) | **v3 (ADR-022):** stop at the first `</answer>`, kept in the output, because v2's post-answer tail ran to the cap |
 
-- **Frozen config:** `configs/train/grpo.yaml`, v1 by ADR-019, revised once to v2 by
-  ADR-021 (its step-50 check passed in `m3-e2-dense-v2`). Clip-higher (`epsilon_high`)
+- **Frozen config:** `configs/train/grpo.yaml`, v1 by ADR-019, revised to v2 by ADR-021 (its
+  step-50 check passed in `m3-e2-dense-v2`) and to **v3 by ADR-022** (M4): every rollout stops
+  at the first `</answer>`. Clip-higher (`epsilon_high`)
   is a no-op in this setup: one optimizer pass per generation batch keeps the PPO ratio at 1.
   Known limitation of v2: nothing stops generation after `</answer>`. In dense v2, the ~1% of
   completions that ran on to the cap held TRL's token-weighted entropy above target and
   switched the bonus off from step ~90. In sparse v2 that tail grew to ~90% of completions
-  after step 150, steps took ~4× longer, and the answers stopped changing. A v3 with a
-  `</answer>` stop string is proposed for M4 (ADR-021).
+  after step 150, steps took ~4× longer, and the answers stopped changing. v3 (ADR-022) adds
+  the `</answer>` stop string, and both E2 arms are re-run under it in M4.
 
 - **Logging per step:** each reward component (mean and std), legal rate,
   format rate, completion length (mean and p95), KL, entropy, generation and

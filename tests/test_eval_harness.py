@@ -209,3 +209,18 @@ def test_rescore_regrades_format_only(puzzles):
     assert "rescored" in report.markdown(new)
     with pytest.raises(ValueError, match="legal_list"):
         harness.rescore(res, closed.model_copy(update={"legal_list": False}), "x")
+
+
+def test_rambling_after_the_answer_is_cut_and_not_truncated(puzzles):
+    # ADR-022: an old output that answered and then ran to the cap grades as if it had stopped
+    sol = _solutions(puzzles)
+    res = run(puzzles, lambda r: f"<answer>{sol[r.id]}</answer> Step 1: <answer>Ka1</answer>")
+    for it in res["items"]:
+        it["samples"][0]["finish"] = "length"
+    it = res["items"][0]
+    it["samples"][0] |= {"text": "Let me think about the knight on", "finish": "length"}
+    closed = LLM.model_copy(update={"template_closes_think": True})
+    new = harness.rescore(res, closed, "ADR-022")
+    s = new["summary"]
+    assert s["truncated"] == pytest.approx(1 / s["positions"])
+    assert s["format"]["value"] > 0.95 and s["move_acc"]["value"] < 1.0

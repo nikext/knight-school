@@ -3,9 +3,9 @@
 The user turn is the primer's (`Position (FEN)`, `Side to move`, question),
 so a primer checkpoint sees what it was taught. A zero-shot model has never
 seen the answer formats, so one fixed format line per task follows the
-question for **every** model. The grader then reads the answer from the last
-`<answer>` block if there is one, else from the text after `</think>`, else
-the whole reply.
+question for **every** model. The grader then reads the answer from the
+`<answer>` block if there is one (the reply ends at the first `</answer>`, as in
+every eval: ADR-022), else from the text after `</think>`, else the whole reply.
 
 | Task | Graded |
 |---|---|
@@ -52,6 +52,7 @@ def messages(row: dict[str, Any]) -> list[dict[str, str]]:
 
 
 def extract(text: str) -> str:
+    text = kp.cut(text)
     blocks = re.findall(r"<answer>(.*?)</answer>", text, re.DOTALL)
     if blocks:
         return blocks[-1].strip()

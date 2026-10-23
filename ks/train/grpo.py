@@ -29,6 +29,7 @@ import polars as pl
 import typer
 
 from ks.chess import prompt as kpr
+from ks.chess.parse import STOP
 from ks.data.manifest import git_sha
 from ks.eval import profile as prof
 from ks.train import ckpt as kc
@@ -173,7 +174,14 @@ class EngineBackend:
 
         from ks.eval.backends import Completion
 
-        sp = SamplingParams(n=1, temperature=0.0, max_tokens=self.p.max_tokens, seed=self.p.seed)
+        sp = SamplingParams(
+            n=1,
+            temperature=0.0,
+            max_tokens=self.p.max_tokens,
+            seed=self.p.seed,
+            stop=[STOP],  # every eval stops at </answer> (ADR-022)
+            include_stop_str_in_output=True,
+        )
         outs = self.vg.llm.chat(
             [r.messages for r in reqs],
             sp,
@@ -278,7 +286,9 @@ def main(
         target_modules=lora_targets(model),
         task_type="CAUSAL_LM",
     )
-    fns = RewardFns(cfg.task_reward, p.require_think, samples.write, cfg.samples_per_step)
+    fns = RewardFns(
+        cfg.task_reward, p.require_think, samples.write, cfg.samples_per_step, cfg.max_completion
+    )
     reward_funcs, weights = fns.funcs()
     args = GRPOConfig(
         output_dir=str(work / "trainer"),
@@ -296,6 +306,10 @@ def main(
         beta=cfg.beta,
         loss_type=cfg.loss_type,
         mask_truncated_completions=cfg.mask_truncated,
+        # TRL 1.16 colocate hands these straight to vLLM's SamplingParams (ADR-022)
+        generation_kwargs={"stop": [STOP], "include_stop_str_in_output": True}
+        if cfg.stop_at_answer
+        else None,
         entropy_coef=cfg.entropy_coef,
         use_adaptive_entropy=cfg.entropy_adaptive,
         entropy_target=cfg.entropy_target,

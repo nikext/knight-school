@@ -31,7 +31,8 @@ KEYS = {
     "completions/mean_length": "len_mean",
     "completions/p95_length": "len_p95",
     "completions/max_length": "len_max",
-    "completions/clipped_ratio": "clipped",
+    "completions/clipped_ratio": "clipped",  # TRL: no EOS at the end (stopped ones too, ADR-022)
+    "completions/truncated": "truncated",  # ours: at the token cap without an answer
     "completions/tokens": "completion_tokens",
     "reasoning/prose_frac": "prose_frac",
     "reasoning/prose_chars_mean": "prose_chars",
