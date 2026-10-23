@@ -12,8 +12,8 @@ bootstrap CIs. Arm-vs-arm differences use a paired bootstrap. Model:
 | base (zero-shot) | 4.8% [1.6, 8.8] | 4.0% [0.8, 8.0] | 0.0% | 50.4% [41.6, 59.2] | P1 40–60%, P2 2–8%, P3 0–2%, P4 55–75% (written 2026-10-21, before any run) |
 | base → GRPO dense (E2, config v1) | 1.6% [0.0, 4.0] | 3.2% [0.8, 6.4] | 0.0% | 50.4% [41.6, 59.2] | no change beyond noise (E2 predictions) |
 | base → GRPO dense (E2, config v2) | 3.2% [0.8, 6.4] | 4.0% [0.8, 8.0] | 0.0% | 50.4% [41.6, 59.2] | no change beyond noise (E2 predictions) |
-| primer-M | | | | | |
-| primer-M → GRPO dense | | | | | |
+| primer-M | | | | | P1 80–99% (point 93%), P2 20–75% (45%), P3 25–85% (55%), P4 85–100% (95%) (E3 predictions) |
+| primer-M → GRPO dense | | | | | within ±10 points of the primer-M row on each task (E3 predictions) |
 
 Base row: `m2-screen-a100-r4`, `results/eval/probe500/qwen3.5-2b.md`. **It
 mostly measures copying of the format hint, not knowledge.** Qwen3.5-2B
@@ -75,9 +75,9 @@ $/1k counts the 105 s of generation only; the job cost $0.13 with boot.
 | E2 base → GRPO sparse, v2 | 16–30% (point 24%); see below | **23.5% [21.6, 25.4]** | 38.7% [37.2, 40.3] | 98.1% | −3.6 [−4.9, −2.4] at step 200; dev500 steps 100–150: −0.3 [−2.0, 1.4] | $12.16 + $5.35 (resumed from step 180 as `-r2`) |
 | E2 base → GRPO dense, v3 | 24–30% (point 27%); see below | | | | **reference for E3 (H1)** | |
 | E2 base → GRPO sparse, v3 | 22–29% (point 25.5%); see below | | | | | |
-| E3 primer-M only | | | | | | |
-| E3 primer-M → GRPO sparse | | | | | | |
-| E3 primer-M → GRPO dense | | | | | | |
+| E3 primer-M only | 18–42% (point 30%) if the format holds; see below | | | | | |
+| E3 primer-M → GRPO sparse | 25–48% (point 37%) | | | | | |
+| E3 primer-M → GRPO dense | 26–50% (point 38%) | | | | | |
 
 **E2 predictions** (written 2026-10-22, before any GRPO run of the main model; the only
 training signal seen so far is M2's 5-step compatibility smoke and the M3 laptop wiring test
@@ -228,6 +228,36 @@ the 4-step laptop smoke on Qwen3.5-0.8B, whose numbers mean nothing).
   step 94). Step time 30–45 s after step 20.
 - **Cost:** $7–10 per run with both evals (dense v2 $9.22).
 - **E0 on dense v3:** no change beyond noise from the base row.
+
+**E3 predictions** (written 2026-10-23, before the primer-M SFT launched; no primer-trained 2B
+model exists yet. The only SFT run so far is the laptop wiring test on Qwen3.5-0.8B, with 256
+examples and two trainable layers, whose numbers mean nothing.) Primer-M T5 holds 390k "Best
+move?" examples. About half are solver positions of `primer_pool` puzzles, answered with the
+puzzle solution; the rest are eval-DB positions, answered with Stockfish's best move. So the
+primer is supervised move imitation as well as rules teaching.
+- **Format first.** The primer answers bare (`Qxc8+`), and the RL prompt asks for `<answer>`
+  tags. I give 65% to the primer checkpoint keeping a dev500 format rate ≥ 50% (point 75%).
+  **Pre-registered stop rule:** if the SFT probe's format rate (32 dev500 RL prompts) is below 50%
+  at two checkpoints in a row, I stop the VM and bring the T8 fallback (TRAINING.md §5) to the
+  user. At the end, the task's rule applies: dev500 format < 50% → T8.
+- **Primer-M only (test2000), if the format holds:** solve 18–42% (point 30%), move accuracy
+  40–58%, legal ≥ 95%, puzzle rating ~1050–1300. That's about E2 dense v3's level from imitation
+  alone. The gain over base is largest in the 800–1799 bins.
+- **E0 on primer-M:** P1 square 80–99% (point 93%), P2 legal count 20–75% (45%; exact counting
+  without search is hard), P3 FEN after a move 25–85% (55%), P4 in check 85–100% (95%). In
+  every case well above the base row, which copies the hint. Part of that gain is format
+  (see the E0 note).
+- **Primer → GRPO dense (H1):** test2000 26–50% (point 38%). Paired Δ vs E2 dense v3 about +11
+  points (range +2 to +20). I give H1 (Δ ≥ 3 with a CI that excludes 0) 75%.
+- **Primer → GRPO sparse (H2):** 25–48% (point 37%), about 1 point below primer → dense. I give
+  H2 85%: sparse gains ≥ 3 points over the primer-only start, since base → sparse learned too.
+- **H5 (RL adds to the primer):** primer → dense − primer only ≈ +8 points (range 0 to +16). 70% on
+  ≥ 3 points with a CI that excludes 0.
+- **pass@k on dev500 (T = 1, n = 8):** RL sharpens more than it discovers (Shen et al.). pass@1
+  rises from primer to primer → GRPO, and pass@8 moves less (within ±5 points).
+- **Health of the primer arms under v3:** completions stay short (mean ≤ 15 tokens), prose before
+  `<answer>` < 2%, truncation ≤ 1%.
+- **Cost:** SFT job 4.5–7 h, $15–23 (point $19); each primer → GRPO arm $7–10.
 
 Figures (E2): dev500 solve rate vs dollars spent for all three runs
 (`results/figures/e2_dev_vs_usd.png`), and training metrics per step: move-match rate, legal and

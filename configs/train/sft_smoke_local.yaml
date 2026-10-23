@@ -1,0 +1,14 @@
+# Laptop wiring test (task M4 §1): RTX 3060 6 GB, Qwen3.5-0.8B, a slice of primer-S. A full
+# fine-tune of the 0.8B doesn't fit in 6 GB, so only the last two decoder layers train here;
+# everything else is the code path of the real run. Not an arm; its numbers mean nothing.
+base: sft.yaml
+name: sft-smoke-local
+model: qwen3.5-0.8b
+data: data/primer/S
+examples: 256
+step_examples: 16
+micro_batch: 4
+train_params: "language_model\\.layers\\.2[23]\\."
+save_steps: 4
+probe_prompts: 4
+probe_max_tokens: 16

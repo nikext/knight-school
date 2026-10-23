@@ -558,3 +558,62 @@ run should cost ~$7–9 at ADR-019's rates, and the rambling regime can't occur.
 still grow before `<answer>`, where it is reasoning: a completion that reaches the cap there
 has no answer and gets reward 0. A TRL bump must re-check that `generation_kwargs` reach
 `SamplingParams` in colocate mode.
+
+### ADR-023: Primer SFT implementation (M4): answer-only loss, no packing, 30-minute checkpoints
+**Status:** accepted (2026-10-23)
+**Context:** TRAINING.md §5 fixed a full fine-tune, lr 1e-5 with cosine decay, 3% warmup, 1 epoch,
+packing, loss on the answers only, seq len 2048 and ~0.25M tokens a step. §7 asked for a
+checkpoint every ~15 min. Building `ks.train.sft` and its laptop wiring test turned up several
+things the plan didn't foresee.
+**Decision:**
+- **Stack:** TRL 1.16 `SFTTrainer` on pre-tokenized examples with labels (`skip_prepare_dataset`).
+  The prompt is the chat template with a generation prompt (`enable_thinking: false`, so it ends
+  in an empty, closed think block), which gives exactly the token ids vLLM sees in every eval and
+  rollout. The answer and `<|im_end|>` follow; the template's trailing newline is dropped.
+  Labels are -100 on the prompt. On primer-S with the Qwen3.5-2B tokenizer: 142.3 tokens per
+  example, p99 274, max 468. TRL 1.16 has a fused LM head that projects only the labelled
+  positions (~15% of tokens), so the 248k-vocabulary head is cheap and the full logits are never
+  materialised.
+- **Full fine-tune** of every language-model parameter, the tied embeddings included (the vision
+  tower stays frozen). fp32 master weights with bf16 autocast, fused AdamW (β 0.9/0.999),
+  weight decay 0, grad clip 1.0. Weights kept in bf16 would round most lr-1e-5 updates away.
+- **No packing (a deviation from §5).** TRL's packing needs padding-free attention, and
+  flash-attn isn't in the image. Without the `causal-conv1d` package (ADR-018), Qwen3.5's
+  DeltaNet short convolution (kernel 4) also runs a torch fallback that ignores sequence
+  boundaries. Packed examples would then see up to 3 tokens of the previous example in every
+  DeltaNet layer. Instead, the primer is shuffled once (seed 2026) and cut into optimizer steps of
+  1,728 examples (~0.25M tokens). Each step is sorted by length (longest first) and cut into
+  right-padded micro-batches of 64. Padding costs 3.5% of the tokens (primer-S: 0.8% at
+  micro-batch 16). Every step is a random sample of the primer, so no length curriculum sneaks
+  in. The dataset is stored in this order and read sequentially, so a resume continues at the
+  same batch. Primer-M makes 752 optimizer steps, with 23 steps of warmup.
+- **Gradient checkpointing on.** On the laptop's 0.8B, activations took 2.8 MiB per token without
+  it, and with it the cost was mostly fixed, about 0.5 GiB. Scaled to the 2B, with fp32 residuals
+  under autocast, that's ~6–7 MiB per token. Neither the longest micro-batch of 64 (30k tokens)
+  nor one of 16 (7.5k) would fit next to ~34 GB of fp32 weights, grads, Adam state and autocast
+  cache. Checkpointing costs ~35–40% more compute and changes no math.
+- **A checkpoint every 30 min of wall clock** (not ~15, as §7 had it), because each one is ~22 GB
+  (fp32 weights 7.6 GB, Adam state 15 GB). The trainer writes it locally (~2 min, blocking, on
+  the pd-balanced boot disk). A background thread copies it to `<root>/ckpt` with `_COMPLETE`
+  last, one copy at a time, and then frees the older local copy. The last one is kept, and
+  all are deleted once the final model is saved. The a2's bundled local SSD would save under
+  $1. It isn't used, because it needs a startup-script change that can't be tested locally.
+- **A probe at each checkpoint:** 32 dev500 RL prompts, greedy, 32 tokens, through HF
+  `generate`. It logs the format, legal and move rates and the share with an `<answer>` tag. It is
+  the early warning for the T8 fallback (§5), with a stop rule pre-registered in RESULTS.md (E3).
+- **Final model:** bf16 weights, plus the base model's `config.json` verbatim and its
+  tokenizer and processor files. SFTTrainer aligns the config's special-token ids with the
+  tokenizer, and `save_pretrained` serialises the config differently, so the copy keeps the
+  checkpoint different from the base model in its weights only.
+- **Laptop wiring test** (Qwen3.5-0.8B, 256 primer-S examples). Only the last two decoder layers
+  trained, because a full fine-tune doesn't fit in 6 GB. Everything else ran the real code path:
+  16 steps, with a checkpoint every 4. A SIGTERM after checkpoint 8 made the job exit 143, and
+  attempt 2 resumed from checkpoint 8. Tokens per step matched the uninterrupted run at every
+  step, and losses stayed within 0.16% (relative), the same spread as between two
+  uninterrupted runs (the GPU kernels aren't bitwise deterministic). vLLM loaded the final model
+  (`ks eval --ckpt`, 24 dev500 puzzles, format 98%), and GRPO started from it through
+  `init_ckpt` (2 steps).
+**Consequences:** primer-M is 186.5M tokens at ~11.6 GFLOP per token (forward, recompute and
+backward), so ~2.2e18 FLOPs. At 32–42% MFU on the A100 that's 4.6–6 h, plus boot, checkpoint
+writes and evals: **~$17–21** (BUDGET.md §2 had $21–31). The run measures it. The same trainer
+runs E4 (primer-S) and E5a (rules-only) with only `data` changed.

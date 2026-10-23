@@ -130,6 +130,15 @@ each component separately.
   listed by python-chess, still teacher-free). Record it in an ADR. The
   format reward then handles the rest.
 
+**Built in M4 (ADR-023):** `ks.train.sft`, `configs/train/sft.yaml`, job `configs/jobs/m4-sft.sh`.
+fp32 master weights with bf16 autocast, every language-model parameter trained (the vision tower
+frozen). **Not packed:** each optimizer step is a random sample of 1,728 examples (~0.25M tokens),
+sorted by length and cut into padded micro-batches of 64 (3.5% padding). Packing would need
+flash-attn, and Qwen3.5's DeltaNet convolution fallback would leak tokens across packed
+examples. Gradient checkpointing is on. A short probe of the RL prompt (format and legal rate
+on 32 dev500 positions) runs at every checkpoint, as the early warning for T8. The final model
+is bf16, with the base model's config and tokenizer files.
+
 **Frozen in M3 (ADR-019):** `configs/train/grpo.yaml` holds exactly the values above,
 plus `micro_batch: 32` and `vllm_mem: 0.45`, which affect speed only. Arms change only the factor
 under test (`ks.train.config.ARM_KEYS`, enforced by a test). Implementation details (engine
@@ -154,10 +163,10 @@ RL removed this in ~10 steps: by step 13 the mean length was 18 tokens, legal 87
 
 ## 7. Checkpointing, preemption, resume
 
-- Every ~15 minutes (GRPO: every 25 steps; SFT: by wall clock), write to
-  `gs://$BUCKET/runs/<id>/ckpt/` and keep the last 2. LoRA adapters are
-  small. Full-FT SFT keeps one optimizer state for resume and deletes it when
-  the run finishes.
+- Every ~15 minutes (GRPO: every 25 steps, every 10 from v2; SFT: every 30 min by wall
+  clock, ADR-023), write to `gs://$BUCKET/runs/<id>/ckpt/` and keep the last 2. LoRA adapters
+  are small. Full-FT SFT keeps one ~22 GB optimizer state for resume, copied in a background
+  thread, and deletes it when the run finishes.
 - Preemption gives about 30 s notice. Don't rely on it; rely on the periodic
   checkpoints. On SIGTERM, flush metrics and write a `preempted` marker.
 - `ks launch --watch` relaunches a preempted run from its last checkpoint,

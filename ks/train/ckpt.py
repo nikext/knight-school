@@ -129,6 +129,15 @@ def prune(store: Store, root: str, keep: int) -> list[int]:
     return sorted(gone)
 
 
+def drop_all(store: Store, root: str) -> list[int]:
+    """Delete every checkpoint under root (SFT, once the final model is copied: TRAINING.md §7)."""
+    all_ = steps(store, root)
+    for names in all_.values():
+        for n in sorted(names, key=lambda n: not n.endswith(COMPLETE)):  # marker first, as in prune
+            store.rm(root, n)
+    return sorted(all_)
+
+
 def pull(store: Store, root: str, step: int, dest: Path) -> Path:
     """Copy checkpoint-<step> into dest/checkpoint-<step> and return that path."""
     out = dest / f"checkpoint-{step}"

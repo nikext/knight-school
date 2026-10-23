@@ -1,0 +1,25 @@
+# E3 primer-M SFT (task M4 §3-4): Qwen3.5-2B full fine-tune on primer-M (1.3M examples, 186.5M
+# tokens), ADR-023; then the final model on dev500 (the format check), test2000 and E0 (probe500).
+# Estimate (ADR-023): 4.6-6 h of training + boot, checkpoint writes and evals, ~$17-21.
+# max_hours 9 leaves room for a slower MFU; a cut-off run keeps its last 30-min checkpoint and
+# can be finished under a new id, as m3-e2-sparse-v2-r2 was.
+# Spot handling as in M3 (ADR-020): us-central1-c first, stockouts waited out for up to 12 h.
+id: m4-sft-primer-m
+milestone: M4
+description: "E3: primer-M SFT (full fine-tune), then dev500, test2000, probe500"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-c, europe-west4-a, us-central1-a]
+max_hours: 9
+max_attempts: 6
+stockout_wait_hours: 12
+run_budget_usd: 35
+boot_disk_gb: 200
+image: IMAGE_AFTER_BUILD
+command: "bash configs/jobs/m4-sft.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/sft.yaml"
+  TRAIN_SETS: "name=m4-sft-primer-m"
+  TEST_SET: "test2000"

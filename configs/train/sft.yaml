@@ -1,0 +1,25 @@
+# Primer SFT (TRAINING.md §5, task M4 §1, ADR-023): Qwen3.5-2B, full fine-tune of the language
+# model (fp32 master weights, bf16 autocast, AdamW), loss on the answer tokens only, primer-M
+# (1.3M examples, 186.5M tokens, 28.1M answer tokens), 1 epoch, lr 1e-5 cosine, 3% warmup.
+# Not packed: each optimizer step is a random sample of 1728 examples (~0.25M tokens), sorted by
+# length inside the step and cut into padded micro-batches of 64 (ADR-023).
+name: sft-primer-m
+model: qwen3.5-2b
+data: gs://knight-school-nt26-knight-school/data/v1/primer/M
+max_length: 2048
+
+learning_rate: 1.0e-5
+lr_scheduler: cosine
+warmup_ratio: 0.03
+weight_decay: 0.0
+max_grad_norm: 1.0
+epochs: 1
+step_examples: 1728
+micro_batch: 64
+gradient_checkpointing: true    # ~6-7 MiB/token of activations without it: 64 x 468 tokens would not fit (ADR-023)
+
+save_minutes: 30         # fp32 weights + AdamW state are ~22 GB per checkpoint (ADR-023)
+keep_last: 1
+probe_prompts: 32
+probe_max_tokens: 32
+seed: 2026

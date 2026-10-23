@@ -68,3 +68,11 @@ def test_pull_restores_the_tree(tmp_path: Path):
 def test_push_wants_a_checkpoint_dir(tmp_path: Path):
     with pytest.raises(ValueError):
         kc.push(kc.LocalStore(), tmp_path, str(tmp_path / "r"), keep=2)
+
+
+def test_drop_all_removes_every_checkpoint(tmp_path: Path):
+    store, root = kc.LocalStore(), str(tmp_path / "remote")
+    kc.push(store, make(tmp_path / "w", 10), root, keep=2)
+    kc.push(store, make(tmp_path / "w", 20), root, keep=2)
+    assert kc.drop_all(store, root) == [10, 20]
+    assert kc.latest(store, root) is None and store.names(root) == []
