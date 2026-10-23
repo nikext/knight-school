@@ -92,3 +92,4 @@
 {"ts":"2026-10-22T22:16:50Z","event":"end","id":"m3-e2-dense-v2","attempt":2,"hours":2.9464,"actual_usd":9.221,"status":"done","source":"gcs-marker","zone":"us-central1-a","note":"exit code 0"}
 {"ts":"2026-10-22T22:17:17Z","event":"start","id":"m3-e2-sparse-v2","attempt":1,"milestone":"M3","pool":"compute","kind":"gce-spot","machine":"a2-ultragpu-1g","zones":["us-central1-c","europe-west4-a","us-central1-a"],"max_hours":4.0,"price_per_hour":3.12961,"worst_case_usd":13.1444,"run_budget_usd":22.0,"approved":"user, in session 2026-10-22","contingency":false,"instance":"ks-m3-e2-sparse-v2-a1"}
 {"ts":"2026-10-22T22:17:17Z","event":"created","id":"m3-e2-sparse-v2","attempt":1,"instance":"ks-m3-e2-sparse-v2-a1","zone":"us-central1-c"}
+{"ts":"2026-10-23T03:11:54Z","event":"end","id":"m3-e2-sparse-v2","attempt":1,"hours":3.8844,"actual_usd":12.1568,"status":"failed","source":"gcs-marker","zone":"us-central1-c","note":"exit code 124"}

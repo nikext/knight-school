@@ -72,7 +72,7 @@ $/1k counts the 105 s of generation only; the job cost $0.13 with boot.
 | E2 base → GRPO sparse, v1 | 4–8% (point 6%); move acc 16–24%, legal ≥ 98% | not run: v1 dropped (ADR-021) | | | | $6.13, preempted to step 20 |
 | E2 base → GRPO dense, v1 | 7–14% (point 10%); move acc 22–32%, legal ≥ 99% | **23.8% [21.9, 25.7]** | 41.8% [40.3, 43.3] | 100.0% | — | $7.84 + $0.29 eval |
 | E2 base → GRPO dense, v2 | 22–33% (point 28%); see below | **27.2% [25.2, 29.1]** | 43.6% [42.1, 45.2] | 100.0% | reference for v2 arms; vs dense v1 +3.4 [1.8, 4.8] | $9.22 with both evals (attempt 1 a $0 stockout) |
-| E2 base → GRPO sparse, v2 | 16–30% (point 24%); see below | | | | | |
+| E2 base → GRPO sparse, v2 | 16–30% (point 24%); see below | not yet: stopped at step 186 by `max_hours` (below) | | | dev500, steps 100–150: −0.3 [−2.0, 1.4] | $12.16, no test eval |
 | E3 primer-M only | | | | | | |
 | E3 primer-M → GRPO sparse | | | | | | |
 | E3 primer-M → GRPO dense | | | | | | |
@@ -162,6 +162,28 @@ gain is +3.4 points [1.8, 4.8]: v2 alone solves 145 puzzles, v1 alone 78. The po
   stays frozen for comparability (ADR-021).
 - **The rest of the predictions:** completions stayed short (mean 10–32 tokens per step), and
   prose before `<answer>` stayed under 0.1% of completions, so my 25% bet on > 10% lost.
+
+**E2 sparse, config v2** (`m3-e2-sparse-v2`, `results/train/m3-e2-sparse-v2/`). Not finished.
+The job reached its 4-hour wall clock at step 186 of 200 (exit 124, not a preemption) after
+spending $12.16, so it has no test2000 number yet. Checkpoint 180 is complete in GCS.
+- **Up to step 150 it matched dense v2.** From step 30 to 150, dev500 ran 24.0–27.4% (dense v2:
+  21.6–28.8%). Paired on the same 500 puzzles and averaged over the six evals at steps 100–150,
+  sparse − dense = −0.3 points [−2.0, +1.4]. The −4 prediction missed: in this setup the dense
+  Stockfish reward adds nothing over the 0/1 move reward. The per-sample move-match rate in
+  training (T = 1) rose from 0.06 to about 0.5.
+- **Then it blew up into post-answer rambling.** At step 150, 1.6% of completions ran to the
+  1024-token cap. That share was 31% at step 155, 72% at step 160, and 86–93% from step 165 on,
+  with mean length about 950 tokens. Every logged completion from step 170 on closes `</answer>`
+  at character 11 and then writes a made-up "explanation" until the cap. The answer still
+  comes first, so reward, legal rate (~98%) and the chosen move barely changed, and dev500 only
+  slipped to 24.2%. Step time, though, went from ~40 s to ~170 s, and that is what used up the
+  4 hours. Logged entropy rose to ~0.89, all from the rambling. The coefficient sat at 0 and
+  ~90% of groups were dead.
+- **Nothing anchors the tokens after `</answer>`.** The reward never reads them, truncated
+  completions keep their reward (`mask_truncated: false`), and the KL term (β = 1e-3) is weak.
+  Each rambling completion's advantage is its answer's, spread over far more tokens. Dense v2
+  had the same 0.5–2% tail from step 85 and never took off. One run can't say why sparse took
+  off at step 150. The two arms share every other setting, so the trigger may just be chance.
 
 Figures: dev solve rate vs $ spent, all arms overlaid
 (`results/figures/e2e3_curves.png`), and per-bin solve rate
