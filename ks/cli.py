@@ -256,6 +256,23 @@ def rescore(
     typer.echo(paths[1].read_text())
 
 
+@app.command("compare")
+def compare(
+    results: Annotated[
+        list[Path], typer.Argument(help="Saved results/eval/<set>/<run>.json[.gz].")
+    ],
+    ref: Annotated[str, typer.Option(help="Run name (file stem) the others are compared with.")],
+) -> None:
+    """Paired solve-rate deltas against one run, and solve rates per rating bin ($0)."""
+    from ks.eval import compare as cmp
+    from ks.eval import report
+
+    loaded = {r.name.split(".json")[0]: report.read(r) for r in results}
+    if ref not in loaded:
+        raise typer.BadParameter(f"--ref {ref!r} is not one of {list(loaded)}")
+    typer.echo(cmp.markdown(loaded, ref))
+
+
 @app.command("primer-tokens")
 def primer_tokens(
     model: Annotated[str, typer.Argument(help="Profile of the chosen main model.")],

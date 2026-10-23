@@ -224,3 +224,18 @@ def test_rambling_after_the_answer_is_cut_and_not_truncated(puzzles):
     s = new["summary"]
     assert s["truncated"] == pytest.approx(1 / s["positions"])
     assert s["format"]["value"] > 0.95 and s["move_acc"]["value"] < 1.0
+
+
+def test_compare_counts_who_alone_solved_what(puzzles):
+    from ks.eval import compare
+
+    sol = _solutions(puzzles)
+    good = run(puzzles, lambda r: f"<answer>{sol[r.id]}</answer>")
+    bad = run(puzzles, lambda r: "<answer>Zz9</answer>")
+    d = compare.paired(good, bad)
+    assert d["n"] == 36 and d["a_only"] == 36 and d["b_only"] == 0
+    assert d["delta"]["value"] == 1.0
+    md = compare.markdown({"good": good, "bad": bad}, ref="bad")
+    assert (
+        "| good | 100.0% [100.0, 100.0] | +100.0" in md and "| 600-799 | 3 | 100.0% | 0.0% |" in md
+    )

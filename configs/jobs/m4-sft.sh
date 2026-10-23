@@ -2,7 +2,7 @@
 # Primer SFT job (task M4 §3-4), run inside the train image on one spot GPU:
 #   1. train: python -m ks.train.sft (resumes from the run's newest complete checkpoint);
 #   2. eval the final model on dev500 (the format check, TRAINING.md §5), then on $TEST_SET;
-#   3. E0 (probe500) on it.
+#   3. E0 (probe500) on it, and pass@8 on dev500 for it and for the base model.
 # Env: TRAIN_CONFIG, TRAIN_SETS ("key=value ..." passed as --set), MODEL (profile), TEST_SET
 # (default test2000; none skips it). A retry pulls the earlier attempts' /out and skips finished
 # steps, as m3-grpo.sh does. SIGTERM (preemption) is forwarded to the trainer, which exits 143
@@ -64,4 +64,7 @@ if [[ "$TEST_SET" != none ]]; then
     ks eval "$MODEL" --set "$TEST_SET" --ckpt "$ckpt" --run "$KS_RUN_ID" --out "$OUT/eval"
 fi
 step probe "$OUT/probe.log" ks eval "$MODEL" --set probe500 --ckpt "$ckpt" --run "$KS_RUN_ID" --out "$OUT/eval"
+# pass@k on dev500, 8 samples at T = 1 (task M4 §7): the primer model, and the base model for reference
+step pass8 "$OUT/pass8.log" ks eval "$MODEL" --set dev500 --n 8 --ckpt "$ckpt" --run "$KS_RUN_ID-pass8" --out "$OUT/eval"
+step pass8-base "$OUT/pass8-base.log" ks eval "$MODEL" --set dev500 --n 8 --run "$MODEL-pass8" --out "$OUT/eval"
 echo "[job] $(date -u +%FT%TZ) done"
