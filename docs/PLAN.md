@@ -13,13 +13,14 @@ merged PR whose description lists what was verified, the numbers, and the
 | M1 | Data: puzzles, splits, Stockfish rewards, primer | [M1](tasks/M1-data.md) | 1 | 0 | ✅ done | PR #2 · spent $0.02 compute (GCS storage) · 66,008 rl_train positions, SF19 N=1M, 99.7% agree · primer S 130k / M 1.3M · 0 contamination |
 | M2 | Eval harness, container, model choice, baselines (E0, E1) | [M2](tasks/M2-evals-baselines.md) | 15 | 50 | ✅ done | PR #3 · spent $4.85 compute, $0 vertex · main model Qwen3.5-2B, non-thinking (ADR-011, ADR-017) · E1 base 4.1% solve, 96.4% legal · Stockfish 1 node 68.6% · Gemini rows pending until 2026-11-13 |
 | M3 | GRPO pipeline, RL on base (E2), re-plan | [M3](tasks/M3-grpo.md) | 70 | 0 | ✅ done | PR #4 · spent $50.15 compute, $0 vertex · config v2 frozen (ADR-021, adaptive entropy) · E2 test2000: dense v2 27.2%, sparse v2 23.5%, dense v1 23.8% (base 4.1%) · post-answer rambling flaw found, v3 proposed |
-| M4 | Primer SFT → GRPO, the main result (E3) | [M4](tasks/M4-primer.md) | 100 | 0 | 🟨 in progress | config v3 adopted (ADR-022); E2 dense and sparse re-run under v3 |
+| M4 | Primer SFT → GRPO, the main result (E3) | [M4](tasks/M4-primer.md) | 100 | 0 | 🟨 in progress | config v3 adopted (ADR-022) · E2 dense v3 25.8% (H1 reference) · primer-M SFT running |
 
-> **Next up (M4):** before the first launch, decide config v3 with the user: v2 plus generation
-> stopped at `</answer>` (ADR-021, "Observed in `m3-e2-sparse-v2`"). Under v2, any arm can tip
-> into post-answer rambling to the cap, which costs ~4× per step and freezes the answers. If v3 is
-> adopted, verify the TRL 1.16 stop-string path, smoke it on the laptop, and re-run E2 dense
-> under v3 (~$9) as the H1 comparator.
+> **Next up (M4):** config v3 adopted (ADR-022). E2 dense v3 done: test2000 25.8% [23.9, 27.8],
+> the H1 reference ($10.19). `m4-sft-primer-m` launched 2026-10-23 12:30Z (approved; T8 stop rule
+> in RESULTS.md). When it ends: check dev500 format ≥ 50% (else T8), pull its evals, then ask the
+> user before each of `m4-e3-dense`, `m4-e3-sparse` and `m4-e2-sparse-v3` (run configs ready).
+> Then the paired deltas vs dense v3 (`ks compare`), `ks bins-figure`, the four-arm dev-vs-$
+> figure, pass@8, the H1/H2/H5 verdicts and an ADR for the main result.
 | M5 | Scaling and ablations (E4, E5) | [M5](tasks/M5-scaling-ablations.md) | 110 | 110* | ⬜ todo | |
 | M6 | Release and showcase | [M6](tasks/M6-release.md) | 9 | 4 | ⬜ todo | |
 | | contingency (user approval only) | | 50 | 15 | | |
