@@ -27,8 +27,10 @@ RESULTS = REPO / "results" / "train"
 FIGURES = REPO / "results" / "figures"
 SAMPLE_STEPS = (1, 25, 50, 100, 150, 200)
 
-# reference palette, categorical slots 1-2, and neutral ink (dataviz skill)
-ARM_COLORS = {"dense": "#2a78d6", "sparse": "#eb6834"}
+# reference palette (dataviz skill): categorical slots in fixed order, one per run as listed,
+# and neutral ink. Slots 1-3 validate all-pairs on SURFACE; slot 3 is under 3:1 contrast, so
+# the legend and end-of-line labels carry identity too.
+SERIES = ("#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948")
 INK, INK_2, GRID, SURFACE = "#0b0b0b", "#52514e", "#e4e3df", "#fcfcfb"
 
 
@@ -114,10 +116,6 @@ def _style(ax: Any) -> None:
     ax.set_axisbelow(True)
 
 
-def _arm(run_id: str) -> str:
-    return "sparse" if "sparse" in run_id else "dense"
-
-
 def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> list[Path]:
     """Dev solve rate vs dollars (all runs on one axis) and reward components vs step."""
     import matplotlib
@@ -125,15 +123,18 @@ def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> l
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
+    if len(run_ids) > len(SERIES):
+        raise ValueError(f"at most {len(SERIES)} runs per figure; split them into several")
     FIGURES.mkdir(parents=True, exist_ok=True)
     runs = {r: (RESULTS / r) for r in run_ids}
+    color = dict(zip(run_ids, SERIES, strict=False))
     paths = []
 
     fig, ax = plt.subplots(figsize=(6.4, 4.0), facecolor=SURFACE)
     _style(ax)
     for r, d in runs.items():
         dev = pl.read_csv(d / "dev.csv")
-        c = ARM_COLORS[_arm(r)]
+        c = color[r]
         ax.fill_between(
             dev["usd_cum"], dev["solve_lo"] * 100, dev["solve_hi"] * 100, color=c, alpha=0.15, lw=0
         )
@@ -167,28 +168,27 @@ def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> l
     plt.close(fig)
     paths.append(p)
 
-    panels = [
-        ("task reward (mean)", None),
-        ("legal_rate", "legal rate"),
-        ("format_rate", "format rate"),
-        ("len_mean", "completion tokens (mean)"),
-        ("prose_frac", "share with prose before <answer>"),
-        ("kl", "KL to the base policy"),
+    panels = [  # (column, title, log y)
+        ("sparse_mean", "move-match rate in training (T = 1)", False),
+        ("legal_rate", "legal rate", False),
+        ("format_rate", "format rate", False),
+        ("len_mean", "completion tokens (mean, log)", True),
+        ("clipped", "share truncated at max tokens", False),
+        ("prose_frac", "share with prose before <answer>", False),
+        ("entropy", "mean token entropy", False),
+        ("frac_zero_std", "share of groups with no reward spread", False),
+        ("kl", "KL to the base policy (log)", True),
     ]
-    fig, axes = plt.subplots(2, 3, figsize=(10, 5.4), facecolor=SURFACE)
-    for ax, (col, title) in zip(axes.flat, panels, strict=True):
+    fig, axes = plt.subplots(3, 3, figsize=(10, 7.6), facecolor=SURFACE)
+    for ax, (col, title, log) in zip(axes.flat, panels, strict=True):
         _style(ax)
         for r, d in runs.items():
             s = pl.read_csv(d / "steps.csv")
-            key = f"{_arm(r)}_mean" if col.startswith("task") else col
-            if key in s.columns:
-                ax.plot(s["step"], s[key], color=ARM_COLORS[_arm(r)], lw=1.5, label=r)
-        ax.set_title(
-            title or f"task reward ({'/'.join(sorted({_arm(r) for r in runs}))})",
-            color=INK,
-            fontsize=9,
-            loc="left",
-        )
+            if col in s.columns:
+                ax.plot(s["step"], s[col], color=color[r], lw=1.5, label=r)
+        if log:
+            ax.set_yscale("log")
+        ax.set_title(title, color=INK, fontsize=9, loc="left")
         ax.set_xlabel("step", color=INK_2, fontsize=8)
     axes.flat[0].legend(frameon=False, fontsize=7, labelcolor=INK)
     fig.tight_layout()

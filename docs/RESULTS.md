@@ -72,7 +72,7 @@ $/1k counts the 105 s of generation only; the job cost $0.13 with boot.
 | E2 base → GRPO sparse, v1 | 4–8% (point 6%); move acc 16–24%, legal ≥ 98% | not run: v1 dropped (ADR-021) | | | | $6.13, preempted to step 20 |
 | E2 base → GRPO dense, v1 | 7–14% (point 10%); move acc 22–32%, legal ≥ 99% | **23.8% [21.9, 25.7]** | 41.8% [40.3, 43.3] | 100.0% | — | $7.84 + $0.29 eval |
 | E2 base → GRPO dense, v2 | 22–33% (point 28%); see below | **27.2% [25.2, 29.1]** | 43.6% [42.1, 45.2] | 100.0% | reference for v2 arms; vs dense v1 +3.4 [1.8, 4.8] | $9.22 with both evals (attempt 1 a $0 stockout) |
-| E2 base → GRPO sparse, v2 | 16–30% (point 24%); see below | not yet: stopped at step 186 by `max_hours` (below) | | | dev500, steps 100–150: −0.3 [−2.0, 1.4] | $12.16, no test eval |
+| E2 base → GRPO sparse, v2 | 16–30% (point 24%); see below | **23.5% [21.6, 25.4]** | 38.7% [37.2, 40.3] | 98.1% | −3.6 [−4.9, −2.4] at step 200; dev500 steps 100–150: −0.3 [−2.0, 1.4] | $12.16 + $5.35 (resumed from step 180 as `-r2`) |
 | E3 primer-M only | | | | | | |
 | E3 primer-M → GRPO sparse | | | | | | |
 | E3 primer-M → GRPO dense | | | | | | |
@@ -163,30 +163,57 @@ gain is +3.4 points [1.8, 4.8]: v2 alone solves 145 puzzles, v1 alone 78. The po
 - **The rest of the predictions:** completions stayed short (mean 10–32 tokens per step), and
   prose before `<answer>` stayed under 0.1% of completions, so my 25% bet on > 10% lost.
 
-**E2 sparse, config v2** (`m3-e2-sparse-v2`, `results/train/m3-e2-sparse-v2/`). Not finished.
-The job reached its 4-hour wall clock at step 186 of 200 (exit 124, not a preemption) after
-spending $12.16, so it has no test2000 number yet. Checkpoint 180 is complete in GCS.
-- **Up to step 150 it matched dense v2.** From step 30 to 150, dev500 ran 24.0–27.4% (dense v2:
-  21.6–28.8%). Paired on the same 500 puzzles and averaged over the six evals at steps 100–150,
-  sparse − dense = −0.3 points [−2.0, +1.4]. The −4 prediction missed: in this setup the dense
-  Stockfish reward adds nothing over the 0/1 move reward. The per-sample move-match rate in
-  training (T = 1) rose from 0.06 to about 0.5.
-- **Then it blew up into post-answer rambling.** At step 150, 1.6% of completions ran to the
-  1024-token cap. That share was 31% at step 155, 72% at step 160, and 86–93% from step 165 on,
-  with mean length about 950 tokens. Every logged completion from step 170 on closes `</answer>`
-  at character 11 and then writes a made-up "explanation" until the cap. The answer still
-  comes first, so reward, legal rate (~98%) and the chosen move barely changed, and dev500 only
-  slipped to 24.2%. Step time, though, went from ~40 s to ~170 s, and that is what used up the
-  4 hours. Logged entropy rose to ~0.89, all from the rambling. The coefficient sat at 0 and
-  ~90% of groups were dead.
+**E2 sparse, config v2** (`m3-e2-sparse-v2`, finished as `m3-e2-sparse-v2-r2`;
+`results/eval/test2000/m3-e2-sparse-v2-r2.md`, `results/train/m3-e2-sparse-v2/`, which merges both
+ids). test2000: 23.5% [21.6, 25.4] solve, 38.7% move accuracy, 98.1% legal, puzzle rating 917
+[873, 958]. Paired against dense v2 it is −3.6 points [−4.9, −2.4], against dense v1 −0.3
+[−2.0, +1.5], and against the base model +19.4 [+17.5, +21.3]. The first job reached its 4-hour
+wall clock at step 186 (exit 124, not a preemption; $12.16). `m3-e2-sparse-v2-r2` resumed from a
+server-side copy of checkpoint 180 and ran steps 181–200 plus test2000 ($5.35). Steps 181–186
+were therefore paid for twice (~$0.9). The committed eval file cuts each response to its first
+300 characters to fit the repo's 1 MB limit. Its header explains the cut, and the full file
+stays in GCS until M6.
+- **Point predictions met, but for the wrong reason.** The 24% point and the −4 gap vs dense
+  both landed (my "CI may include 0" didn't: it doesn't). But up to step 150 sparse matched dense.
+  From step 30 to 150, dev500 ran 24.0–27.4% for sparse and 21.6–28.8% for dense v2. Paired on the
+  same 500 puzzles and averaged over the six evals at steps 100–150, sparse − dense = −0.3 points
+  [−2.0, +1.4]. The step-200 gap comes from what happened after step 150, not from the reward.
+  While both arms were healthy, the dense Stockfish reward added nothing over the 0/1 move reward.
+  The per-sample move-match rate in training (T = 1) rose from 0.06 to 0.44–0.47 (mean over steps 151–200) in all three runs.
+- **From step 150 it blew up into post-answer rambling.** At step 150, 1.6% of completions ran to
+  the 1024-token cap. That share was 31% at step 155, 72% at step 160, and 83–96% from step 165 to
+  200, with mean length about 950 tokens. Every logged completion from step 170 on closes
+  `</answer>` at character 11 and then writes a made-up "explanation" until the cap. Under greedy
+  decoding it is the same: 99.8% of test2000 answers hit the cap, so the eval took 369 s instead
+  of 26 s. Step time went from ~40 s to 170–210 s, which is what used up the first job's
+  4 hours. Logged entropy rose to ~0.9, all of it from the rambling. The coefficient sat at 0 and
+  ~90% of groups were dead. A smaller episode at steps 45–60 (up to 10% truncated) had recovered.
+- **The rambling froze the answer.** Between dev evals at steps 140 and 150, 99 of 1163 greedy
+  answers changed. Between 160 and 170 it was 11, and from 170 to 200 it was 2–4 per 10 steps.
+  dev500 read 24.2% at all five evals from step 160 to 200. This fits the loss arithmetic. The
+  DAPO loss averages over every completion token, and the ~5 answer tokens are ~0.5% of a
+  1024-token completion, so the move choice got almost none of the gradient. The tail cost time
+  and also stopped learning. Answers came out slightly worse too: legal 98.1% against 100%, and
+  move accuracy 38.7% against dense v2's 43.6%.
 - **Nothing anchors the tokens after `</answer>`.** The reward never reads them, truncated
   completions keep their reward (`mask_truncated: false`), and the KL term (β = 1e-3) is weak.
   Each rambling completion's advantage is its answer's, spread over far more tokens. Dense v2
-  had the same 0.5–2% tail from step 85 and never took off. One run can't say why sparse took
-  off at step 150. The two arms share every other setting, so the trigger may just be chance.
+  had the same 0.5–2% tail from step 85 and never took off. With one run per arm, I can't say
+  why sparse took off at step 150 and dense didn't. The arms share every other setting, so it
+  may be chance.
 
-Figures: dev solve rate vs $ spent, all arms overlaid
-(`results/figures/e2e3_curves.png`), and per-bin solve rate
+**E2 reading.** GRPO on the base model lifts test2000 solve from 4.1% to 23.5–27.2% under every
+reward and config tried (dense v1 23.8%, dense v2 27.2%, sparse v2 23.5%). dev500 reaches its
+plateau by step ~25 (about $2) and stays at 21.6–29.0% from there to step 200. Neither more learning signal
+(v2's entropy control) nor a denser reward lifted that plateau while the runs were healthy.
+E0 didn't move either. That is the starting point H1 tests. The open problem for M4 is
+the post-answer tail in config v2, which cost sparse its last 50 steps and pulled dense v2's
+entropy controller off.
+
+Figures (E2): dev500 solve rate vs dollars spent for all three runs
+(`results/figures/e2_dev_vs_usd.png`), and training metrics per step: move-match rate, legal and
+format rates, length, truncated share, prose share, entropy, dead groups and KL
+(`results/figures/e2_components.png`). M4 adds the E3 arms and a per-bin figure
 (`results/figures/e3_bins.png`).
 
 ## E4: primer scaling (test2000, GRPO dense)

@@ -499,6 +499,16 @@ where none of those metrics look. From about step 85, 0.5–2% of completions ra
 1024-token cap after a valid answer. TRL's controller measures a token-weighted entropy over the
 whole step, and these completions carried ~40% of the tokens. They held it above target, so the
 coefficient sat near 0 for steps 94–135, and dead groups climbed back to 70–80%. Test2000 was
-still 27.2% (+3.4 [1.8, 4.8] paired vs v1) on the same dev plateau. v2 stays frozen so the
-E2/E3 arms stay comparable. The fix, if a later milestone has the budget: a `</answer>` stop
-string, or masking post-answer tokens from the loss and the controller.
+still 27.2% (+3.4 [1.8, 4.8] paired vs v1) on the same dev plateau.
+**Observed in `m3-e2-sparse-v2`** (RESULTS.md, E2 sparse v2): the same tail took over. Truncated
+completions went from 1.6% at step 150 to 72% at step 160 and 83–96% after that. Step time rose
+from ~40 s to 170–210 s, so the first job ran out of `max_hours` at step 186. The greedy answers
+froze: 2–4 of 1163 dev answers changed per 10 steps, because the ~5 answer tokens are ~0.5% of a
+1024-token completion under DAPO's token mean. test2000 came out at 23.5%, −3.6 [−4.9, −2.4]
+vs dense v2 at step 200, although the two arms were equal on dev500 to step 150.
+**So v2 has a real flaw for M4:** any arm can tip into this regime at random, which costs ~4× per
+step and stops learning. The candidate fix, config v3, is v2 plus generation stopped at
+`</answer>` (a stop string, kept in the output). It is to be decided by the user before M4's
+first launch, and is not adopted here. v3 changes what the loss sees, so a clean H1 comparison
+would need E2 dense re-run under v3 (~$9). Verify first that TRL 1.16 passes stop strings to
+vLLM in colocate mode.

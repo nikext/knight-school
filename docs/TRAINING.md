@@ -100,9 +100,11 @@ each component separately.
 - **Frozen config:** `configs/train/grpo.yaml`, v1 by ADR-019, revised once to v2 by
   ADR-021 (its step-50 check passed in `m3-e2-dense-v2`). Clip-higher (`epsilon_high`)
   is a no-op in this setup: one optimizer pass per generation batch keeps the PPO ratio at 1.
-  Known limitation of v2: TRL's controller measures token-weighted entropy, so the ~1% of
-  completions that keep generating after `</answer>` up to the cap can hold it above target
-  and switch the bonus off (ADR-021, observed from step ~90).
+  Known limitation of v2: nothing stops generation after `</answer>`. In dense v2, the ~1% of
+  completions that ran on to the cap held TRL's token-weighted entropy above target and
+  switched the bonus off from step ~90. In sparse v2 that tail grew to ~90% of completions
+  after step 150, steps took ~4× longer, and the answers stopped changing. A v3 with a
+  `</answer>` stop string is proposed for M4 (ADR-021).
 
 - **Logging per step:** each reward component (mean and std), legal rate,
   format rate, completion length (mean and p95), KL, entropy, generation and

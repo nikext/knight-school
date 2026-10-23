@@ -115,6 +115,12 @@ stockouts (E2 sparse under v1 reached step 20 for $6.13). Config v2 adds one den
 M3 is now expected at ~$40–48 of its $70: dense v2 and sparse v2 at ~$8–9 each plus preemption
 overhead. No allocation changes.
 
+**M3 final (2026-10-23):** **$50.15 of $70.** Dense v2 cost $9.22 with both evals. Sparse v2
+cost $17.51 in total ($12.16 + $5.35 to resume from step 180), because its last 50 steps ran
+with completions at the 1024-token cap. A GRPO step costs ~$0.035 at ~40 s with short answers
+and ~$0.15 at ~175 s when completions ramble to the cap. M4 planning should assume the healthy
+rate only if v3 (ADR-021) is adopted. Under v2, budget a 200-step run at up to ~$18.
+
 ## 3. Guardrails, outermost first
 
 1. **Burn-rate cap via quota.** The project's GPU quota is 1
