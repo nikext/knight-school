@@ -130,6 +130,11 @@ each component separately.
   listed by python-chess, still teacher-free). Record it in an ADR. The
   format reward then handles the rest.
 
+**T8 used in M4 (ADR-024):** primer-M alone broke the RL format (probe format 0.00 at the first
+checkpoint: bare moves). T8 = 26k copies of T5 examples (2%) asked with the RL prompt and
+answered `<answer>SAN</answer>`, with **no** think block, so the primer arms get no prompt scaffold
+the E2 arms lack. Built by `ks data primer_t8` into `data/primer/M-t8` (primer-M + one shard).
+
 **Built in M4 (ADR-023):** `ks.train.sft`, `configs/train/sft.yaml`, job `configs/jobs/m4-sft.sh`.
 fp32 master weights with bf16 autocast, every language-model parameter trained (the vision tower
 frozen). **Not packed:** each optimizer step is a random sample of 1,728 examples (~0.25M tokens),

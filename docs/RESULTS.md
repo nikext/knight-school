@@ -274,6 +274,24 @@ primer is supervised move imitation as well as rules teaching.
   `<answer>` < 2%, truncation ≤ 1%.
 - **Cost:** SFT job 4.5–7 h, $15–23 (point $19); each primer → GRPO arm $7–10.
 
+**E3 primer SFT, attempt with primer-M alone (`m4-sft-primer-m`, stopped).** The format broke as
+feared: the probe scored format 1.00 at step 0 and **0.00** at the first checkpoint (step 53),
+answering with bare moves (`Qxh2#`). Loss 0.83 → 0.56 and answer-token accuracy 71% → 80% from
+step 25 to step 75. The rule above said stop after two failed checkpoints. The user asked for
+anything that speeds M4 up, so it stopped after one, at ~step 95 ($4.16). The T8 fallback
+(ADR-024) follows: primer-M plus 26k RL-format copies of T5 examples, answered
+`<answer>SAN</answer>`, with no think block.
+
+**T8 predictions** (written 2026-10-23, before `m4-sft-primer-m-t8`'s first checkpoint; no
+model has trained on T8 yet). The E3 predictions above stand for the primer-M + T8 model, as the
+"if the format holds" case.
+- **Format:** probe format ≥ 50% at the first checkpoint, 85%; ≥ 90% there, 65%. Final dev500
+  format ≥ 95%, 80%. 2% is ~35 examples per optimizer step, each with the instruction line that
+  tells the two formats apart.
+- **Primer content:** T8 repeats moves T5 already teaches, so loss and answer accuracy on the
+  other tasks track the stopped run to within noise at matching steps (e.g. ~0.56 / ~80% near
+  step 75).
+
 Figures (E2): dev500 solve rate vs dollars spent for all three runs
 (`results/figures/e2_dev_vs_usd.png`), and training metrics per step: move-match rate, legal and
 format rates, length, truncated share, prose share, entropy, dead groups and KL

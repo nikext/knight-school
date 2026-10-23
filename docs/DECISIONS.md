@@ -617,3 +617,37 @@ things the plan didn't foresee.
 backward), so ~2.2e18 FLOPs. At 32–42% MFU on the A100 that's 4.6–6 h, plus boot, checkpoint
 writes and evals: **~$17–21** (BUDGET.md §2 had $21–31). The run measures it. The same trainer
 runs E4 (primer-S) and E5a (rules-only) with only `data` changed.
+
+### ADR-024: T8 fallback for the primer SFT: 2% RL-format copies of T5, answer only
+**Status:** accepted (2026-10-23, M4; the user approved the rerun)
+**Context:** `m4-sft-primer-m` trained on primer-M as planned (ADR-023): ~30 s per step,
+8.3k tok/s, loss 0.83 → 0.56 and answer-token accuracy 71% → 80% from step 25 to step 75. Its
+probe of the RL prompt (32 dev500 positions) scored format 1.00 at step 0, but **0.00** at the
+first checkpoint (step 53). The model answered the RL prompt with a bare move (`Qxh2#`), the way
+the 390k T5 "Best move?" examples are answered. The two prompts differ only in their last line,
+and none of the 1.3M primer examples shows the answer tags. The pre-registered rule (RESULTS.md,
+E3) was to stop after two such checkpoints in a row. The user asked for anything that speeds
+M4 up, so the run was stopped after the first one, at ~step 95 (13:47Z, $4.16). TRAINING.md §5
+planned the T8 fallback for this case.
+**Decision:**
+- **T8 = 26,000 examples (2% of primer-M's count), added to primer-M.** Each is a copy of a T5
+  example drawn at random (seed 2034; 13,057 from puzzle positions, 12,943 from eval-DB
+  positions). It keeps the T5 example's position and move, and only the user turn changes: the RL
+  prompt's instruction (`ks.chess.prompt.user_text`, prompt hash `c728de49e119`) replaces
+  "Best move?". The answer is `<answer>SAN</answer>`. The T5 originals stay in the data, so the
+  model sees each pair of instructions with its own format. `data/primer/M-t8` holds primer-M's
+  26 shards byte for byte, plus `shard-00026` with the T8 examples (manifest `primer_M-t8`,
+  0 contamination hits).
+- **No think block (a deviation from §5),** which proposed a short templated think block that
+  lists checks, captures and threats from python-chess. Under config v3 every RL arm and the
+  base model already answer the RL prompt as `<answer>SAN</answer>` with no thinking (E2 v3:
+  ~9 tokens). The step-0 probe of the base model did the same. A templated think block would
+  hand the primer arms a list of checks and captures at inference time that the E2 arms don't
+  get. The H1 difference would then mix the primer's knowledge with that prompt scaffold. The
+  answer-only T8 adds no move and no position that T5 doesn't already have, only the format.
+- **Same run otherwise:** the same image (`train:1a92ddf79865`), config and seed as
+  `m4-sft-primer-m`. Only `data` and the run name change (`m4-sft-primer-m-t8`). The stop rule
+  carries over: probe format < 50% at two checkpoints in a row → stop and ask the user.
+**Consequences:** the primer arms of E3 start from `m4-sft-primer-m-t8`, and the write-up calls
+the primer "primer-M + T8". The rerun costs another ~$21; the stopped attempt cost $4.16. If the
+format still breaks with 2%, the next step is a larger T8 share. That needs the user's yes.
