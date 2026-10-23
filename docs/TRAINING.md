@@ -203,7 +203,9 @@ RL removed this in ~10 steps: by step 13 the mean length was 18 tokens, legal 87
 - **M3 additions** (ADR-018): `flash-linear-attention`/`fla-core` 0.5.2 (Triton kernels for
   Qwen3.5's DeltaNet layers in training) and `tensorboardX` 2.6.5. TRL 1.16.0 was still the
   newest release on 2026-10-22, so the pins are unchanged.
-- **Current image (M4, config v3 runs, ADR-022):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:91af7e44bf9f@sha256:c377f7f110a18a69acf5361c37e267f4a8e3641f7e50b3a2a0f141854f106e48`
+- **SFT image (M4, primer SFT and the E3 arms, ADR-023):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:1a92ddf79865@sha256:d8ebb5f19ae14b1a3ddc10fc7122c0b604166e6797ce1d2721939ef350da18f2`
+  (built 2026-10-23 from 1a92ddf, 11 min 27 s on Cloud Build; adds `ks.train.sft` and the pass@8 job step; GRPO code as in 91af7e4).
+- **E2 v3 image (M4, ADR-022):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:91af7e44bf9f@sha256:c377f7f110a18a69acf5361c37e267f4a8e3641f7e50b3a2a0f141854f106e48`
   (built 2026-10-23 from 91af7e4, 11 min 32 s on Cloud Build).
 - **M3 image (config v2 runs, ADR-021):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:35e9bf043759@sha256:8808004de26e22080fbc678338d6871a15af1f831588ce8c27a45782f0b0e01e`
   (built 2026-10-22 from 35e9bf0, 12 min 54 s on Cloud Build).
