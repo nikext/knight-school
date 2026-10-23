@@ -1,0 +1,22 @@
+# E2 base -> GRPO sparse (task M3 §8): Qwen3.5-2B, the frozen config (configs/train/grpo.yaml,
+# ADR-019), task reward = sparse, 200 steps on one spot A100 80GB. Dev500 every 25 steps; then the
+# final merged model on test2000. Approved by the user 2026-10-22 (with dense).
+# Expected ~2-4 h, $6-13 (ADR-019); max_hours 5 caps an arm that grows long reasoning.
+id: m3-e2-sparse
+milestone: M3
+description: "E2: base -> GRPO sparse, 200 steps, frozen config"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-a, us-central1-c, europe-west4-a, europe-west4-b]
+max_hours: 5
+max_attempts: 3
+run_budget_usd: 25
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:25b5dd417d43@sha256:b1127f781cb392cf18aa545759c02d90763c1d2403645a36a4f10c95f5004606
+command: "bash configs/jobs/m3-grpo.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/grpo_sparse.yaml"
+  TRAIN_SETS: "name=m3-e2-sparse"
+  TEST_SET: "test2000"

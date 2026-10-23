@@ -129,7 +129,13 @@ def created(id: str, *, attempt: int = 1, ts: datetime | None = None) -> Created
 
 
 def end(
-    id: str, usd: float, *, attempt: int = 1, ts: datetime | None = None, status: str = "done"
+    id: str,
+    usd: float,
+    *,
+    attempt: int = 1,
+    ts: datetime | None = None,
+    status: str = "done",
+    note: str | None = None,
 ) -> EndEvent:
     return EndEvent(
         ts=ts or NOW - timedelta(hours=1),
@@ -139,6 +145,7 @@ def end(
         actual_usd=usd,
         status=status,
         source="test",
+        note=note,
     )
 
 

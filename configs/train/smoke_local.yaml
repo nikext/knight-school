@@ -1,0 +1,18 @@
+# Laptop wiring test (task M3 §3): RTX 3060 6 GB, Qwen3.5-0.8B, a few tiny steps. Not an arm;
+# its numbers mean nothing. Local data, local checkpoint root (same code path as GCS).
+base: grpo_dense.yaml
+name: smoke-local
+model: qwen3.5-0.8b
+data: data/positions/rl_train.parquet
+positions: 64
+prompts_per_step: 4
+generations: 4
+micro_batch: 4
+max_completion: 64
+steps: 4
+warmup_steps: 1
+eval_every: 2
+eval_limit: 10
+save_every: 2
+vllm_mem: 0.45   # 0.3 leaves no KV cache on the 6 GB card
+samples_per_step: 4

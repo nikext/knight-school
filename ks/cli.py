@@ -88,10 +88,10 @@ def launch(
         approved=approved,
     )
     _echo(res.lines)
-    if not res.ok:
+    if watch and (res.ok or (res.stockout and run.stockout_wait_hours > 0)):
+        _watch(run, interval, approved)  # it also waits out a first-attempt stockout (ADR-020)
+    elif not res.ok:
         raise typer.Exit(2)
-    if watch:
-        _watch(run, interval, approved)
 
 
 def _watch(run: cfg.RunConfig, interval: float, approved: str) -> None:
@@ -269,6 +269,42 @@ def primer_tokens(
         typer.echo(
             f"primer-{name}: {c['examples']:,} examples, {c['total']:,} tokens, {c['answer']:,} answer tokens"
         )
+
+
+@app.command("train-report")
+def train_report(
+    run_id: Annotated[str, typer.Argument(help="Run id, e.g. m3-e2-dense.")],
+    local: Annotated[
+        Path | None, typer.Option(help="A local out/ dir instead of the run's GCS attempts.")
+    ] = None,
+    continued_by: Annotated[
+        list[str] | None,
+        typer.Option(help="Run ids that finished this run from a copy of its checkpoint."),
+    ] = None,
+) -> None:
+    """Collect a GRPO run's metrics into results/train/<id>/ (steps.csv, dev.csv, run.json)."""
+    from ks.train import report as tr
+
+    if local:
+        counts = tr.collect([[local]], tr.RESULTS / run_id)
+    else:
+        counts = tr.pull(run_id, _env("BUCKET")["BUCKET"], continued_by=tuple(continued_by or ()))
+    typer.echo(f"results/train/{run_id}: {counts}")
+
+
+@app.command("train-figures")
+def train_figures(
+    run_ids: Annotated[list[str], typer.Argument(help="Runs under results/train/.")],
+    name: Annotated[str, typer.Option(help="Figure file prefix in results/figures/.")],
+    base_solve: Annotated[
+        float | None, typer.Option(help="The base model's dev solve rate (a reference line).")
+    ] = None,
+) -> None:
+    """Dev solve rate vs $ and reward components vs step, for one or more runs."""
+    from ks.train import report as tr
+
+    for p in tr.figures(run_ids, name, base_solve):
+        typer.echo(str(p))
 
 
 def _fetch_ckpt(ckpt: str) -> str:

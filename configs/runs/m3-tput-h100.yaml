@@ -1,0 +1,24 @@
+# M3 throughput (task M3 §5): the frozen dense config (max_completion 1024, user's choice
+# 2026-10-22) for 20 steps on one spot H100 80GB, on the image with per-chunk padding trimming
+# (ADR-019). m3-tput-a100 and m3-tput-h100 run the same config, seed and data, so their step times
+# compare directly; the machine is picked by $/step. No post-training eval.
+# 14 steps, not 20: m3-tput-a100 reached step 14 before its 1 h limit (the first ~10 steps take
+# ~150 s on the A100), so steps 1-14 are the comparison window.
+id: m3-tput-h100
+milestone: M3
+description: "GRPO throughput, a3-highgpu-1g: 20 steps of the frozen dense config"
+machine: a3-highgpu-1g
+gpus: 1
+zones: [us-central1-a, us-central1-b, us-central1-c]
+max_hours: 1.0
+max_attempts: 2
+run_budget_usd: 13.25
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:1551764c3907@sha256:3971a429276c349e4e9cca6874f083005b7d07d9ef91aed8d35a26b79c8c7ed3
+command: "bash configs/jobs/m3-grpo.sh"
+env:
+  KS_PRICE_PER_HOUR: "6.304"  # us-central1 spot H100 + 200 GB boot disk (europe-west4 is $8.44/h, left out)
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/grpo_dense.yaml"
+  TRAIN_SETS: "name=m3-tput-h100 steps=14 eval_every=10 save_every=10"
+  TEST_SET: "none"

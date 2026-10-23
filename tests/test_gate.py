@@ -246,6 +246,51 @@ def test_retry_beyond_max_attempts_is_refused():
     assert refused_because(res, "exceeds max_attempts 3")
 
 
+def stockouts(run_id: str, first: int, n: int) -> list:
+    """n $0 stockout attempts (start + end) numbered from `first`."""
+    events = []
+    for a in range(first, first + n):
+        events += [
+            f.start(run_id, attempt=a, worst=1),
+            f.end(run_id, 0.0, attempt=a, status="not-created", note="stockout"),
+        ]
+    return events
+
+
+def test_stockout_attempts_do_not_use_up_max_attempts():
+    led = f.ledger(
+        f.start("m3-e2-dense-r1", worst=1, budget=500.0),
+        f.end("m3-e2-dense-r1", 0.1, status="preempted"),
+        *stockouts("m3-e2-dense-r1", 2, 5),
+    )
+    passed(check(ledger=led, attempt=7, caps=f.caps(remaining_usd=1000)))  # VM 2 of 3
+
+
+def test_vms_count_against_max_attempts_across_stockouts():
+    led = f.ledger(
+        f.start("m3-e2-dense-r1", worst=1, budget=500.0),
+        f.end("m3-e2-dense-r1", 0.1, status="preempted"),
+        *stockouts("m3-e2-dense-r1", 2, 2),
+        f.start("m3-e2-dense-r1", attempt=4, worst=1),
+        f.end("m3-e2-dense-r1", 0.1, attempt=4, status="preempted"),
+        f.start("m3-e2-dense-r1", attempt=5, worst=1),
+        f.end("m3-e2-dense-r1", 0.1, attempt=5, status="preempted"),
+    )
+    res = check(ledger=led, attempt=6, caps=f.caps(remaining_usd=1000))
+    assert refused_because(res, "would be VM 4, which exceeds max_attempts 3")
+
+
+def test_attempts_have_a_hard_cap_even_when_all_stocked_out():
+    n = gate.MAX_LEDGER_ATTEMPTS
+    led = f.ledger(
+        f.start("m3-e2-dense-r1", worst=1, budget=500.0),
+        f.end("m3-e2-dense-r1", 0.0, status="not-created", note="stockout"),
+        *stockouts("m3-e2-dense-r1", 2, n - 1),
+    )
+    res = check(ledger=led, attempt=n + 1, caps=f.caps(remaining_usd=1000))
+    assert refused_because(res, f"exceeds the hard cap of {n}")
+
+
 def test_retry_while_previous_attempt_is_open_is_refused():
     led = f.ledger(f.start("m3-e2-dense-r1", worst=31.5, budget=100.0))
     res = check(ledger=led, attempt=2)

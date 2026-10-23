@@ -12,8 +12,14 @@ merged PR whose description lists what was verified, the numbers, and the
 | M0 | Bootstrap and money guardrails | [M0](tasks/M0-bootstrap.md) | 5 | 1 | ✅ done | PR #1 · spent $0.08 compute, $0.000001 vertex · L4 smoke passed (r2); kill switch tested |
 | M1 | Data: puzzles, splits, Stockfish rewards, primer | [M1](tasks/M1-data.md) | 1 | 0 | ✅ done | PR #2 · spent $0.02 compute (GCS storage) · 66,008 rl_train positions, SF19 N=1M, 99.7% agree · primer S 130k / M 1.3M · 0 contamination |
 | M2 | Eval harness, container, model choice, baselines (E0, E1) | [M2](tasks/M2-evals-baselines.md) | 15 | 50 | ✅ done | PR #3 · spent $4.85 compute, $0 vertex · main model Qwen3.5-2B, non-thinking (ADR-011, ADR-017) · E1 base 4.1% solve, 96.4% legal · Stockfish 1 node 68.6% · Gemini rows pending until 2026-11-13 |
-| M3 | GRPO pipeline, RL on base (E2), re-plan | [M3](tasks/M3-grpo.md) | 70 | 0 | ⬜ todo | |
+| M3 | GRPO pipeline, RL on base (E2), re-plan | [M3](tasks/M3-grpo.md) | 70 | 0 | ✅ done | PR #4 · spent $50.15 compute, $0 vertex · config v2 frozen (ADR-021, adaptive entropy) · E2 test2000: dense v2 27.2%, sparse v2 23.5%, dense v1 23.8% (base 4.1%) · post-answer rambling flaw found, v3 proposed |
 | M4 | Primer SFT → GRPO, the main result (E3) | [M4](tasks/M4-primer.md) | 100 | 0 | ⬜ todo | |
+
+> **Next up (M4):** before the first launch, decide config v3 with the user: v2 plus generation
+> stopped at `</answer>` (ADR-021, "Observed in `m3-e2-sparse-v2`"). Under v2, any arm can tip
+> into post-answer rambling to the cap, which costs ~4× per step and freezes the answers. If v3 is
+> adopted, verify the TRL 1.16 stop-string path, smoke it on the laptop, and re-run E2 dense
+> under v3 (~$9) as the H1 comparator.
 | M5 | Scaling and ablations (E4, E5) | [M5](tasks/M5-scaling-ablations.md) | 110 | 110* | ⬜ todo | |
 | M6 | Release and showcase | [M6](tasks/M6-release.md) | 9 | 4 | ⬜ todo | |
 | | contingency (user approval only) | | 50 | 15 | | |
@@ -40,7 +46,7 @@ could still run after **2026-11-10 00:00Z**. Gemini may only spend from
 
 \* Only if the Vertex credit covers Vertex AI custom training (checked in M0).
 
-Spent to date: compute $0.08 · vertex $0.00 (update from `make costs` in each PR).
+Spent to date: compute $55.10 · vertex $0.00 (as of M3, 2026-10-23; update from `make costs` in each PR).
 
 ---
 
@@ -88,9 +94,12 @@ configs identical to E2. Learning curves are overlaid and the hypothesis
 verdict goes in an ADR.
 
 **M5: Scaling and ablations.** In priority order, until the line runs out:
-primer-S / primer-L → RL (E4 scaling curve), rules-only primer (E5a), no
-legal-move list (E5b), and a ~4B model with the best recipe (E5c). Skipped
-items get a reason.
+primer-S → RL (E4 scaling curve: none, S, M), rules-only primer (E5a), no
+legal-move list (E5b), LoRA rank (E5d), and a ~4B model with the best recipe
+(E5c, conditional). Skipped items get a reason. **Re-plan (M3, user-approved
+2026-10-22, BUDGET.md §2):** primer-L is dropped, because it needs new data and the
+most expensive SFT. E5c is decided at the start of M5 from the measured SFT cost
+and any reallocated M3/M4 underrun.
 
 **M6: Release and showcase.** Hugging Face models and datasets with cards,
 a static "puzzle browser" site showing reasoning before and after RL, README

@@ -322,3 +322,193 @@ this ADR. The base model has no chain of thought to start from. Whether
 GRPO grows one, as prose before the answer, is something to watch in M3
 (completion length). The comparison between arms is unaffected, since
 every arm uses the same contract.
+
+### ADR-018: GRPO implementation (M3): engine, LoRA targets, loss, checkpoints, preemption
+**Status:** accepted (2026-10-22)
+**Context:** TRAINING.md §4 fixed the stack (TRL GRPOTrainer, vLLM colocate, LoRA) and left the
+details to M3. Building `ks.train.grpo` and running the laptop wiring test (Qwen3.5-0.8B) turned up
+several things the plan didn't foresee.
+**Decision:**
+- **Pins unchanged** (ADR-016): TRL 1.16.0 was still the newest release on 2026-10-22. Added to
+  the image and the `train` extra: `flash-linear-attention`/`fla-core` 0.5.2 and `tensorboardX`
+  2.6.5. Without fla, transformers runs Qwen3.5's Gated DeltaNet layers in a reference PyTorch
+  implementation ("correct but much slower"). fla is pure Python plus Triton, so the base
+  image's torch and triton stay. `causal-conv1d` is source-only (it needs nvcc) and stays out;
+  its fallback is one convolution.
+- **Engine:** TRL 1.16 builds the colocated vLLM engine itself and passes neither
+  `language_model_only` nor `enforce_eager`. `ks.train.grpo` passes both from the model profile.
+  Without `language_model_only`, vLLM loads the vision tower and reserves memory for dummy image
+  inputs, which left the 0.8B no KV cache at all on the laptop's 6 GB. The trainer and vLLM both
+  load a local snapshot at the pinned revision, so model, tokenizer and engine match.
+- **LoRA targets:** TRL loads Qwen3.5 as the full VLM class (`Qwen3_5ForConditionalGeneration`),
+  so `target_modules="all-linear"` would also adapt the vision tower. The adapter goes on every
+  `nn.Linear` of the language model instead: attention, DeltaNet projections and MLP, but not
+  the LM head and not the vision tower. That's 21.6M parameters on the 0.8B, and the 2B count
+  is in its run.json.
+- **Loss and sampling:** TRL 1.16 defaults, recorded here because they differ from Chess-R1's
+  verl setup. `loss_type: dapo` (token-level normalisation over the whole generation batch, no
+  length bias), `scale_rewards: group`, ε = 0.2, one iteration per batch. The vLLM importance-
+  sampling correction is on (`sequence_mask`, cap 3). The KL term is TRL's default
+  bias-corrected estimator at β = 1e-3. `mask_truncated_completions: false`, because a
+  completion that runs out of tokens has given no answer, and reward 0 is correct for it.
+- **Rewards:** the task reward and `format` have weight 1. `legal` and the other task
+  components have weight 0, so they're logged but don't train. Each completion is parsed once
+  per step.
+- **Dev eval** (every 25 steps, dev500): greedy, on the trainer's colocated engine after a
+  weight sync, through the same harness as `ks eval`. The token limit is the training one.
+- **Checkpoints:** HF Trainer saves every 25 steps (adapter, optimizer, scheduler, RNG, data
+  position). Each one is copied to `gs://BUCKET/runs/<id>/ckpt/checkpoint-<n>/` with a
+  `_COMPLETE` object written last, the newest 2 are kept, and an attempt resumes from the newest
+  complete one. Laptop test: a SIGTERM after checkpoint 2, then a resume, reproduced the
+  uninterrupted run's step-3 and step-4 rewards exactly.
+- **Preemption:** on SIGTERM the job leaves a marker, pushes its metrics and exits 143. The VM's
+  EXIT trap can then write `ended` before the shutdown script writes `preempted`. Before this
+  fix, reconcile would have booked that as `failed`, and the watcher would not have retried.
+  Now the startup script flags `ended` as preempted when the VM's metadata says so, and
+  reconcile also treats a failed exit plus an audit-log preemption as a preemption. A spot
+  create that GCE cancels mid-provisioning (`Operation was canceled`, seen in
+  m3-smoke-l4-r2) moves on to the next zone after checking that no VM was created.
+- **Per-step metrics** (`<out>/metrics/attempt-<n>.jsonl`, TensorBoard via tensorboardX): every
+  reward component's mean and std, legal and format rate, completion length (mean, p95, max,
+  clipped share), prose before `<answer>` (share and characters: the reasoning-emergence
+  signal), KL, entropy, step, generation and training seconds and tokens/s, and $/step plus
+  cumulative $ (wall time × spot price, carried across attempts).
+**Consequences:** One more thing to re-check when TRL is bumped: the `vllm_generation.LLM`
+patch and the `_last_loaded_step` attribute the dev eval sets. A frozen-config test keeps arms
+from changing anything but their factor (`ks.train.config.ARM_KEYS`).
+
+### ADR-019: GRPO config frozen for every arm; A100 by $/step; padding trimmed, micro-batches sorted
+**Status:** accepted (2026-10-22; max_completion and the throughput runs chosen by the user in the M3 session)
+**Context:** Task M3 §4–5: smoke the main model, measure A100 vs H100 by $ per step, tune the
+memory and batch split, then freeze the config. Measured on Qwen3.5-2B, dense reward, the full
+64 × 8 batch (`m3-smoke-a100`, `m3-tput-a100`, `m3-tput-h100`; `results/train/`):
+- **The base model rambles when sampled.** At temperature 1.0, 42% of completions ran into the
+  1024-token cap, mostly prose that decodes the FEN character by character (cf. ADR-017). The
+  legal rate was 53% (96.5% greedy). RL trained it away within ~10 steps: by step 13 the mean
+  length was 18 tokens, legal 87%, format 99.6%, prose before `<answer>` < 1%.
+- **Padding, not generation, set the step time.** Generation took 7–30 s a step. TRL pads all
+  512 completions to the longest, and ~1% still hit the cap at step 13, so a step stayed at
+  ~127 s on the A100 at an 18-token mean.
+- **A100 vs H100**, same image, config and seed, before sorting (micro_batch 8, trimming on):
+  steps 2–7 took 159 s vs 87 s ($0.138 vs $0.153 a step), and steps 8–10 took 98 s vs 55 s
+  ($0.085 vs $0.097). The H100 is 1.8× faster at 2.05× the price. Trainer init took 218 s vs 86 s.
+  With trimming, the A100's step at an ~20-token mean fell from 127 s to 62 s.
+- Memory on the A100 80GB: peak ~40 GiB (mostly vLLM's 45% reservation), 44.5 GiB in use.
+**Decision:**
+- **Machine: `a2-ultragpu-1g` (A100 80GB spot)**, 10–13% cheaper per step. The H100 is the
+  fallback when the A100 is stocked out or the calendar is tight (1.8× faster per step).
+  Zones: us-central1-a/-c, then europe-west4-a/-b.
+- **Frozen config** (`configs/train/grpo.yaml`; arms may change only `ARM_KEYS`, enforced by
+  `tests/test_train_config.py`). It is TRAINING.md §4's starting point, unchanged:
+  LoRA r = 32, α = 64 on the language model's linear layers (ADR-018); lr 1e-5, 10 warmup steps,
+  then constant; 64 prompts × 8 completions; temperature 1.0; β = 1e-3; `loss_type: dapo`;
+  **max_completion 1024** (the user's choice, so that reasoning can still emerge in any arm);
+  200 steps; dev500 every 25 steps; checkpoints every 25; seed 2026.
+- **Efficiency only, exact:** `micro_batch: 32` (was 8); `vllm_mem: 0.45`. Each log-prob pass
+  drops the right padding of its chunk (`ks.train.trim`; tested equal to TRL's log-probs and
+  entropies). The step's micro-batches are cut from the batch sorted by completion length,
+  in place of TRL's random shuffle. Under `dapo`, each micro-batch's loss is its token sum over
+  the whole generation batch's token count, so the accumulated gradient doesn't depend on the
+  grouping. The sorted, larger micro-batch is first measured in E2. If it runs out of memory,
+  micro_batch drops back to 16 or 8 for every arm; that doesn't change the arms' math.
+- Per run (A100, before the sorting gain is measured): ~14 min to the first step, ~25 min for
+  the first ~10 (rambling) steps, then 190 steps at 20–60 s. That's **~2–4 h and $6–13 a run**,
+  against BUDGET.md §2's $17–34. If an arm grows long reasoning, its steps go back toward the
+  early ~150 s ($0.14 a step); `max_hours` caps that.
+**Consequences:** M3 underruns its line. The re-plan (PLAN.md) prices M4/M5 with these numbers.
+Changing anything in `grpo.yaml` after E2 starts invalidates the comparisons and needs a new ADR.
+TRL's padding and shuffling are now patched (`ks.train.trim`), so a TRL bump must re-run
+`tests/test_train_trim.py`.
+
+### ADR-020: A $0 stockout is waited out within the run's approval; A100 zone order
+**Status:** accepted (2026-10-22; the user approved waits of up to 12 h in the M3 session)
+**Context:** On the afternoon of 2026-10-22, E2 sparse used 9 attempts over two run ids
+(`m3-e2-sparse`, `m3-e2-sparse-r2`) and $6.13 and reached step 20. Its VMs lived 4–41 min
+before preemption (about 10 min typically), while a fresh attempt needs ~16 min before its first
+useful step: ~9 min of boot, docker install and image pull, ~3.7 min of trainer init, and a
+~4.7 min first step at the base model's 450-token completions. 7 of the 8 VMs landed in
+us-central1-a, the first zone in the list. Then every zone stocked out, which ended the run, and
+the gate wants a new run id and a new yes for attempt 1. Spot A100 80GB quota exists only in
+us-central1 and europe-west4, where `a2-ultragpu-1g` is offered in us-central1-a, us-central1-c
+and europe-west4-a only. `europe-west4-b`, in every A100 config so far, doesn't offer the machine.
+**Decision:**
+- A stockout in every zone closes the attempt as `not-created` at $0 with `note: stockout`;
+  any other create error gets `note: create failed` and is never retried.
+- `stockout_wait_hours` per run config (default 0, at most 12, the user's limit): `ks watch`
+  retries a stockout every 15 min for that long, counted from the first stockout in a row. It
+  also picks up a first-attempt stockout from `ks launch --watch`. A run's approval covers
+  these $0 retries, as it covers its preemption retries.
+- `max_attempts` counts attempts that created a VM. A hard cap of 60 ledger attempts per run
+  stops a retry loop that has gone wrong. The gate still checks the run budget, `max_hours`
+  and the 2026-11-10 deadline on every retry.
+- A100 zone order: us-central1-c, europe-west4-a, us-central1-a.
+**Consequences:** one approval can run unattended overnight while the laptop stays awake (the
+watcher runs there). That matters most for M4's 7–10 h SFT run. A long stockout leaves up to
+~100 `start`/`end` lines in the ledger; they cost $0. Not done: baking docker into a custom VM
+image (saves ~4 min a boot, but adds a billable image to manage), and asking for A100 quota in
+us-east4/us-east5 (3 more zones; the user's call if capacity stays this bad).
+
+### ADR-021: GRPO config v2: adaptive entropy control (supersedes ADR-019's frozen config)
+**Status:** accepted (2026-10-22; the user chose one bounded revision before M4). Step-50 check
+passed 2026-10-22 (RESULTS.md, E2 v2), so v2 is the frozen config for every later arm.
+**Context:** E2 dense under ADR-019 (`m3-e2-dense`) reached 23.8% [21.9, 25.7] on test2000
+(base 4.1%), but the policy collapsed by step 25. Mean token entropy fell from 0.88 (step 1)
+to 0.25 (step 15) and 0.056 (step 25), then to ~0.02. Over steps 41–50 a mean of 74% of the
+8-sample groups had zero reward spread, so zero advantage and no gradient. dev500 went
+5.6% → 22.8% by step 25 and then stayed at 22–28% to step 200: steps 25–200 (~$6 of the
+$7.84) taught little. Answers shrank to ~9 tokens with no reasoning. M4's main result (H1)
+would run every arm under this config, so E3 would measure where each start point collapses,
+and the GRPO baseline would be open to the charge of being undertuned. Chess-R1's 25–30%
+plateau may be the same effect.
+- **Clip-higher can't help here.** `num_iterations` is 1 and generation happens once per
+  optimizer step, so the PPO ratio is exactly 1 and the clip never binds (TRL 1.16:
+  `old_per_token_logps` is the same weights' log-probs). `epsilon_high`, first proposed to the
+  user, was dropped after reading the TRL source.
+- TRL 1.16 has an entropy bonus (`entropy_coef`) with adaptive control from Skywork-OR1
+  (`use_adaptive_entropy`): each step the coefficient rises by `entropy_coef_delta` if mean
+  token entropy is at or below `entropy_target` and falls otherwise, and applies only at or
+  below the target. Chess-R1 used a static entropy bonus of 1e-3; ADR-019 had none.
+**Decision:** v2 = v1 + `entropy_adaptive: true`, `entropy_target: 0.2`,
+`entropy_coef_delta: 0.02`. Nothing else that shapes learning changes (lr 1e-5, 64 × 8,
+T = 1.0, β = 1e-3, dapo, 200 steps, seed 2026).
+- Target 0.2 is TRL's and Skywork's default, and also where v1 was still healthy: at steps
+  15–17 answers were already ~10 tokens with ~9% dead groups. Delta 0.02 is 4× TRL's default
+  because v1 fell from 0.2 to 0.06 in 6 steps; at 0.005 the coefficient would be 0.03 by then.
+  The initial coefficient doesn't matter: above the target it decays to 0 within a few steps.
+- Not learning settings: `eval_every` 25 → 10 (a finer dev curve, ~$0.2 a run) and
+  `save_every` 25 → 10 (a preemption loses ≤ ~6 min).
+- Bounded: one variant and one check. `m3-e2-dense-v2` is checked at step 50 against
+  pre-registered criteria (RESULTS.md, E2). If it fails, the VM is stopped, v2 is dropped,
+  ADR-019 stays frozen and E2 sparse runs under v1. If it passes, it runs to 200 and is E2
+  dense, and E2 sparse and every M4/M5 arm use v2.
+- Checked on the laptop (Qwen3.5-0.8B, forced ramp): the coefficient rises 0.02, 0.04;
+  `entropy_ctrl_state.json` is copied with each checkpoint and restored on resume (0.06,
+  0.08 after resuming from step 2).
+- Found by the same smoke and fixed: resuming from a checkpoint at `max_steps` (a preemption
+  between the last checkpoint and the final save) made `trainer.train()` run one step past
+  it. The trainer now loads that adapter and saves the final model without training (the
+  final adapter equals the checkpoint bit for bit).
+**Consequences:** `m3-e2-dense` stays in the write-up as the v1 data point and the evidence
+for the collapse; it isn't compared with v2 arms as if it were the same config. If v2 passes,
+E2 costs one more dense run (~$8). `entropy_coef` is logged each step. Risk to watch: the
+bonus applies to every completion token, so it could show up as noise on the format tokens
+or prose before `<answer>`; format, legal, length and prose_frac are in the step-50 check or
+next to it.
+**Observed in `m3-e2-dense-v2`** (RESULTS.md, E2 dense v2): the risk showed up after `</answer>`,
+where none of those metrics look. From about step 85, 0.5–2% of completions ran on to the
+1024-token cap after a valid answer. TRL's controller measures a token-weighted entropy over the
+whole step, and these completions carried ~40% of the tokens. They held it above target, so the
+coefficient sat near 0 for steps 94–135, and dead groups climbed back to 70–80%. Test2000 was
+still 27.2% (+3.4 [1.8, 4.8] paired vs v1) on the same dev plateau.
+**Observed in `m3-e2-sparse-v2`** (RESULTS.md, E2 sparse v2): the same tail took over. Truncated
+completions went from 1.6% at step 150 to 72% at step 160 and 83–96% after that. Step time rose
+from ~40 s to 170–210 s, so the first job ran out of `max_hours` at step 186. The greedy answers
+froze: 2–4 of 1163 dev answers changed per 10 steps, because the ~5 answer tokens are ~0.5% of a
+1024-token completion under DAPO's token mean. test2000 came out at 23.5%, −3.6 [−4.9, −2.4]
+vs dense v2 at step 200, although the two arms were equal on dev500 to step 150.
+**So v2 has a real flaw for M4:** any arm can tip into this regime at random, which costs ~4× per
+step and stops learning. The candidate fix, config v3, is v2 plus generation stopped at
+`</answer>` (a stop string, kept in the output). It is to be decided by the user before M4's
+first launch, and is not adopted here. v3 changes what the loss sees, so a clean H1 comparison
+would need E2 dense re-run under v3 (~$9). Verify first that TRL 1.16 passes stop strings to
+vLLM in colocate mode.

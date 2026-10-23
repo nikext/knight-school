@@ -20,12 +20,12 @@ the same positions and seed, then gets a test2000 eval and E0.
 
 | # | Arm | Why | Estimate |
 |---|---|---|---|
-| 1 | **E4** primer-S → GRPO dense | the second point on the scaling curve (cheap) | from the M3 re-plan table |
-| 2 | **E5a** rules-only primer (T1–T4, tokens matched to M) → GRPO dense | rules vs moves (H4), the most interesting "why" | |
-| 3 | **E4** primer-L → GRPO dense | the third point; the most expensive SFT | |
-| 4 | **E5b** best primer recipe, prompt without the legal-move list | does the primer replace the crutch? | |
-| 5 | **E5c** ~4B sibling, best recipe (primer → GRPO dense) | does it hold at a larger size? | |
-| 6 | **E5d** LoRA r=8 vs r=64 on dev only, short runs | a cheap check of ADR-007 | |
+| 1 | **E4** primer-S → GRPO dense | the second point on the scaling curve (cheap) | ~$15 (BUDGET.md §2 re-plan) |
+| 2 | **E5a** rules-only primer (T1–T4, tokens matched to M) → GRPO dense | rules vs moves (H4), the most interesting "why" | ~$33–43 |
+| 3 | ~~**E4** primer-L → GRPO dense~~ | **dropped in the M3 re-plan** (new data + the most expensive SFT, ~$105) | — |
+| 4 | **E5b** best primer recipe, prompt without the legal-move list | does the primer replace the crutch? | ~$12 |
+| 5 | **E5c** ~4B sibling, best recipe (primer → GRPO dense) | does it hold at a larger size? | ~$85; **conditional**: decide at M5 start with the measured SFT cost (needs M3/M4 underrun moved to M5, user's call) |
+| 6 | **E5d** LoRA r=8 vs r=64 on dev only, short runs | a cheap check of ADR-007 | ~$12 |
 
 The M4 ADR may reorder these. If it does, follow it.
 

@@ -160,7 +160,11 @@ class RunConfig(_Strict):
     spot: bool = True
     zones: list[str] = Field(min_length=1)
     max_hours: float
-    max_attempts: int = Field(default=3, ge=1, le=10)
+    max_attempts: int = Field(default=3, ge=1, le=10)  # attempts that created a VM
+    # How long `ks watch` keeps retrying when no zone has capacity, from the first stockout
+    # in a row; each try is a $0 attempt (ADR-020). 0 = a stockout ends the run. The user
+    # approved up to 12 h.
+    stockout_wait_hours: float = Field(default=0, ge=0, le=12)
     run_budget_usd: float | None = None  # approved total over all attempts
     boot_disk_gb: int = Field(default=200, ge=10, le=2000)
     image: str

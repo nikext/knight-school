@@ -1,0 +1,23 @@
+# E2 sparse, relaunch. m3-e2-sparse was preempted 3 times on 2026-10-22 (at 8 min, 4 min, and at
+# step 19 of 200, before the first checkpoint), so it hit max_attempts with nothing to resume
+# ($2.72). Same arm and frozen config; only the preemption handling changes: a checkpoint every
+# 10 steps instead of 25 (save_every isn't a learning setting; ~10 s per push), and up to 6
+# attempts. The run budget keeps E2 sparse in total near the $25 approved for m3-e2-sparse.
+id: m3-e2-sparse-r2
+milestone: M3
+description: "E2: base -> GRPO sparse, 200 steps, frozen config"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-a, us-central1-c, europe-west4-a, europe-west4-b]
+max_hours: 5
+max_attempts: 6
+run_budget_usd: 22
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:25b5dd417d43@sha256:b1127f781cb392cf18aa545759c02d90763c1d2403645a36a4f10c95f5004606
+command: "bash configs/jobs/m3-grpo.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/grpo_sparse.yaml"
+  TRAIN_SETS: "name=m3-e2-sparse-r2 save_every=10"
+  TEST_SET: "test2000"

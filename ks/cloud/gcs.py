@@ -12,6 +12,8 @@ with google-auth credentials (the VM's service account, or ADC on the laptop).
 
 from __future__ import annotations
 
+import time
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote
@@ -19,6 +21,32 @@ from urllib.parse import quote
 API = "https://storage.googleapis.com/storage/v1"
 UPLOAD = "https://storage.googleapis.com/upload/storage/v1"
 READ_WRITE = "https://www.googleapis.com/auth/devstorage.read_write"
+
+
+RETRIES = 6  # 1 + 2 + 4 + 8 + 16 s of backoff
+_sleep = time.sleep
+
+
+def _retry[T](fn: Callable[[], T]) -> T:
+    """Run a request, retrying dropped connections and 408/429/5xx with backoff.
+
+    m3-tput-h100 died on one `RemoteDisconnected` while copying a checkpoint: the session's
+    kept-alive connection had been closed by the server during ten idle minutes.
+    """
+    import requests
+
+    for attempt in range(RETRIES):
+        try:
+            return fn()
+        except requests.exceptions.HTTPError as e:
+            code = e.response.status_code if e.response is not None else 0
+            if (code not in (408, 429) and code < 500) or attempt == RETRIES - 1:
+                raise
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            if attempt == RETRIES - 1:
+                raise
+        _sleep(2**attempt)
+    raise AssertionError("unreachable")
 
 
 def split(uri: str) -> tuple[str, str]:
@@ -47,9 +75,13 @@ def list_names(uri: str, session: Any = None) -> list[str]:
         params = {"prefix": prefix, "fields": "items(name),nextPageToken"}
         if token:
             params["pageToken"] = token
-        r = s.get(f"{API}/b/{bucket}/o", params=params, timeout=60)
-        r.raise_for_status()
-        body = r.json()
+
+        def page(params: dict[str, str] = params) -> Any:
+            r = s.get(f"{API}/b/{bucket}/o", params=params, timeout=60)
+            r.raise_for_status()
+            return r.json()
+
+        body = _retry(page)
         names += [it["name"] for it in body.get("items", [])]
         token = body.get("nextPageToken")
         if not token:
@@ -61,11 +93,15 @@ def download(uri: str, dest: Path, session: Any = None) -> Path:
     s = session or _session()
     dest.parent.mkdir(parents=True, exist_ok=True)
     url = f"{API}/b/{bucket}/o/{quote(name, safe='')}"
-    with s.get(url, params={"alt": "media"}, stream=True, timeout=600) as r:
-        r.raise_for_status()
-        with open(dest, "wb") as f:
-            for chunk in r.iter_content(1 << 20):
-                f.write(chunk)
+
+    def get() -> None:
+        with s.get(url, params={"alt": "media"}, stream=True, timeout=600) as r:
+            r.raise_for_status()
+            with open(dest, "wb") as f:
+                for chunk in r.iter_content(1 << 20):
+                    f.write(chunk)
+
+    _retry(get)
     return dest
 
 
@@ -83,15 +119,31 @@ def download_prefix(uri: str, dest: Path) -> Path:
 def upload(path: Path, uri: str, session: Any = None) -> None:
     bucket, name = split(uri)
     s = session or _session(write=True)
-    with open(path, "rb") as f:
-        r = s.post(
-            f"{UPLOAD}/b/{bucket}/o",
-            params={"uploadType": "media", "name": name},
-            data=f,
-            headers={"Content-Type": "application/octet-stream"},
-            timeout=600,
-        )
-    r.raise_for_status()
+
+    def post() -> None:
+        with open(path, "rb") as f:  # reopened per try: a failed try consumed the stream
+            r = s.post(
+                f"{UPLOAD}/b/{bucket}/o",
+                params={"uploadType": "media", "name": name},
+                data=f,
+                headers={"Content-Type": "application/octet-stream"},
+                timeout=600,
+            )
+        r.raise_for_status()
+
+    _retry(post)
+
+
+def delete(uri: str, session: Any = None) -> None:
+    bucket, name = split(uri)
+    s = session or _session(write=True)
+
+    def rm() -> None:
+        r = s.delete(f"{API}/b/{bucket}/o/{quote(name, safe='')}", timeout=60)
+        if r.status_code != 404:  # already gone is fine
+            r.raise_for_status()
+
+    _retry(rm)
 
 
 def push(src: Path, uri: str) -> int:

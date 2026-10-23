@@ -1,0 +1,26 @@
+# E2 base -> GRPO sparse under config v2 (ADR-021), task M3 §8. Same run settings as
+# m3-e2-dense-v2; only the arm differs (task reward = 1 if the move solves the position).
+# Launched only after m3-e2-dense-v2 passed its step-50 check, and with its own approval.
+# Spot handling (ADR-020): us-central1-c first (m3-e2-dense ran 2.5 h there without a
+# preemption; 7 of 8 sparse VMs landed in us-central1-a and were preempted), europe-west4-b
+# dropped (it doesn't offer a2-ultragpu-1g); stockouts are waited out for up to 12 h.
+# max_hours 4: v1 took 2.5 h with boot and both evals.
+id: m3-e2-sparse-v2
+milestone: M3
+description: "E2: base -> GRPO sparse, 200 steps, config v2 (adaptive entropy)"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-c, europe-west4-a, us-central1-a]
+max_hours: 4
+max_attempts: 6
+stockout_wait_hours: 12
+run_budget_usd: 22
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:35e9bf043759@sha256:8808004de26e22080fbc678338d6871a15af1f831588ce8c27a45782f0b0e01e
+command: "bash configs/jobs/m3-grpo.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/grpo_sparse.yaml"
+  TRAIN_SETS: "name=m3-e2-sparse-v2"
+  TEST_SET: "test2000"

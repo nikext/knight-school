@@ -1,0 +1,27 @@
+# E2 sparse under config v2, steps 181-200 and test2000. m3-e2-sparse-v2 reached its 4-hour wall
+# clock at step 186 (exit 124, not a preemption; $12.16): from step 155 most completions ran on
+# to the 1024-token cap after `</answer>`, so steps took ~170 s instead of ~40 s (RESULTS.md, E2
+# sparse v2). Same arm, same image, same config; the run resumes from m3-e2-sparse-v2's complete
+# checkpoint-180, copied server-side into this run's ckpt/ before launch. Remaining time at ~170 s
+# a step: ~16 min boot + ~57 min for 20 steps + dev500 at 190 and 200 + merge + test2000 with
+# capped completions (~6 min) ~= 1.5 h; max_hours 2. run_budget_usd 10 leaves room for one
+# preemption retry.
+id: m3-e2-sparse-v2-r2
+milestone: M3
+description: "E2: base -> GRPO sparse, config v2, steps 181-200 from m3-e2-sparse-v2 checkpoint-180"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-c, europe-west4-a, us-central1-a]
+max_hours: 2
+max_attempts: 3
+stockout_wait_hours: 12
+run_budget_usd: 10
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:35e9bf043759@sha256:8808004de26e22080fbc678338d6871a15af1f831588ce8c27a45782f0b0e01e
+command: "bash configs/jobs/m3-grpo.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/grpo_sparse.yaml"
+  TRAIN_SETS: "name=m3-e2-sparse-v2"
+  TEST_SET: "test2000"

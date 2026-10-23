@@ -116,19 +116,37 @@ def test_stockout_tries_the_next_zone(ledger_path):
     assert res.ok and res.zone == "us-central1-b" and len(cloud.created) == 2
 
 
+def test_cancelled_create_tries_the_next_zone(ledger_path):
+    cloud = FakeCloud(cancelled_zones={"us-central1-a"})
+    res = do_launch(cloud, ledger_path)
+    assert res.ok and res.zone == "us-central1-b"
+    assert any("cancelled by GCE" in line for line in res.lines)
+
+
+def test_cancelled_create_that_left_a_vm_counts_as_created(ledger_path):
+    cloud = FakeCloud(cancelled_zones={"us-central1-a"}, cancelled_but_created=True)
+    res = do_launch(cloud, ledger_path)
+    assert res.ok and res.zone == "us-central1-a" and len(cloud.instances) == 1
+    att = load_state(ledger_path).run_attempts("m0-smoke-l4")[0]
+    assert att.created is not None and att.created.zone == "us-central1-a"
+
+
 def test_stockout_everywhere_closes_the_attempt_at_zero(ledger_path):
     cloud = FakeCloud(stockout_zones={"us-central1-a", "us-central1-b"})
     res = do_launch(cloud, ledger_path)
-    assert not res.ok
+    assert not res.ok and res.stockout
     att = load_state(ledger_path).run_attempts("m0-smoke-l4")[0]
     assert att.end and att.end.status == "not-created" and att.end.actual_usd == 0
+    assert att.stocked_out and not att.made_vm
 
 
 def test_fatal_create_error_does_not_try_other_zones(ledger_path):
     cloud = FakeCloud(fail_message="Quota 'GPUS_ALL_REGIONS' exceeded. Limit: 0.0 globally.")
     res = do_launch(cloud, ledger_path)
-    assert not res.ok and len(cloud.created) == 1
+    assert not res.ok and not res.stockout and len(cloud.created) == 1
     assert any("GPUS_ALL_REGIONS" in x for x in res.lines)
+    att = load_state(ledger_path).run_attempts("m0-smoke-l4")[0]
+    assert att.end and att.end.note == "create failed" and not att.stocked_out
 
 
 # --- reconcile --------------------------------------------------------------------------
@@ -188,6 +206,45 @@ def test_reconcile_preempted_marker(ledger_path):
     )
     R.reconcile(cloud, BUCKET, NOW + timedelta(minutes=20), ledger_path)
     assert closed(ledger_path).status == "preempted"
+
+
+def test_failed_exit_on_a_preemption_counts_as_preempted(ledger_path):
+    # the job exits 143 on SIGTERM and `ended` lands before the shutdown script's marker
+    cloud = launched(ledger_path)
+    cloud.vm_finishes(
+        "ks-m0-smoke-l4-a1",
+        "us-central1-a",
+        prefix(),
+        ended={"ts": (NOW + timedelta(minutes=3)).isoformat(), "exit_code": 143},
+    )
+    cloud.preemptions.add("ks-m0-smoke-l4-a1")
+    R.reconcile(cloud, BUCKET, NOW + timedelta(minutes=20), ledger_path)
+    assert closed(ledger_path).status == "preempted"
+
+
+def test_ended_marker_flagged_preempted_counts_as_preempted(ledger_path):
+    cloud = launched(ledger_path)
+    cloud.vm_finishes(
+        "ks-m0-smoke-l4-a1",
+        "us-central1-a",
+        prefix(),
+        ended={"ts": (NOW + timedelta(minutes=3)).isoformat(), "exit_code": 143, "preempted": True},
+    )
+    R.reconcile(cloud, BUCKET, NOW + timedelta(minutes=20), ledger_path)
+    assert closed(ledger_path).status == "preempted"
+
+
+def test_clean_exit_stays_done_even_if_preempted_later(ledger_path):
+    cloud = launched(ledger_path)
+    cloud.vm_finishes(
+        "ks-m0-smoke-l4-a1",
+        "us-central1-a",
+        prefix(),
+        ended={"ts": (NOW + timedelta(minutes=3)).isoformat(), "exit_code": 0},
+    )
+    cloud.preemptions.add("ks-m0-smoke-l4-a1")
+    R.reconcile(cloud, BUCKET, NOW + timedelta(minutes=20), ledger_path)
+    assert closed(ledger_path).status == "done"
 
 
 def test_reconcile_shutdown_at_the_time_limit_is_a_timeout(ledger_path):
@@ -342,6 +399,151 @@ def test_watch_does_not_retry_a_vm_that_was_stopped(ledger_path):
         log=lambda _: None,
     )
     assert status == "stopped" and len(cloud.created) == 1
+
+
+ZONES = {"us-central1-a", "us-central1-b"}
+
+
+def watch_with(cloud, clock, run, sleep, ledger_path, logs=None):
+    return watch(
+        run,
+        caps=f.caps(),
+        prices=f.prices(),
+        ops=cloud,
+        bucket=BUCKET,
+        runner_sa=SA,
+        approved="test",
+        ledger_path=ledger_path,
+        clock=clock,
+        sleep=sleep,
+        log=(logs.append if logs is not None else lambda _: None),
+    )
+
+
+def test_watch_waits_out_a_stockout_then_runs(ledger_path):
+    cloud, clock = launched(ledger_path), Clock()
+    run = smoke(stockout_wait_hours=2)
+    slept: list[float] = []
+    ticks = iter(
+        [
+            lambda: (  # preempted; the retry finds no capacity anywhere
+                cloud.vm_finishes(
+                    "ks-m0-smoke-l4-a1",
+                    "us-central1-a",
+                    prefix(),
+                    preempted={"ts": (NOW + timedelta(minutes=3)).isoformat()},
+                ),
+                cloud.stockout_zones.update(ZONES),
+            ),
+            lambda: None,  # attempt 3 finds none either
+            lambda: cloud.stockout_zones.clear(),  # capacity is back for attempt 4
+            lambda: cloud.vm_finishes(
+                "ks-m0-smoke-l4-a4",
+                "us-central1-a",
+                prefix(attempt=4),
+                ended={"ts": clock.t.isoformat(), "exit_code": 0},
+            ),
+        ]
+    )
+
+    def sleep(s):
+        slept.append(s)
+        clock.t += timedelta(seconds=s)
+        next(ticks)()
+
+    assert watch_with(cloud, clock, run, sleep, ledger_path) == "done"
+    atts = load_state(ledger_path).run_attempts("m0-smoke-l4")
+    assert [a.end.status for a in atts if a.end] == [
+        "preempted",
+        "not-created",
+        "not-created",
+        "done",
+    ]
+    assert "stockout retry" in atts[2].start.approved and "stockout retry" in atts[3].start.approved
+    assert slept[1] == 900  # STOCKOUT_RETRY
+
+
+def test_watch_gives_up_after_stockout_wait_hours(ledger_path):
+    cloud, clock = launched(ledger_path), Clock()
+    run = smoke(stockout_wait_hours=1)
+    first = True
+
+    def sleep(s):
+        nonlocal first
+        clock.t += timedelta(seconds=s)
+        if first:
+            first = False
+            cloud.vm_finishes(
+                "ks-m0-smoke-l4-a1",
+                "us-central1-a",
+                prefix(),
+                preempted={"ts": (NOW + timedelta(minutes=3)).isoformat()},
+            )
+            cloud.stockout_zones.update(ZONES)
+
+    assert watch_with(cloud, clock, run, sleep, ledger_path) == "stockout"
+    atts = load_state(ledger_path).run_attempts("m0-smoke-l4")
+    tries = [a for a in atts if a.stocked_out]
+    assert len(tries) == 5  # at 0, 15, 30, 45 and 60 min after the first stockout
+    assert tries[-1].end and tries[0].end
+    assert tries[-1].end.ts - tries[0].end.ts == timedelta(hours=1)
+    assert sum(a.actual_usd for a in tries) == 0
+
+
+def test_watch_without_stockout_wait_ends_on_a_stockout(ledger_path):
+    cloud, clock = launched(ledger_path), Clock()
+
+    def sleep(_):
+        clock.t += timedelta(minutes=5)
+        cloud.vm_finishes(
+            "ks-m0-smoke-l4-a1",
+            "us-central1-a",
+            prefix(),
+            preempted={"ts": (NOW + timedelta(minutes=3)).isoformat()},
+        )
+        cloud.stockout_zones.update(ZONES)
+
+    assert watch_with(cloud, clock, smoke(), sleep, ledger_path) == "retry-failed"
+    assert len(load_state(ledger_path).run_attempts("m0-smoke-l4")) == 2
+
+
+def test_watch_does_not_retry_a_create_error(ledger_path):
+    cloud, clock = launched(ledger_path), Clock()
+
+    def sleep(_):
+        clock.t += timedelta(minutes=5)
+        cloud.vm_finishes(
+            "ks-m0-smoke-l4-a1",
+            "us-central1-a",
+            prefix(),
+            preempted={"ts": (NOW + timedelta(minutes=3)).isoformat()},
+        )
+        cloud.fail_message = "Invalid value for field 'resource.machineType'"
+
+    run = smoke(stockout_wait_hours=12)
+    assert watch_with(cloud, clock, run, sleep, ledger_path) == "retry-failed"
+    atts = load_state(ledger_path).run_attempts("m0-smoke-l4")
+    assert len(atts) == 2 and atts[1].end and atts[1].end.note == "create failed"
+
+
+def test_watch_picks_up_a_first_attempt_stockout(ledger_path):
+    cloud, clock = FakeCloud(stockout_zones=set(ZONES)), Clock()
+    run = smoke(stockout_wait_hours=1)
+    assert not do_launch(cloud, ledger_path, run=run).ok
+
+    def sleep(s):
+        clock.t += timedelta(seconds=s)
+        if cloud.stockout_zones:
+            cloud.stockout_zones.clear()
+        else:
+            name, zone = next(iter(cloud.instances))
+            cloud.vm_finishes(
+                name, zone, prefix(attempt=2), ended={"ts": clock.t.isoformat(), "exit_code": 0}
+            )
+
+    assert watch_with(cloud, clock, run, sleep, ledger_path) == "done"
+    atts = load_state(ledger_path).run_attempts("m0-smoke-l4")
+    assert [a.end.status for a in atts if a.end] == ["not-created", "done"]
 
 
 def test_watch_deletes_a_vm_that_outlives_its_ended_marker(ledger_path):

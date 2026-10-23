@@ -7,6 +7,11 @@ transformers==5.17.0
 trl==1.16.0
 peft==0.21.2
 accelerate==1.15.0
+tensorboardX==2.6.5
+# Triton kernels for Qwen3.5's Gated DeltaNet layers in transformers (without them training runs a
+# slow reference implementation, M3). Pure Python; torch and triton stay the base image's.
+flash-linear-attention==0.5.2
+fla-core==0.5.2
 chess==1.11.2
 numpy
 polars

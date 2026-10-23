@@ -28,9 +28,15 @@ train = [
     "trl==1.16.0",
     "peft==0.21.2",
     "accelerate==1.15.0",
+    "tensorboardX==2.6.5",
+    "flash-linear-attention==0.5.2",  # Qwen3.5 Gated DeltaNet kernels for training (M3)
+    "fla-core==0.5.2",
 ]
 gemini = [
     "google-genai>=2.32.0",
+]
+plots = [
+    "matplotlib>=3.10",
 ]
 
 [project.scripts]

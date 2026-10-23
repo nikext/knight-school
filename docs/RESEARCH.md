@@ -56,8 +56,21 @@ training data (ADR-008).
   but it falls behind on large SFT datasets. → LoRA for GRPO, full FT for the
   primer (ADR-007). Verify our own way in E5 if the budget allows.
 
-Before M3, re-search for anything newer (from 2026-10 on) on LLM chess and
-RLVR, and add it here.
+- **C1 / "Grounded Chess Reasoning in Language Models via Master Distillation"**,
+  arXiv:2603.20510 (Mar 2026; missed before M3). Qwen3-4B-Instruct-2507, near 0 at the start.
+  SFT on ~39.6k puzzles whose chain of thought Gemini-3-Flash wrote around Stockfish (depth 24)
+  lines, then DAPO with a binary "matches Stockfish's best move" reward (KL kept). The prompt has
+  the FEN, a piece list and the legal moves. On their 900-puzzle set: 40.9% after SFT, 48.1%
+  after RL. RL helps on beginner-to-advanced puzzles, not on expert ones. → The nearest prior
+  result to H1/H2, but **with a teacher**: an LLM wrote the reasoning. Ours stays teacher-free
+  (ADR-008), which keeps the question open. It also shows binary rewards learning after SFT
+  (cf. H2).
+- **VAM: Verbalized Action Masking**, arXiv:2602.16833 (Feb 2026). An exploration method for
+  RL post-training, with chess puzzles as the case study. It repeats that the legal-move list
+  matters. Not a change to the plan.
+
+M3 re-search (2026-10-22, from 2026-10 on): no new LLM-chess RLVR result found. **The plan
+is unchanged.**
 
 ## 3. Hypotheses and what would falsify them
 
@@ -84,7 +97,7 @@ factor under test changes.
 | E1 | random legal · Stockfish 1 node · candidate base models · Gemini Flash-Lite / Flash (test2000) · Gemini Pro (test500) | test | zero-shot, same prompt |
 | E2 | base → GRPO sparse · base → GRPO dense | test + dev curves | expect sparse ≈ flat (replicates Chess-R1) |
 | E3 | base → primer-M (SFT only) · primer-M → GRPO sparse · primer-M → GRPO dense | test + dev curves | the main result |
-| E4 | primer-S → GRPO dense · primer-L → GRPO dense (M from E3) | test | scaling curve: x = primer tokens (log) |
+| E4 | primer-S → GRPO dense (M from E3; primer-L dropped in the M3 re-plan) | test | scaling curve over none, S, M: x = primer tokens (log) |
 | E5a | rules-only primer (T1–T4, matched tokens to M) → GRPO dense | test | rules vs moves |
 | E5b | E3-dense recipe, no legal-move list in the prompt | test | does the primer replace the crutch? |
 | E5c | best recipe on a ~4B model | test | does it hold at a larger size? |

@@ -75,12 +75,51 @@ figures this plan was written with. Spot prices can change up to once every
 30 days, so the launcher refuses a `prices.yaml` that is unverified or older
 than 30 days.
 
-Rough job costs at the measured prices (M3 measures the real ones): a GRPO
-run on a ~2B model is **$17–34** (was $10–20), a GRPO run on a ~4B model is
-**$42–59** (was $25–35), and primer SFT of a 2B model on primer-M (186M tokens
-measured in M2, planned as 150M) is **$11–21** (was $5–10; $9–17 at 150M). The $360 compute ceiling buys at most ~118 A100-hours.
-M3's re-plan will almost certainly cut M5. Gemini baselines are still about
-$30–50 in total.
+Rough job costs before M3 measured them: a GRPO run on a ~2B model was planned
+at $17–34, and primer SFT of a 2B model on primer-M (186M tokens) at $11–21. The
+$360 compute ceiling buys at most ~118 A100-hours. Gemini baselines are still
+about $30–50 in total.
+
+**Measured in M3 (ADR-019), A100 80GB spot, $3.13/h with the boot disk.** A GRPO
+step costs $0.14 while completions are long (the first ~10 steps), and a few
+cents once they are short. A 200-step 2B run is **~2–4 h, $6–13** (planning
+value $12). The H100 is 1.8× faster per step at 2.05× the price, so it costs
+10–13% more per step. 2B primer-M SFT is not measured yet: the FLOPs estimate
+at 27–40% MFU is 7–10 h, **$21–31**.
+
+### Re-plan (M3 §6, approved by the user 2026-10-22)
+
+| Run | Milestone | Planning $ | Wall time |
+|---|---|---|---|
+| smoke + throughput (spent) | M3 | 8.92 | |
+| E2 sparse, E2 dense (+ E0) | M3 | 24 | 4–8 h |
+| SFT primer-M (2B full FT) | M4 | 21–31 | 7–10 h |
+| primer-only eval (test2000 + E0) | M4 | 1 | 0.5 h |
+| primer → GRPO sparse, primer → GRPO dense (+ E0) | M4 | 24 | 4–8 h |
+| E3 second seed (primer → dense) | M4 | 12 | 2–4 h |
+| E4 primer-S (SFT + GRPO dense) | M5 | 15 | 4–5 h |
+| E5a rules-only primer (SFT + GRPO) | M5 | 33–43 | 9–14 h |
+| E5b no legal-move list (GRPO from primer-M) | M5 | 12 | 2–4 h |
+| E5d LoRA rank 8 vs 64 (2 × 100 steps, dev only) | M5 | 12 | 3–4 h |
+| **E5c ~4B, best recipe: conditional** | M5 | ~85 | 15–25 h |
+| ~~E4 primer-L~~ **dropped** | M5 | (~105) | (25–35 h) |
+
+Totals: M3 ~$33 of 70, M4 ~$58–68 of 100, and M5 core ~$72–82 of 110. **primer-L is
+dropped**: it needs new data plus the most expensive SFT, so E4 becomes a 3-point curve
+(none, S, M). **E5c is decided at the start of M5** with the measured SFT cost. It fits only
+if the user moves the M3/M4 underruns to M5. No allocation changes for now. Calendar: the
+core plan is ~55 GPU-hours, one job at a time, before 2026-11-10.
+
+**M3 update (2026-10-22, ADR-020/021):** $23.43 spent, of which ~$6.4 went to preemptions and
+stockouts (E2 sparse under v1 reached step 20 for $6.13). Config v2 adds one dense run (~$8).
+M3 is now expected at ~$40–48 of its $70: dense v2 and sparse v2 at ~$8–9 each plus preemption
+overhead. No allocation changes.
+
+**M3 final (2026-10-23):** **$50.15 of $70.** Dense v2 cost $9.22 with both evals. Sparse v2
+cost $17.51 in total ($12.16 + $5.35 to resume from step 180), because its last 50 steps ran
+with completions at the 1024-token cap. A GRPO step costs ~$0.035 at ~40 s with short answers
+and ~$0.15 at ~175 s when completions ramble to the cap. M4 planning should assume the healthy
+rate only if v3 (ADR-021) is adopted. Under v2, budget a 200-step run at up to ~$18.
 
 ## 3. Guardrails, outermost first
 

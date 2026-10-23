@@ -36,7 +36,8 @@ file.
 - **Ask the user before every launch.** Show them the run id, the machine,
   `max_hours`, the worst-case cost, and what the pool and milestone have left
   afterwards. Pass `--confirm` only after they say yes in this session.
-  Approval covers that one run (with its preemption retries), not later ones.
+  Approval covers that one run (with its preemption retries and, within its
+  `stockout_wait_hours`, its $0 stockout retries; ADR-020), not later ones.
 - **Spot only, one GPU, no exceptions without asking:** no on-demand GPUs, no
   multi-GPU machines, no TPUs, no reservations or committed use, no GKE, no
   Vertex/Model Garden endpoint deploys, no Workbench notebooks. Don't request

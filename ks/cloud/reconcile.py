@@ -70,6 +70,11 @@ def close(att: Attempt, ops: CloudOps, bucket: str, now: datetime) -> EndEvent |
         rc = m.get("exit_code")
         status = "done" if rc == 0 else "failed"
         note = f"exit code {rc}"
+        # A training job exits on the preemption's SIGTERM, and the startup script's EXIT trap can
+        # write `ended` before the shutdown script writes `preempted` (M3). A failed exit that the
+        # audit log shows as a preemption is a preemption, so the watcher retries it.
+        if rc != 0 and (m.get("preempted") or ops.was_preempted(instance_name(att))):
+            status = "preempted"
     elif (m := read_marker(ops, bucket, att, "preempted")) is not None:
         end_at, source, status = marker_time(m), "gcs-marker", "preempted"
     elif (m := read_marker(ops, bucket, att, "shutdown")) is not None:

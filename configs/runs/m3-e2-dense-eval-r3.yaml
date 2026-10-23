@@ -1,0 +1,26 @@
+# E2 dense: test2000 + E0 (probe500) on the final merged model (task M3 §8); see m3-e2-dense-eval.
+# r2 was preempted twice (24 min in europe-west4-b, then 3 min; $0.26) and kept nothing: the inline
+# command only reached GCS when the job ended. r3 pushes /out after each set and skips a set whose
+# report an earlier attempt already pushed, so a preemption loses at most the set in progress.
+id: m3-e2-dense-eval-r3
+milestone: M3
+description: "E2 dense: test2000 + probe500 on the final merged model"
+machine: g2-standard-8
+gpus: 1
+zones: [us-central1-a, us-central1-b, us-central1-c, europe-west4-a, europe-west4-b, europe-west4-c]
+max_hours: 0.75
+max_attempts: 3
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:25b5dd417d43@sha256:b1127f781cb392cf18aa545759c02d90763c1d2403645a36a4f10c95f5004606
+command: >-
+  cd /app && M=gs://knight-school-nt26-knight-school/runs/m3-e2-dense/final/merged &&
+  R=${KS_GCS_PREFIX%/attempts/*} &&
+  for s in test2000 probe500; do
+  if python3 -c "import sys; from ks.cloud.gcs import list_names; sys.exit(not any('/out/eval/'+sys.argv[1]+'/' in n for n in list_names(sys.argv[2])))" $s $R/attempts/;
+  then echo "[job] $s: done in an earlier attempt, skipping"; continue; fi;
+  echo "[job] $(date -u +%FT%TZ) $s";
+  ks eval qwen3.5-2b --set $s --ckpt $M --run m3-e2-dense --out /out/eval &&
+  python3 -m ks.cloud.gcs push /out $KS_GCS_PREFIX/out || exit 1; done
+env:
+  KS_PRICE_PER_HOUR: "0.541"
+  VLLM_USE_FLASHINFER_SAMPLER: "0"

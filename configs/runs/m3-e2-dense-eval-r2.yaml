@@ -1,0 +1,19 @@
+# E2 dense: test2000 + E0 (probe500) on the final merged model (task M3 §8). m3-e2-dense trained all
+# 200 steps and saved final/merged, but its eval step died on "Can't initialize NVML" (the host's
+# daemon-reload took the GPU from new processes; fixed in infra/vm_startup.sh). This reruns only
+# the eval, on one spot L4 like m2-test2000-qwen35-l4 (0.24 h, $0.13). Same image as the E2 runs.
+# r2: m3-e2-dense-eval found no L4 in us-central1-a/b/c (stockout, $0); r2 adds europe-west4-a/b/c.
+id: m3-e2-dense-eval-r2
+milestone: M3
+description: "E2 dense: test2000 + probe500 on the final merged model"
+machine: g2-standard-8
+gpus: 1
+zones: [us-central1-a, us-central1-b, us-central1-c, europe-west4-a, europe-west4-b, europe-west4-c]
+max_hours: 0.75
+max_attempts: 2
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:25b5dd417d43@sha256:b1127f781cb392cf18aa545759c02d90763c1d2403645a36a4f10c95f5004606
+command: "cd /app && M=gs://knight-school-nt26-knight-school/runs/m3-e2-dense/final/merged && ks eval qwen3.5-2b --set test2000 --ckpt $M --run m3-e2-dense --out /out/eval && ks eval qwen3.5-2b --set probe500 --ckpt $M --run m3-e2-dense --out /out/eval"
+env:
+  KS_PRICE_PER_HOUR: "0.541"
+  VLLM_USE_FLASHINFER_SAMPLER: "0"

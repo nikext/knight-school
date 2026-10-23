@@ -1,0 +1,4 @@
+# E2 / E3 dense arm: task reward = Stockfish win probability of the move (TRAINING.md §3).
+base: grpo.yaml
+name: grpo-dense
+task_reward: dense

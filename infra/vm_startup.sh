@@ -30,7 +30,9 @@ LOG=$WORK/job.log
 ENV_FILE=$WORK/job.env
 mkdir -p "$OUT"
 attr ks-env | base64 -d > "$ENV_FILE" || : > "$ENV_FILE"
-printf 'KS_RUN_ID=%s\nKS_ATTEMPT=%s\nKS_OUT=/out\nKS_GCS_PREFIX=%s\n' "$RUN_ID" "$ATTEMPT" "$PREFIX" >> "$ENV_FILE"
+MACHINE=$(md machine-type | awk -F/ '{print $NF}')
+printf 'KS_RUN_ID=%s\nKS_ATTEMPT=%s\nKS_OUT=/out\nKS_GCS_PREFIX=%s\nKS_IMAGE=%s\nKS_ZONE=%s\nKS_MACHINE=%s\n' \
+  "$RUN_ID" "$ATTEMPT" "$PREFIX" "$IMAGE" "$ZONE" "$MACHINE" >> "$ENV_FILE"
 
 put() { printf '%s\n' "$2" | gcloud storage cp - "$PREFIX/$1" --quiet; }
 self_delete() { gcloud compute instances delete "$NAME" --zone "$ZONE" --quiet; }
@@ -66,9 +68,16 @@ fi
 
 RC=1
 finish() {
+  # A preempted job exits on SIGTERM, and this trap can run before the shutdown script.
+  # Say so in `ended`, so reconcile books a preemption (and the watcher retries) not a failure.
+  local pre=false
+  [[ "$(md preempted)" == "TRUE" ]] && pre=true
+  if [[ $pre == true ]]; then
+    put ended "{\"ts\":\"$(stamp)\",\"exit_code\":$RC,\"preempted\":true}" || true
+  fi
   gcloud storage rsync -r "$OUT" "$PREFIX/out" --quiet || true
   gcloud storage cp "$LOG" "$PREFIX/job.log" --quiet || true
-  put ended "{\"ts\":\"$(stamp)\",\"exit_code\":$RC}" || true
+  [[ $pre == true ]] || put ended "{\"ts\":\"$(stamp)\",\"exit_code\":$RC}" || true
   self_delete
 }
 trap finish EXIT
@@ -89,7 +98,16 @@ left() { echo $(( JOB_SECONDS - ($(date +%s) - T0) )); }
     gcloud auth configure-docker us-central1-docker.pkg.dev,europe-west4-docker.pkg.dev --quiet
     timeout "$(left)" docker pull "$IMAGE" || exit 1
     GPU_FLAGS=()
-    (( GPUS > 0 )) && GPU_FLAGS=(--gpus all)
+    if (( GPUS > 0 )); then
+      # m3-e2-dense trained for 2.2 h, then its eval (a new process in the same container) got
+      # "Can't initialize NVML": a systemd daemon-reload on the host (apt-daily/unattended-upgrades)
+      # resets the container's device cgroup, and only processes with the GPU already open keep it.
+      # Stop the timers that reload, and pass the device nodes explicitly (NVIDIA's workaround).
+      systemctl stop apt-daily.timer apt-daily-upgrade.timer unattended-upgrades.service 2>/dev/null || true
+      nvidia-modprobe -u -c=0 2>/dev/null || true  # create /dev/nvidia-uvm* if not there yet
+      GPU_FLAGS=(--gpus all)
+      for d in /dev/nvidia*; do [[ -c "$d" ]] && GPU_FLAGS+=(--device "$d"); done
+    fi
     timeout --signal=TERM --kill-after=60 "$(left)" \
       docker run --rm "${GPU_FLAGS[@]}" --env-file "$ENV_FILE" -v "$OUT:/out" "$IMAGE" bash -c "$CMD"
   fi
