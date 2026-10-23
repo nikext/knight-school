@@ -273,6 +273,29 @@ def compare(
     typer.echo(cmp.markdown(loaded, ref))
 
 
+@app.command("bins-figure")
+def bins_figure(
+    role: Annotated[
+        list[str], typer.Option(help="role=path, roles: base, e2_dense, e2_sparse, primer, ...")
+    ],
+    name: Annotated[str, typer.Option(help="Writes results/figures/<name>_bins.png.")],
+    ref: Annotated[str, typer.Option(help="Role the Δ panel compares with.")] = "e2_dense",
+) -> None:
+    """Solve rate per rating bin for each arm, and the primer arms' paired Δ per bin ($0)."""
+    from ks.eval import compare as cmp
+    from ks.eval import report
+    from ks.train.report import FIGURES
+
+    results = {}
+    for r in role:
+        k, sep, v = r.partition("=")
+        if not sep:
+            raise typer.BadParameter(f"--role wants role=path, got {r!r}")
+        results[k] = report.read(Path(v))
+    FIGURES.mkdir(parents=True, exist_ok=True)
+    typer.echo(str(cmp.bins_figure(results, FIGURES / f"{name}_bins.png", ref)))
+
+
 @app.command("primer-tokens")
 def primer_tokens(
     model: Annotated[str, typer.Argument(help="Profile of the chosen main model.")],
@@ -316,11 +339,16 @@ def train_figures(
     base_solve: Annotated[
         float | None, typer.Option(help="The base model's dev solve rate (a reference line).")
     ] = None,
+    role: Annotated[
+        list[str] | None,
+        typer.Option(help="run=role (ks.eval.compare.ROLES): colour by start, style by reward."),
+    ] = None,
 ) -> None:
     """Dev solve rate vs $ and reward components vs step, for one or more runs."""
     from ks.train import report as tr
 
-    for p in tr.figures(run_ids, name, base_solve):
+    roles = dict(r.split("=", 1) for r in role or [])
+    for p in tr.figures(run_ids, name, base_solve, roles or None):
         typer.echo(str(p))
 
 

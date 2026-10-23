@@ -116,7 +116,12 @@ def _style(ax: Any) -> None:
     ax.set_axisbelow(True)
 
 
-def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> list[Path]:
+def figures(
+    run_ids: list[str],
+    name: str,
+    base_solve: float | None = None,
+    roles: dict[str, str] | None = None,
+) -> list[Path]:
     """Dev solve rate vs dollars (all runs on one axis) and reward components vs step."""
     import matplotlib  # type: ignore[import-not-found]
 
@@ -127,7 +132,15 @@ def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> l
         raise ValueError(f"at most {len(SERIES)} runs per figure; split them into several")
     FIGURES.mkdir(parents=True, exist_ok=True)
     runs = {r: (RESULTS / r) for r in run_ids}
-    color = dict(zip(run_ids, SERIES, strict=False))
+    color: dict[str, str] = dict(zip(run_ids, SERIES, strict=False))
+    style = dict.fromkeys(run_ids, "-")
+    label = {r: r for r in run_ids}
+    if roles:  # colour = start point, line style = reward (ks.eval.compare.ROLES)
+        from ks.eval.compare import ROLES
+
+        for r, role in roles.items():
+            text, slot, ls = ROLES[role]
+            color[r], style[r], label[r] = (INK_2 if slot is None else SERIES[slot]), ls, text
     paths = []
 
     fig, ax = plt.subplots(figsize=(6.4, 4.0), facecolor=SURFACE)
@@ -138,7 +151,16 @@ def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> l
         ax.fill_between(
             dev["usd_cum"], dev["solve_lo"] * 100, dev["solve_hi"] * 100, color=c, alpha=0.15, lw=0
         )
-        ax.plot(dev["usd_cum"], dev["solve"] * 100, color=c, lw=2, marker="o", ms=4, label=r)
+        ax.plot(
+            dev["usd_cum"],
+            dev["solve"] * 100,
+            color=c,
+            ls=style[r],
+            lw=2,
+            marker="o",
+            ms=4,
+            label=label[r],
+        )
         ax.annotate(
             f"{dev['solve'][-1] * 100:.1f}%",
             (dev["usd_cum"][-1], dev["solve"][-1] * 100),
@@ -187,7 +209,7 @@ def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> l
             # before ADR-022, TRL's clipped ratio was the truncated share
             col_r = "clipped" if col == "truncated" and col not in s.columns else col
             if col_r in s.columns:
-                ax.plot(s["step"], s[col_r], color=color[r], lw=1.5, label=r)
+                ax.plot(s["step"], s[col_r], color=color[r], ls=style[r], lw=1.5, label=label[r])
         if log:
             ax.set_yscale("log")
         ax.set_title(title, color=INK, fontsize=9, loc="left")

@@ -1,0 +1,25 @@
+# E3 primer-M -> GRPO dense (task M4 §5): config v3 (ADR-022), the same rl_train positions, seed and
+# steps as m4-e2-dense-v3; only the start point differs (init_ckpt = the primer-M SFT model).
+# Then the final model on test2000, pass@8 on dev500 (task M4 §7) and E0 (probe500).
+# Spot handling as in M3 (ADR-020): us-central1-c first, stockouts waited out for up to 12 h.
+id: m4-e3-dense
+milestone: M4
+description: "E3: primer-M -> GRPO dense, 200 steps, config v3"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-c, europe-west4-a, us-central1-a]
+max_hours: 4
+max_attempts: 6
+stockout_wait_hours: 12
+run_budget_usd: 22
+boot_disk_gb: 200
+image: IMAGE_AFTER_BUILD
+command: "bash configs/jobs/m3-grpo.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/grpo_dense.yaml"
+  TRAIN_SETS: "name=m4-e3-dense init_ckpt=gs://knight-school-nt26-knight-school/runs/m4-sft-primer-m/final/merged"
+  TEST_SET: "test2000"
+  PASSK: "1"
+  PROBE: "1"  # E0 on the dense checkpoint (task M4 §5)
