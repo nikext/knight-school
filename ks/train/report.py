@@ -118,10 +118,10 @@ def _style(ax: Any) -> None:
 
 def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> list[Path]:
     """Dev solve rate vs dollars (all runs on one axis) and reward components vs step."""
-    import matplotlib
+    import matplotlib  # type: ignore[import-not-found]
 
     matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt  # type: ignore[import-not-found]
 
     if len(run_ids) > len(SERIES):
         raise ValueError(f"at most {len(SERIES)} runs per figure; split them into several")

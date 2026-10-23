@@ -85,7 +85,7 @@ def model_dir(cfg: GrpoConfig, p: prof.Profile, work: Path) -> str:
     """A local snapshot at the pinned revision, so trainer, vLLM and tokenizer load the same files."""
     if cfg.init_ckpt:
         return str(fetch(cfg.init_ckpt, work / "init"))
-    from huggingface_hub import snapshot_download
+    from huggingface_hub import snapshot_download  # type: ignore[import-not-found]
 
     assert p.hf_repo, f"{p.name} is not an open model"
     return snapshot_download(p.hf_repo, revision=p.revision)
@@ -93,7 +93,7 @@ def model_dir(cfg: GrpoConfig, p: prof.Profile, work: Path) -> str:
 
 def lora_targets(model: Any) -> list[str]:
     """Every linear layer of the language model: not the vision tower, not the LM head (ADR-018)."""
-    import torch
+    import torch  # type: ignore[import-not-found]
 
     names = [
         n
@@ -210,11 +210,11 @@ def main(
         "/tmp/ks-work"
     ),
 ) -> None:
-    import torch
-    import transformers
+    import torch  # type: ignore[import-not-found]
+    import transformers  # type: ignore[import-not-found]
     from datasets import Dataset  # type: ignore[import-not-found]
     from peft import LoraConfig  # type: ignore[import-not-found]
-    from transformers import AutoConfig, TrainerCallback
+    from transformers import AutoConfig, TrainerCallback  # type: ignore[import-not-found]
     from trl import GRPOConfig, GRPOTrainer  # type: ignore[attr-defined]
 
     from ks.eval import harness, report, sets
@@ -457,7 +457,7 @@ def main(
         # Preempted between the last checkpoint and the final save. trainer.train() would run
         # one step past max_steps here (seen in the laptop smoke), so load the adapter and skip.
         from peft import set_peft_model_state_dict  # type: ignore[import-not-found]
-        from safetensors.torch import load_file
+        from safetensors.torch import load_file  # type: ignore[import-not-found]
 
         set_peft_model_state_dict(
             trainer.model, load_file(str(Path(resume) / "adapter_model.safetensors"))

@@ -30,7 +30,7 @@ from typing import Any
 
 def sort_by_length(seq_dict: dict[str, Any]) -> dict[str, Any]:
     """TRL's `shuffle_sequence_dict` contract, but ordered by completion length (longest first)."""
-    import torch
+    import torch  # type: ignore[import-not-found]
 
     lengths = seq_dict["completion_mask"].sum(dim=-1)
     order = torch.argsort(lengths, descending=True, stable=True).tolist()
@@ -54,8 +54,8 @@ def install_sorted_batches() -> None:
 
 def trimmed(trainer_cls: type) -> type:
     """A subclass of a TRL GRPOTrainer class whose text-only log-prob passes trim each chunk."""
-    import torch
-    import torch.nn.functional as F
+    import torch  # type: ignore[import-not-found]
+    import torch.nn.functional as F  # type: ignore[import-not-found]
 
     class Trimmed(trainer_cls):  # type: ignore[valid-type, misc]
         trimmed_columns = 0  # columns skipped since the last read (for the step log)
