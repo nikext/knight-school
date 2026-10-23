@@ -277,14 +277,18 @@ def train_report(
     local: Annotated[
         Path | None, typer.Option(help="A local out/ dir instead of the run's GCS attempts.")
     ] = None,
+    continued_by: Annotated[
+        list[str] | None,
+        typer.Option(help="Run ids that finished this run from a copy of its checkpoint."),
+    ] = None,
 ) -> None:
     """Collect a GRPO run's metrics into results/train/<id>/ (steps.csv, dev.csv, run.json)."""
     from ks.train import report as tr
 
     if local:
-        counts = tr.collect([local], tr.RESULTS / run_id)
+        counts = tr.collect([[local]], tr.RESULTS / run_id)
     else:
-        counts = tr.pull(run_id, _env("BUCKET")["BUCKET"])
+        counts = tr.pull(run_id, _env("BUCKET")["BUCKET"], continued_by=tuple(continued_by or ()))
     typer.echo(f"results/train/{run_id}: {counts}")
 
 
