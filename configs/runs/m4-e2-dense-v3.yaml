@@ -16,7 +16,7 @@ max_attempts: 6
 stockout_wait_hours: 12
 run_budget_usd: 22
 boot_disk_gb: 200
-image: IMAGE_AFTER_BUILD
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:91af7e44bf9f@sha256:c377f7f110a18a69acf5361c37e267f4a8e3641f7e50b3a2a0f141854f106e48
 command: "bash configs/jobs/m3-grpo.sh"
 env:
   KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk

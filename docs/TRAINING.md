@@ -194,7 +194,9 @@ RL removed this in ~10 steps: by step 13 the mean length was 18 tokens, legal 87
 - **M3 additions** (ADR-018): `flash-linear-attention`/`fla-core` 0.5.2 (Triton kernels for
   Qwen3.5's DeltaNet layers in training) and `tensorboardX` 2.6.5. TRL 1.16.0 was still the
   newest release on 2026-10-22, so the pins are unchanged.
-- **Current image (M3, config v2 runs, ADR-021):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:35e9bf043759@sha256:8808004de26e22080fbc678338d6871a15af1f831588ce8c27a45782f0b0e01e`
+- **Current image (M4, config v3 runs, ADR-022):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:91af7e44bf9f@sha256:c377f7f110a18a69acf5361c37e267f4a8e3641f7e50b3a2a0f141854f106e48`
+  (built 2026-10-23 from 91af7e4, 11 min 32 s on Cloud Build).
+- **M3 image (config v2 runs, ADR-021):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:35e9bf043759@sha256:8808004de26e22080fbc678338d6871a15af1f831588ce8c27a45782f0b0e01e`
   (built 2026-10-22 from 35e9bf0, 12 min 54 s on Cloud Build).
 - **E2 v1 image (M3):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:25b5dd417d43@sha256:b1127f781cb392cf18aa545759c02d90763c1d2403645a36a4f10c95f5004606` (`m3-e2-dense`, `m3-e2-sparse{,-r2}`).
 - **Earlier image (M2):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:90bfc56fc862@sha256:5750820ecc59b72928dc82f11db31cef6e5b5e404c69d12ac7b345e7437b7e7c`.
