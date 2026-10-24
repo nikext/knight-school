@@ -14,7 +14,7 @@ bootstrap CIs. Arm-vs-arm differences use a paired bootstrap. Model:
 | base → GRPO dense (E2, config v2) | 3.2% [0.8, 6.4] | 4.0% [0.8, 8.0] | 0.0% | 50.4% [41.6, 59.2] | no change beyond noise (E2 predictions) |
 | base (E2, config v3, `m4-e2-dense-v3`) → GRPO dense | 1.6% [0.0, 4.0] | 4.0% [0.8, 8.0] | 0.0% | 50.4% [41.6, 59.2] | no change beyond noise (E2 v3 predictions) |
 | primer-M + T8 (`m4-sft-primer-m-t8`) | 97.6% [94.4, 100.0] | 14.4% [8.8, 20.8] | 92.0% [87.2, 96.0] | 80.0% [72.8, 86.4] | P1 80–99% (point 93%), P2 20–75% (45%), P3 25–85% (55%), P4 85–100% (95%) (E3 predictions) |
-| primer-M → GRPO dense | | | | | within ±10 points of the primer-M row on each task (E3 predictions) |
+| primer-M + T8 → GRPO dense (`m4-e3-dense`) | 97.6% [94.4, 100.0] | 7.2% [3.2, 12.0] | 91.2% [85.6, 96.0] | 80.0% [72.8, 86.4] | within ±10 points of the primer-M row on each task (E3 predictions) |
 
 Base row: `m2-screen-a100-r4`, `results/eval/probe500/qwen3.5-2b.md`. **It
 mostly measures copying of the format hint, not knowledge.** Qwen3.5-2B
@@ -78,7 +78,7 @@ $/1k counts the 105 s of generation only; the job cost $0.13 with boot.
 | E2 base → GRPO sparse, v3 | 22–29% (point 25.5%); see below | | | | | |
 | E3 primer-M (+ T8) only | 18–42% (point 30%) if the format holds; see below | **35.7% [33.6, 37.9]** | 55.8% [54.3, 57.4] | 100.0% | +9.9 [+8.2, +11.8] vs dense v3 | $22.01 SFT + evals (+ $4.16 stopped primer-M-only attempt) |
 | E3 primer-M → GRPO sparse | 25–48% (point 37%) | | | | | |
-| E3 primer-M → GRPO dense | 26–50% (point 38%) | | | | | |
+| E3 primer-M (+ T8) → GRPO dense | 26–50% (point 38%) | **32.6% [30.5, 34.7]** | 54.5% [53.1, 56.1] | 100.0% | **+6.8 [+5.2, +8.4]** (H1); vs primer only −3.1 [−4.5, −1.6] | $9.64 (preempted at step 140, resumed) |
 
 **E2 predictions** (written 2026-10-22, before any GRPO run of the main model; the only
 training signal seen so far is M2's 5-step compatibility smoke and the M3 laptop wiring test
@@ -309,6 +309,27 @@ twice the cost ($22 vs $10). The gain is spread over every bin from 600 to 1999 
 beat or meet the predictions, legal-move counting (P2) is below them although the full legal
 list scores F1 73.2%, and P4 is under the 85% floor. The task's E0 gate (P3 not near 0) passes,
 so the GRPO arms go ahead.
+
+**E3 primer → GRPO dense reading (`m4-e3-dense`).** test2000 **32.6% [30.5, 34.7]**, move
+accuracy 54.5%, rating at 50% solve 1151 [1107, 1194]. Paired vs E2 dense v3: **+6.8 [+5.2,
++8.4]** (202 puzzles solved only by this arm, 66 only by dense v3), so **H1 holds** (Δ ≥ 3 with a
+CI that excludes 0; predicted +11, range +2 to +20, 75%). But GRPO **lowered** the primer
+model's own score: −3.1 [−4.5, −1.6] paired vs primer only (81 vs 143 puzzles). **H5 fails** (I
+gave ≥ +3 70%). The H1 gain is the primer's, not RL's on top of it. Dev500 shows the path: 35.4%
+at step 0, 36.8% at step 20, a dip to 28.0% at step 50 and 28.0% at step 120, then 36.2% at step
+200. Test2000 is graded on the final model only. pass@k on dev500 (T = 1, n = 8) fell on every
+k: @1 28.1 → 26.6%, @4 43.4 → 37.6%, @8 51.4 → 42.8%. RL narrowed the sample distribution
+without lifting greedy accuracy, as predicted for pass@8, but pass@1 didn't rise either.
+
+A likely cause, not tested: config v3's entropy floor. The adaptive bonus (ADR-021) targets
+token entropy 0.2, set from the base model's runs. The primer model starts at 0.11, so the
+controller raised the coefficient to ~0.64 by steps 21–60 (dense v3: 0.12–0.18) and pushed the
+policy away from its sharp primer answers. That is where dev500 dropped. Zero-spread groups
+averaged ~30% (dense v3: 63%), so the arm had plenty of gradient. KL to the start rose to ~0.25
+over steps 121–200. Health otherwise as predicted: format 100%, truncation 0, prose ~0, ~8.5
+tokens per answer. E0 stayed within ±10 points of the primer row on every task (P2 legal count
+14.4 → 7.2%). The arm was preempted at step 140 (us-central1-c) and resumed from its step-140
+checkpoint in europe-west4-a; dev500 was continuous across the restart (31.4% → 32.8%).
 
 Figures (E2): dev500 solve rate vs dollars spent for all three runs
 (`results/figures/e2_dev_vs_usd.png`), and training metrics per step: move-match rate, legal and
