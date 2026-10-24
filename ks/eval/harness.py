@@ -22,6 +22,7 @@ import numpy as np
 
 from ks.chess import prompt as kpr
 from ks.chess import rewards as kr
+from ks.chess.parse import STOP
 from ks.data.manifest import git_sha
 from ks.eval import metrics as m
 from ks.eval.backends import Backend, Request
@@ -207,7 +208,8 @@ def summarise(items: list[dict[str, Any]], n: int = 1, cost_usd: float = 0.0) ->
         d["format"] += s["well_formed"]
         toks_out.append(s["tokens_out"])
         toks_in.append(s["tokens_in"])
-        truncated += s["finish"] == "length"
+        # hit the cap before answering; an older output that ran on after </answer> didn't (ADR-022)
+        truncated += s["finish"] == "length" and STOP not in s["text"]
     den = [puzzles[p]["pos"] for p in pids]
     solved = [float(puzzles[p]["ok"][0]) for p in pids]
     ratings = [puzzles[p]["rating"] for p in pids]

@@ -512,3 +512,213 @@ step and stops learning. The candidate fix, config v3, is v2 plus generation sto
 first launch, and is not adopted here. v3 changes what the loss sees, so a clean H1 comparison
 would need E2 dense re-run under v3 (~$9). Verify first that TRL 1.16 passes stop strings to
 vLLM in colocate mode.
+
+### ADR-022: GRPO config v3: every rollout and every eval stops at the first `</answer>`
+**Status:** accepted (2026-10-23; the user adopted v3 and re-runs of both E2 arms under it in the
+M4 session). Supersedes ADR-021's frozen config.
+**Context:** ADR-021's v2 had a flaw: nothing stopped generation after `</answer>`. In dense v2,
+0.5–2% of completions ran on to the 1024-token cap after a valid answer, which switched its
+entropy controller off. In sparse v2 that tail grew to ~90% of completions after step 150. Steps
+took ~4× longer and the answers froze. Any M4 arm could tip into that regime at random.
+**Decision:**
+- **v3 = v2 + `stop_at_answer: true`.** `ks.train.grpo` passes `generation_kwargs = {stop:
+  ["</answer>"], include_stop_str_in_output: true}`. TRL 1.16's colocate path hands them straight
+  to vLLM's `SamplingParams` (`generation_kwargs.update(self.generation_kwargs)` in
+  `trl/generation/vllm_generation.py`). Laptop smoke (Qwen3.5-0.8B, 4 steps): all 10 sampled
+  completions that contained `</answer>` ended there, and dev eval, checkpoints and the final
+  save ran as before. The tokens after `</answer>` are never generated, so they get no
+  gradient, no entropy bonus and no weight in the controller's entropy. A stopped completion
+  has no EOS. The completion mask comes from the generated lengths, and `mask_truncated` is
+  false, so its tokens still train. Nothing else changes (lr, 64 × 8, T = 1.0, β, dapo, entropy
+  control, 200 steps, seed 2026).
+- **Grading: the response ends at its first `</answer>`** (`ks.chess.parse.cut`, applied by
+  `parse` and by the E0 probe grader). Before, the last answer block counted, and a second block
+  failed the format. Under any decoding, the text up to the first `</answer>` comes out the same
+  with or without the stop string. So under this rule, outputs generated without the stop and
+  outputs generated with it are graded alike.
+- **Every vLLM eval passes the same stop** (test sets, the dev eval in training, pass@k). Under
+  the cut rule this changes no grade and only saves tokens: sparse v2's test2000 took 369 s
+  instead of 26 s. Gemini doesn't use it yet (its stop sequences leave the stop string out of
+  the output). The cut makes Gemini's grades the same anyway. Adding the stop there would only
+  save cost; that is decided in the Gemini session.
+- **Truncation metric.** TRL's `completions/clipped_ratio` counts every completion that doesn't
+  end in EOS, so under v3 it reads ~1. Ours, `completions/truncated` (`truncated` in
+  steps.csv), is "at the token cap with no `</answer>`". The harness's "hit max tokens" uses the
+  same rule.
+- **Re-grade of the committed evals** (dry run over every LLM file in dev500, test2000 and
+  probe500): no solve, move-accuracy or legal rate changes. Sparse v2's test2000 format goes from
+  99.85% to 100%, and its share at the cap from 99.8% to 0%: every one of those answers had
+  closed before the ramble. Gemma 4 E2B and Qwen3-1.7B (dev500 screening) lose ≤ 0.2 points of
+  "hit max tokens". The committed files stay as they are.
+- **E2 is re-run under v3**, both arms (`m4-e2-dense-v3`, `m4-e2-sparse-v3`), with the same
+  data, seed and steps, and booked to M4. They are the comparators for E3 (H1: primer → dense
+  vs `m4-e2-dense-v3`). The v1 and v2 runs stay in the write-up as the history that led here.
+**Consequences:** v1/v2 arms aren't compared to v3 arms as like-for-like. A healthy 200-step
+run should cost ~$7–9 at ADR-019's rates, and the rambling regime can't occur. Long text can
+still grow before `<answer>`, where it is reasoning: a completion that reaches the cap there
+has no answer and gets reward 0. A TRL bump must re-check that `generation_kwargs` reach
+`SamplingParams` in colocate mode.
+
+### ADR-023: Primer SFT implementation (M4): answer-only loss, no packing, 30-minute checkpoints
+**Status:** accepted (2026-10-23)
+**Context:** TRAINING.md §5 fixed a full fine-tune, lr 1e-5 with cosine decay, 3% warmup, 1 epoch,
+packing, loss on the answers only, seq len 2048 and ~0.25M tokens a step. §7 asked for a
+checkpoint every ~15 min. Building `ks.train.sft` and its laptop wiring test turned up several
+things the plan didn't foresee.
+**Decision:**
+- **Stack:** TRL 1.16 `SFTTrainer` on pre-tokenized examples with labels (`skip_prepare_dataset`).
+  The prompt is the chat template with a generation prompt (`enable_thinking: false`, so it ends
+  in an empty, closed think block), which gives exactly the token ids vLLM sees in every eval and
+  rollout. The answer and `<|im_end|>` follow; the template's trailing newline is dropped.
+  Labels are -100 on the prompt. On primer-S with the Qwen3.5-2B tokenizer: 142.3 tokens per
+  example, p99 274, max 468. TRL 1.16 has a fused LM head that projects only the labelled
+  positions (~15% of tokens), so the 248k-vocabulary head is cheap and the full logits are never
+  materialised.
+- **Full fine-tune** of every language-model parameter, the tied embeddings included (the vision
+  tower stays frozen). fp32 master weights with bf16 autocast, fused AdamW (β 0.9/0.999),
+  weight decay 0, grad clip 1.0. Weights kept in bf16 would round most lr-1e-5 updates away.
+- **No packing (a deviation from §5).** TRL's packing needs padding-free attention, and
+  flash-attn isn't in the image. Without the `causal-conv1d` package (ADR-018), Qwen3.5's
+  DeltaNet short convolution (kernel 4) also runs a torch fallback that ignores sequence
+  boundaries. Packed examples would then see up to 3 tokens of the previous example in every
+  DeltaNet layer. Instead, the primer is shuffled once (seed 2026) and cut into optimizer steps of
+  1,728 examples (~0.25M tokens). Each step is sorted by length (longest first) and cut into
+  right-padded micro-batches of 64. Padding costs 3.5% of the tokens (primer-S: 0.8% at
+  micro-batch 16). Every step is a random sample of the primer, so no length curriculum sneaks
+  in. The dataset is stored in this order and read sequentially, so a resume continues at the
+  same batch. Primer-M makes 752 optimizer steps, with 23 steps of warmup.
+- **Gradient checkpointing on.** On the laptop's 0.8B, activations took 2.8 MiB per token without
+  it, and with it the cost was mostly fixed, about 0.5 GiB. Scaled to the 2B, with fp32 residuals
+  under autocast, that's ~6–7 MiB per token. Neither the longest micro-batch of 64 (30k tokens)
+  nor one of 16 (7.5k) would fit next to ~34 GB of fp32 weights, grads, Adam state and autocast
+  cache. Checkpointing costs ~35–40% more compute and changes no math.
+- **A checkpoint every 30 min of wall clock** (not ~15, as §7 had it), because each one is ~22 GB
+  (fp32 weights 7.6 GB, Adam state 15 GB). The trainer writes it locally (~2 min, blocking, on
+  the pd-balanced boot disk). A background thread copies it to `<root>/ckpt` with `_COMPLETE`
+  last, one copy at a time, and then frees the older local copy. The last one is kept, and
+  all are deleted once the final model is saved. The a2's bundled local SSD would save under
+  $1. It isn't used, because it needs a startup-script change that can't be tested locally.
+- **A probe at each checkpoint:** 32 dev500 RL prompts, greedy, 32 tokens, through HF
+  `generate`. It logs the format, legal and move rates and the share with an `<answer>` tag. It is
+  the early warning for the T8 fallback (§5), with a stop rule pre-registered in RESULTS.md (E3).
+- **Final model:** bf16 weights, plus the base model's `config.json` verbatim and its
+  tokenizer and processor files. SFTTrainer aligns the config's special-token ids with the
+  tokenizer, and `save_pretrained` serialises the config differently, so the copy keeps the
+  checkpoint different from the base model in its weights only.
+- **Laptop wiring test** (Qwen3.5-0.8B, 256 primer-S examples). Only the last two decoder layers
+  trained, because a full fine-tune doesn't fit in 6 GB. Everything else ran the real code path:
+  16 steps, with a checkpoint every 4. A SIGTERM after checkpoint 8 made the job exit 143, and
+  attempt 2 resumed from checkpoint 8. Tokens per step matched the uninterrupted run at every
+  step, and losses stayed within 0.16% (relative), the same spread as between two
+  uninterrupted runs (the GPU kernels aren't bitwise deterministic). vLLM loaded the final model
+  (`ks eval --ckpt`, 24 dev500 puzzles, format 98%), and GRPO started from it through
+  `init_ckpt` (2 steps).
+**Consequences:** primer-M is 186.5M tokens at ~11.6 GFLOP per token (forward, recompute and
+backward), so ~2.2e18 FLOPs. At 32–42% MFU on the A100 that's 4.6–6 h, plus boot, checkpoint
+writes and evals: **~$17–21** (BUDGET.md §2 had $21–31). The run measures it. The same trainer
+runs E4 (primer-S) and E5a (rules-only) with only `data` changed.
+
+### ADR-024: T8 fallback for the primer SFT: 2% RL-format copies of T5, answer only
+**Status:** accepted (2026-10-23, M4; the user approved the rerun)
+**Context:** `m4-sft-primer-m` trained on primer-M as planned (ADR-023): ~30 s per step,
+8.3k tok/s, loss 0.83 → 0.56 and answer-token accuracy 71% → 80% from step 25 to step 75. Its
+probe of the RL prompt (32 dev500 positions) scored format 1.00 at step 0, but **0.00** at the
+first checkpoint (step 53). The model answered the RL prompt with a bare move (`Qxh2#`), the way
+the 390k T5 "Best move?" examples are answered. The two prompts differ only in their last line,
+and none of the 1.3M primer examples shows the answer tags. The pre-registered rule (RESULTS.md,
+E3) was to stop after two such checkpoints in a row. The user asked for anything that speeds
+M4 up, so the run was stopped after the first one, at ~step 95 (13:47Z, $4.16). TRAINING.md §5
+planned the T8 fallback for this case.
+**Decision:**
+- **T8 = 26,000 examples (2% of primer-M's count), added to primer-M.** Each is a copy of a T5
+  example drawn at random (seed 2034; 13,057 from puzzle positions, 12,943 from eval-DB
+  positions). It keeps the T5 example's position and move, and only the user turn changes: the RL
+  prompt's instruction (`ks.chess.prompt.user_text`, prompt hash `c728de49e119`) replaces
+  "Best move?". The answer is `<answer>SAN</answer>`. The T5 originals stay in the data, so the
+  model sees each pair of instructions with its own format. `data/primer/M-t8` holds primer-M's
+  26 shards byte for byte, plus `shard-00026` with the T8 examples (manifest `primer_M-t8`,
+  0 contamination hits).
+- **No think block (a deviation from §5),** which proposed a short templated think block that
+  lists checks, captures and threats from python-chess. Under config v3 every RL arm and the
+  base model already answer the RL prompt as `<answer>SAN</answer>` with no thinking (E2 v3:
+  ~9 tokens). The step-0 probe of the base model did the same. A templated think block would
+  hand the primer arms a list of checks and captures at inference time that the E2 arms don't
+  get. The H1 difference would then mix the primer's knowledge with that prompt scaffold. The
+  answer-only T8 adds no move and no position that T5 doesn't already have, only the format.
+- **Same run otherwise:** the same image (`train:1a92ddf79865`), config and seed as
+  `m4-sft-primer-m`. Only `data` and the run name change (`m4-sft-primer-m-t8`). The stop rule
+  carries over: probe format < 50% at two checkpoints in a row → stop and ask the user.
+**Consequences:** the primer arms of E3 start from `m4-sft-primer-m-t8`, and the write-up calls
+the primer "primer-M + T8". The rerun costs another ~$21; the stopped attempt cost $4.16. If the
+format still breaks with 2%, the next step is a larger T8 share. That needs the user's yes.
+
+### ADR-025: Ablation: primer → GRPO dense with the entropy target at the primer's own entropy
+**Status:** accepted (2026-10-24, M4; the user approved it within the M4 allocation)
+**Context:** `m4-e3-dense` lowered the primer model's test2000 score by 3.1 points [−4.5, −1.6]
+(H5 fails). Config v3's adaptive entropy bonus (ADR-021) has a target of 0.2, set from the base
+model's runs. The primer model starts much sharper: token entropy 0.13–0.15 over steps 1–9.
+So the controller raised the bonus coefficient by 0.02 every step, to ~0.64 by steps 21–60.
+Base-model runs sat at 0.12–0.18. dev500 fell from 36.8% (step 20) to 28.0% (step 50) while the
+coefficient climbed, then recovered to 36.2% by step 200.
+**Decision:** one ablation run, `m4-e3-dense-ent014`. It is `m4-e3-dense` with
+`entropy_target: 0.14`, the mean entropy of steps 1–5 (0.143), set with `--set` in the run
+config and recorded in run.json. Seed, data, steps and reward are unchanged. The controller still
+works against collapse below the primer's own entropy, but it no longer pushes the policy above
+it. The bonus wasn't switched off entirely: that would also remove the protection against v1's
+entropy collapse and confound the answer. The run is outside the frozen protocol on purpose.
+It is reported as an ablation of config v3 for a sharp start, not as an E3 arm. It used the
+second-seed slot of task M4 §6, so no second seed of primer → dense was run.
+**Consequences:** if this arm matches or beats primer only and avoids the dev dip, the H5 failure
+is attributed to the base-tuned entropy floor, and M5 should set the target per start point.
+If it also falls below primer only, GRPO with this reward doesn't add to a primer that already
+imitates puzzle solutions, whatever the entropy control.
+
+### ADR-026: M4 main result: the primer's gain is SFT; RL on top adds nothing; M5 re-prioritised
+**Status:** accepted (2026-10-25, M4)
+**Context:** M4 ran E3 under config v3 (ADR-022) with one seed per arm. The arms: primer-M + T8
+SFT (ADR-024), then GRPO dense and GRPO sparse from it, both E2 arms re-run under v3, and one
+ablation of the entropy target (ADR-025). test2000 solve, with paired deltas:
+
+| Arm | Solve | vs E2 dense v3 | vs primer only |
+|---|---|---|---|
+| E2 base → dense v3 | 25.8% [23.9, 27.8] | — | −9.9 |
+| E2 base → sparse v3 | 28.0% [26.1, 30.0] | +2.2 [+1.1, +3.4] | — |
+| primer-M + T8 only | **35.7% [33.6, 37.9]** | **+9.9 [+8.2, +11.8]** | — |
+| primer → dense (target 0.2) | 32.6% [30.5, 34.7] | +6.8 [+5.2, +8.4] | −3.1 [−4.5, −1.6] |
+| primer → sparse (target 0.2) | 35.4% [33.4, 37.6] | +9.7 [+8.0, +11.3] | −0.2 [−1.6, +1.1] |
+| primer → dense (target 0.14) | 34.8% [32.6, 36.9] | +8.9 [+7.3, +10.5] | −0.9 [−2.3, +0.4] |
+
+**Decision (reading):**
+- **H1 holds; H2 is falsified as stated; H5 fails.** A teacher-free primer lifts test2000 by
+  ~10 points over GRPO from the base model, for $22 of SFT (base → GRPO costs ~$9). Putting GRPO
+  on top keeps that gain at best (sparse, or dense with a matched entropy target) and costs 3 points
+  at worst (dense with the base-tuned entropy floor). pass@8 on dev500 falls under every RL arm
+  (51.4% → 42.8–47.0%): RL sharpens without discovering new solutions (Shen et al.), and the
+  sharpening doesn't reach greedy accuracy either.
+- **What the primer is:** half of T5's 390k "Best move?" examples are `primer_pool` puzzle
+  positions answered with the puzzle's own solution. So primer-M is partly supervised imitation of
+  the RL task, and the +9.9 can't yet be split into "board knowledge" and "move imitation". E0
+  shows the knowledge did go in (P3 board-after-move 0% → 92%, P1 square 5% → 98%). Whether it is
+  what raised the solve rate is H4's question.
+- **Config v3's entropy floor (0.2) is tuned for the base model.** Applied to a sharper start it
+  pushes the policy away from the primer, until the target is set from the start's own entropy.
+  That is a property of the controller, not of the primer. The headline doesn't depend on it:
+  both target settings land within noise of primer only or below.
+
+**Consequences for M5 (task file priority list):**
+1. **E5a (rules-only primer, T1–T4) → GRPO dense moves to first.** It is the cleanest test of the
+   project's question, "does knowledge raise the RL ceiling?", with no move imitation in the
+   primer. Report rules-only SFT on its own as well. Plan the format risk up front: without T5
+   there is no bare-move habit to break, but check the probe at the first checkpoint.
+2. **Every primer arm reports primer-only and primer → GRPO,** so H5 is measured per arm. The SFT
+   eval is ~$0.1, since the SFT job already runs it.
+3. **Set the entropy target per start point**: the mean entropy of steps 1–5, as in ADR-025.
+   Otherwise the controller penalises a sharp start. This changes v3 for primer starts only,
+   because the E2 arms are already done. It needs an ADR and the user's yes before M5.
+4. **E4 primer-S** stays as the cheap second point, now read on primer-only as well as
+   post-RL.
+5. **E5b, E5c, E5d** keep their order after these.
+- **README headline (draft, finalised in M6):** "A teacher-free chess primer (SFT on
+  python-chess rules and Stockfish/puzzle moves, no LLM-written traces) lifts Qwen3.5-2B from 26%
+  to 36% on 2,000 held-out Lichess puzzles, ten points above GRPO alone. GRPO on top of the primer
+  adds nothing: it keeps the gain at best and narrows the model's sampling."

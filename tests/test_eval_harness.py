@@ -209,3 +209,33 @@ def test_rescore_regrades_format_only(puzzles):
     assert "rescored" in report.markdown(new)
     with pytest.raises(ValueError, match="legal_list"):
         harness.rescore(res, closed.model_copy(update={"legal_list": False}), "x")
+
+
+def test_rambling_after_the_answer_is_cut_and_not_truncated(puzzles):
+    # ADR-022: an old output that answered and then ran to the cap grades as if it had stopped
+    sol = _solutions(puzzles)
+    res = run(puzzles, lambda r: f"<answer>{sol[r.id]}</answer> Step 1: <answer>Ka1</answer>")
+    for it in res["items"]:
+        it["samples"][0]["finish"] = "length"
+    it = res["items"][0]
+    it["samples"][0] |= {"text": "Let me think about the knight on", "finish": "length"}
+    closed = LLM.model_copy(update={"template_closes_think": True})
+    new = harness.rescore(res, closed, "ADR-022")
+    s = new["summary"]
+    assert s["truncated"] == pytest.approx(1 / s["positions"])
+    assert s["format"]["value"] > 0.95 and s["move_acc"]["value"] < 1.0
+
+
+def test_compare_counts_who_alone_solved_what(puzzles):
+    from ks.eval import compare
+
+    sol = _solutions(puzzles)
+    good = run(puzzles, lambda r: f"<answer>{sol[r.id]}</answer>")
+    bad = run(puzzles, lambda r: "<answer>Zz9</answer>")
+    d = compare.paired(good, bad)
+    assert d["n"] == 36 and d["a_only"] == 36 and d["b_only"] == 0
+    assert d["delta"]["value"] == 1.0
+    md = compare.markdown({"good": good, "bad": bad}, ref="bad")
+    assert (
+        "| good | 100.0% [100.0, 100.0] | +100.0" in md and "| 600-799 | 3 | 100.0% | 0.0% |" in md
+    )

@@ -1,0 +1,27 @@
+# E2 base -> GRPO dense under config v3 (ADR-022: v2 + every rollout stops at the first
+# </answer>), task M4 §5's comparator for H1. Same arm as m3-e2-dense-v2; only the config
+# version differs. Qwen3.5-2B, 200 steps on one spot A100 80GB, dev500 every 10 steps, then the
+# final merged model on test2000 and E0 (probe500).
+# Spot handling as in M3 (ADR-020): us-central1-c first, stockouts waited out for up to 12 h.
+# max_hours 4: dense v2 took ~2.6 h with boot and both evals; v3 can't fall into the rambling
+# regime that made sparse v2's steps ~4x longer.
+id: m4-e2-dense-v3
+milestone: M4
+description: "E2: base -> GRPO dense, 200 steps, config v3 (stop at </answer>)"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-c, europe-west4-a, us-central1-a]
+max_hours: 4
+max_attempts: 6
+stockout_wait_hours: 12
+run_budget_usd: 22
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:91af7e44bf9f@sha256:c377f7f110a18a69acf5361c37e267f4a8e3641f7e50b3a2a0f141854f106e48
+command: "bash configs/jobs/m3-grpo.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/grpo_dense.yaml"
+  TRAIN_SETS: "name=m4-e2-dense-v3"
+  TEST_SET: "test2000"
+  PROBE: "1"  # E0 on the dense checkpoint

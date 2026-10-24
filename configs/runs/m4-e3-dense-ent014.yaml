@@ -1,0 +1,25 @@
+# Ablation of config v3 for the primer start (ADR-025): m4-e3-dense with one change, the adaptive
+# entropy bonus's target set from 0.2 (fitted on the base model) to 0.14, the primer model's own
+# token entropy at the start (m4-e3-dense steps 1-5: 0.143). Tests whether v3's entropy floor is
+# why GRPO lowered the primer's score (H5). Not an E3 arm: the frozen config is changed on purpose.
+# Then test2000 and pass@8 on dev500. Spot handling as in M3 (ADR-020).
+id: m4-e3-dense-ent014
+milestone: M4
+description: "Ablation (ADR-025): primer-M -> GRPO dense with entropy_target 0.14, 200 steps"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-c, europe-west4-a, us-central1-a]
+max_hours: 4
+max_attempts: 6
+stockout_wait_hours: 12
+run_budget_usd: 22
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:1a92ddf79865@sha256:d8ebb5f19ae14b1a3ddc10fc7122c0b604166e6797ce1d2721939ef350da18f2
+command: "bash configs/jobs/m3-grpo.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/grpo_dense.yaml"
+  TRAIN_SETS: "name=m4-e3-dense-ent014 init_ckpt=gs://knight-school-nt26-knight-school/runs/m4-sft-primer-m-t8/final/merged entropy_target=0.14"
+  TEST_SET: "test2000"
+  PASSK: "1"

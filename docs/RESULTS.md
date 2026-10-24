@@ -12,8 +12,10 @@ bootstrap CIs. Arm-vs-arm differences use a paired bootstrap. Model:
 | base (zero-shot) | 4.8% [1.6, 8.8] | 4.0% [0.8, 8.0] | 0.0% | 50.4% [41.6, 59.2] | P1 40–60%, P2 2–8%, P3 0–2%, P4 55–75% (written 2026-10-21, before any run) |
 | base → GRPO dense (E2, config v1) | 1.6% [0.0, 4.0] | 3.2% [0.8, 6.4] | 0.0% | 50.4% [41.6, 59.2] | no change beyond noise (E2 predictions) |
 | base → GRPO dense (E2, config v2) | 3.2% [0.8, 6.4] | 4.0% [0.8, 8.0] | 0.0% | 50.4% [41.6, 59.2] | no change beyond noise (E2 predictions) |
-| primer-M | | | | | |
-| primer-M → GRPO dense | | | | | |
+| base (E2, config v3, `m4-e2-dense-v3`) → GRPO dense | 1.6% [0.0, 4.0] | 4.0% [0.8, 8.0] | 0.0% | 50.4% [41.6, 59.2] | no change beyond noise (E2 v3 predictions) |
+| primer-M + T8 (`m4-sft-primer-m-t8`) | 97.6% [94.4, 100.0] | 14.4% [8.8, 20.8] | 92.0% [87.2, 96.0] | 80.0% [72.8, 86.4] | P1 80–99% (point 93%), P2 20–75% (45%), P3 25–85% (55%), P4 85–100% (95%) (E3 predictions) |
+| primer-M + T8 → GRPO dense (`m4-e3-dense`) | 97.6% [94.4, 100.0] | 7.2% [3.2, 12.0] | 91.2% [85.6, 96.0] | 80.0% [72.8, 86.4] | within ±10 points of the primer-M row on each task (E3 predictions) |
+| primer-M + T8 → GRPO sparse (`m4-e3-sparse`, job `m4-e3-sparse-e0`) | 98.4% [96.0, 100.0] | 12.8% [7.2, 19.2] | 90.4% [84.8, 95.2] | 80.0% [72.8, 86.4] | not predicted (E0 on sparse added for M4's Done-when) |
 
 Base row: `m2-screen-a100-r4`, `results/eval/probe500/qwen3.5-2b.md`. **It
 mostly measures copying of the format hint, not knowledge.** Qwen3.5-2B
@@ -73,9 +75,11 @@ $/1k counts the 105 s of generation only; the job cost $0.13 with boot.
 | E2 base → GRPO dense, v1 | 7–14% (point 10%); move acc 22–32%, legal ≥ 99% | **23.8% [21.9, 25.7]** | 41.8% [40.3, 43.3] | 100.0% | — | $7.84 + $0.29 eval |
 | E2 base → GRPO dense, v2 | 22–33% (point 28%); see below | **27.2% [25.2, 29.1]** | 43.6% [42.1, 45.2] | 100.0% | reference for v2 arms; vs dense v1 +3.4 [1.8, 4.8] | $9.22 with both evals (attempt 1 a $0 stockout) |
 | E2 base → GRPO sparse, v2 | 16–30% (point 24%); see below | **23.5% [21.6, 25.4]** | 38.7% [37.2, 40.3] | 98.1% | −3.6 [−4.9, −2.4] at step 200; dev500 steps 100–150: −0.3 [−2.0, 1.4] | $12.16 + $5.35 (resumed from step 180 as `-r2`) |
-| E3 primer-M only | | | | | | |
-| E3 primer-M → GRPO sparse | | | | | | |
-| E3 primer-M → GRPO dense | | | | | | |
+| E2 base → GRPO dense, v3 | 24–30% (point 27%); see below | **25.8% [23.9, 27.8]** | 43.2% [41.7, 44.7] | 100.0% | **reference for E3 (H1)**; vs dense v2 −1.4 [−2.6, −0.1] | $9.99 with both evals (attempt 1 preempted after 4 min, $0.20) |
+| E2 base → GRPO sparse, v3 | 22–29% (point 25.5%); see below | **28.0% [26.1, 30.0]** | 44.3% [42.7, 45.9] | 99.9% | +2.2 [+1.1, +3.4]; vs sparse v2 +4.5 [+3.0, +6.0] | $8.48 with test2000 |
+| E3 primer-M (+ T8) only | 18–42% (point 30%) if the format holds; see below | **35.7% [33.6, 37.9]** | 55.8% [54.3, 57.4] | 100.0% | +9.9 [+8.2, +11.8] vs dense v3 | $22.01 SFT + evals (+ $4.16 stopped primer-M-only attempt) |
+| E3 primer-M (+ T8) → GRPO sparse | 25–48% (point 37%) | **35.4% [33.4, 37.6]** | 56.0% [54.5, 57.5] | 99.8% | **+9.7 [+8.0, +11.3]**; vs primer only −0.2 [−1.6, +1.1]; vs primer → dense +2.9 [+1.8, +4.0] | $11.11 (3 preemptions, resumed from step 20) |
+| E3 primer-M (+ T8) → GRPO dense | 26–50% (point 38%) | **32.6% [30.5, 34.7]** | 54.5% [53.1, 56.1] | 100.0% | **+6.8 [+5.2, +8.4]** (H1); vs primer only −3.1 [−4.5, −1.6] | $9.64 (preempted at step 140, resumed) |
 
 **E2 predictions** (written 2026-10-22, before any GRPO run of the main model; the only
 training signal seen so far is M2's 5-step compatibility smoke and the M3 laptop wiring test
@@ -203,12 +207,210 @@ stays in GCS until M6.
   may be chance.
 
 **E2 reading.** GRPO on the base model lifts test2000 solve from 4.1% to 23.5–27.2% under every
-reward and config tried (dense v1 23.8%, dense v2 27.2%, sparse v2 23.5%). dev500 reaches its
+reward and config tried (dense v1 23.8%, dense v2 27.2%, sparse v2 23.5%, dense v3 25.8%). dev500 reaches its
 plateau by step ~25 (about $2) and stays at 21.6–29.0% from there to step 200. Neither more learning signal
 (v2's entropy control) nor a denser reward lifted that plateau while the runs were healthy.
 E0 didn't move either. That is the starting point H1 tests. The open problem for M4 is
 the post-answer tail in config v2, which cost sparse its last 50 steps and pulled dense v2's
 entropy controller off.
+
+**E2 v3 predictions** (written 2026-10-23, before `m4-e2-dense-v3` launched; config v3 =
+v2 + every rollout and eval stops at the first `</answer>`, ADR-022. The only v3 run so far is
+the 4-step laptop smoke on Qwen3.5-0.8B, whose numbers mean nothing).
+- **Dense v3 ≈ dense v2.** test2000 24–30% (point 27%), paired Δ vs dense v2 within ±3 points
+  with a CI that includes 0. Removing the tail keeps the entropy controller on, but in v2 a
+  steady supply of gradient (steps 31–90) didn't lift the dev plateau, so I don't expect v3 to.
+  dev500 plateau 22–29% from step ~30 to 200, as in v1 and v2.
+- **Sparse v3 tracks dense v3**, as sparse v2 did to step 150: test2000 22–29% (point 25.5%),
+  paired Δ vs dense v3 −1.5 points (range −4 to +1), CI likely including 0.
+- **Health, both arms:** our truncation share ≤ 1% on every step after step 10; prose before
+  `<answer>` < 2% of completions at the end; mean completion ≤ 15 tokens after step 20; entropy
+  coefficient > 0 on ≥ 70% of steps 30–200 (dense v2: it sat near 0 for steps 94–135 and from
+  190); mean share of zero-spread groups over steps 50–200 ≤ 50% (dense v2: ~55–80% after
+  step 94). Step time 30–45 s after step 20.
+- **Cost:** $7–10 per run with both evals (dense v2 $9.22).
+- **E0 on dense v3:** no change beyond noise from the base row.
+
+**E2 v3 reading (dense, `m4-e2-dense-v3`).** test2000 25.8% [23.9, 27.8], inside the predicted
+24–30%. Paired vs dense v2 it is −1.4 [−2.6, −0.1] (76 puzzles solved only by v3, 103 only by
+v2). That is within the predicted ±3 points, but the CI just excludes 0 where I predicted it
+would include it. With one seed per config I read this as "stopping at `</answer>` doesn't raise
+the plateau", not as v3 being worse. Puzzle rating at 50% solve 973 [930, 1015] (v2 1011).
+dev500 stayed at 23.2–29.0% from step 30 to 200 (predicted 22–29%). Health, as predicted:
+truncation ≤ 0.6% on every step after step 10, prose before `<answer>` 0.03% over steps 180–200,
+mean completion ≤ 14.9 tokens after step 20 (9.7 on average), entropy coefficient > 0 on 86% of
+steps 30–200, median step 32 s (p90 42 s). One miss: zero-spread groups averaged 63% over steps
+50–200 (predicted ≤ 50%). With the tail gone the controller stays on, but in most groups all
+eight samples are still right or all wrong, so there is little signal for it to spread. E0
+didn't move (P1 1.6%, P2 4.0%, P3 0%, P4 50.4%). Cost $9.99 for the attempt that ran, $10.19
+with the preempted one: the top of the $7–10 range. Dense v3 is the E3 reference: the primer
+arms run the same config and differ only in their start point.
+
+**E2 v3 reading (sparse, `m4-e2-sparse-v3`).** test2000 **28.0% [26.1, 30.0]**, inside the
+predicted 22–29% and above the point (25.5%). Paired vs dense v3 it is **+2.2 [+1.1, +3.4]** (94
+puzzles solved only by sparse, 50 only by dense), where I predicted −1.5 (range −4 to +1). So
+sparse v3 beat dense v3, and the miss is in sign as well as size. vs sparse v2: +4.5 [+3.0, +6.0];
+v3 rescued the arm that v2's post-answer tail had wrecked. dev500 reached 22.8% by step 20 and
+stayed at 24–29% to step 200 (27.6% at the end). Health as predicted: truncation ≤ 0.8% after
+step 10, prose 0.02% over steps 180–200, mean completion ≤ 16.8 tokens after step 20, entropy
+coefficient > 0 on 84% of steps 30–200, median step 32 s. As with dense v3, the zero-spread
+share missed (80% over steps 50–200, predicted ≤ 50%). $8.48, inside $7–10. With both v3 arms
+in, GRPO from the base lands at 26–28% whichever reward it uses: the plateau E2 found holds.
+
+**E3 predictions** (written 2026-10-23, before the primer-M SFT launched; no primer-trained 2B
+model exists yet. The only SFT run so far is the laptop wiring test on Qwen3.5-0.8B, with 256
+examples and two trainable layers, whose numbers mean nothing.) Primer-M T5 holds 390k "Best
+move?" examples. About half are solver positions of `primer_pool` puzzles, answered with the
+puzzle solution; the rest are eval-DB positions, answered with Stockfish's best move. So the
+primer is supervised move imitation as well as rules teaching.
+- **Format first.** The primer answers bare (`Qxc8+`), and the RL prompt asks for `<answer>`
+  tags. I give 65% to the primer checkpoint keeping a dev500 format rate ≥ 50% (point 75%).
+  **Pre-registered stop rule:** if the SFT probe's format rate (32 dev500 RL prompts) is below 50%
+  at two checkpoints in a row, I stop the VM and bring the T8 fallback (TRAINING.md §5) to the
+  user. At the end, the task's rule applies: dev500 format < 50% → T8.
+- **Primer-M only (test2000), if the format holds:** solve 18–42% (point 30%), move accuracy
+  40–58%, legal ≥ 95%, puzzle rating ~1050–1300. That's about E2 dense v3's level from imitation
+  alone. The gain over base is largest in the 800–1799 bins.
+- **E0 on primer-M:** P1 square 80–99% (point 93%), P2 legal count 20–75% (45%; exact counting
+  without search is hard), P3 FEN after a move 25–85% (55%), P4 in check 85–100% (95%). In
+  every case well above the base row, which copies the hint. Part of that gain is format
+  (see the E0 note).
+- **Primer → GRPO dense (H1):** test2000 26–50% (point 38%). Paired Δ vs E2 dense v3 about +11
+  points (range +2 to +20). I give H1 (Δ ≥ 3 with a CI that excludes 0) 75%.
+- **Primer → GRPO sparse (H2):** 25–48% (point 37%), about 1 point below primer → dense. I give
+  H2 85%: sparse gains ≥ 3 points over the primer-only start, since base → sparse learned too.
+- **H5 (RL adds to the primer):** primer → dense − primer only ≈ +8 points (range 0 to +16). 70% on
+  ≥ 3 points with a CI that excludes 0.
+- **pass@k on dev500 (T = 1, n = 8):** RL sharpens more than it discovers (Shen et al.). pass@1
+  rises from primer to primer → GRPO, and pass@8 moves less (within ±5 points).
+- **Health of the primer arms under v3:** completions stay short (mean ≤ 15 tokens), prose before
+  `<answer>` < 2%, truncation ≤ 1%.
+- **Cost:** SFT job 4.5–7 h, $15–23 (point $19); each primer → GRPO arm $7–10.
+
+**E3 primer SFT, attempt with primer-M alone (`m4-sft-primer-m`, stopped).** The format broke as
+feared: the probe scored format 1.00 at step 0 and **0.00** at the first checkpoint (step 53),
+answering with bare moves (`Qxh2#`). Loss 0.83 → 0.56 and answer-token accuracy 71% → 80% from
+step 25 to step 75. The rule above said stop after two failed checkpoints. The user asked for
+anything that speeds M4 up, so it stopped after one, at ~step 95 ($4.16). The T8 fallback
+(ADR-024) follows: primer-M plus 26k RL-format copies of T5 examples, answered
+`<answer>SAN</answer>`, with no think block.
+
+**T8 predictions** (written 2026-10-23, before `m4-sft-primer-m-t8`'s first checkpoint; no
+model has trained on T8 yet). The E3 predictions above stand for the primer-M + T8 model, as the
+"if the format holds" case.
+- **Format:** probe format ≥ 50% at the first checkpoint, 85%; ≥ 90% there, 65%. Final dev500
+  format ≥ 95%, 80%. 2% is ~35 examples per optimizer step, each with the instruction line that
+  tells the two formats apart.
+- **Primer content:** T8 repeats moves T5 already teaches, so loss and answer accuracy on the
+  other tasks track the stopped run to within noise at matching steps (e.g. ~0.56 / ~80% near
+  step 75).
+
+**E3 primer-only reading (`m4-sft-primer-m-t8`, 768 steps, 7.03 h, $22.01).** T8 held the format
+at every checkpoint (probe format 1.00 at steps 54 to 601), and the final model's dev500 format
+is 100.0%, legal 100.0%, ~9 tokens per answer: the T8 predictions came true (≥ 50% at the first
+checkpoint, 85%; ≥ 90%, 65%; final ≥ 95%, 80%). Training loss 0.86 → 0.28, answer-token accuracy
+70% → 90%, matching the stopped run where they overlap. **test2000 solve 35.7% [33.6, 37.9]**,
+move accuracy 55.8%, puzzle rating at 50% solve 1237 [1195, 1278] (dense v3: 973). That's inside
+the predicted 18–42% (point 30%) and above it at the point, with move accuracy inside 40–58% and
+the rating inside 1050–1300. **Imitation alone beats RL from the base model by +9.9 points**
+paired [+8.2, +11.8] (275 puzzles solved only by the primer model, 77 only by dense v3), at about
+twice the cost ($22 vs $10). The gain is spread over every bin from 600 to 1999 (e.g. 1000–1199:
+57.5% vs 34.1%; 1400–1599: 29.3% vs 18.0%). dev500 solve 35.2% [31.0, 39.6]. pass@k on dev500
+(n = 8, T = 1): primer @1 28.1%, @4 43.4%, @8 51.4%; base @1 1.2%, @8 6.0%. E0: P1 97.6%, P2
+14.4%, P3 92.0%, P4 80.0% (predicted P1 80–99%, P2 20–75%, P3 25–85%, P4 85–100%): P1 and P3
+beat or meet the predictions, legal-move counting (P2) is below them although the full legal
+list scores F1 73.2%, and P4 is under the 85% floor. The task's E0 gate (P3 not near 0) passes,
+so the GRPO arms go ahead.
+
+**E3 primer → GRPO dense reading (`m4-e3-dense`).** test2000 **32.6% [30.5, 34.7]**, move
+accuracy 54.5%, rating at 50% solve 1151 [1107, 1194]. Paired vs E2 dense v3: **+6.8 [+5.2,
++8.4]** (202 puzzles solved only by this arm, 66 only by dense v3), so **H1 holds** (Δ ≥ 3 with a
+CI that excludes 0; predicted +11, range +2 to +20, 75%). But GRPO **lowered** the primer
+model's own score: −3.1 [−4.5, −1.6] paired vs primer only (81 vs 143 puzzles). **H5 fails** (I
+gave ≥ +3 70%). The H1 gain is the primer's, not RL's on top of it. Dev500 shows the path: 35.4%
+at step 0, 36.8% at step 20, a dip to 28.0% at step 50 and 28.0% at step 120, then 36.2% at step
+200. Test2000 is graded on the final model only. pass@k on dev500 (T = 1, n = 8) fell on every
+k: @1 28.1 → 26.6%, @4 43.4 → 37.6%, @8 51.4 → 42.8%. RL narrowed the sample distribution
+without lifting greedy accuracy, as predicted for pass@8, but pass@1 didn't rise either.
+
+A likely cause, not tested: config v3's entropy floor. The adaptive bonus (ADR-021) targets
+token entropy 0.2, set from the base model's runs. The primer model starts at 0.11, so the
+controller raised the coefficient to ~0.64 by steps 21–60 (dense v3: 0.12–0.18) and pushed the
+policy away from its sharp primer answers. That is where dev500 dropped. Zero-spread groups
+averaged ~30% (dense v3: 63%), so the arm had plenty of gradient. KL to the start rose to ~0.25
+over steps 121–200. Health otherwise as predicted: format 100%, truncation 0, prose ~0, ~8.5
+tokens per answer. E0 stayed within ±10 points of the primer row on every task (P2 legal count
+14.4 → 7.2%). The arm was preempted at step 140 (us-central1-c) and resumed from its step-140
+checkpoint in europe-west4-a; dev500 was continuous across the restart (31.4% → 32.8%).
+
+**E3 primer → GRPO sparse reading (`m4-e3-sparse`).** test2000 **35.4% [33.4, 37.6]**, move
+accuracy 56.0%, legal 99.8%, rating at 50% solve 1237 [1199, 1276]. That's inside the predicted
+25–48% (point 37%). Paired vs E2 dense v3: +9.7 [+8.0, +11.3]. Paired vs primer only: **−0.2
+[−1.6, +1.1]** (91 vs 96 puzzles), so sparse GRPO left the primer model where it was. **H2 is
+falsified** as RESEARCH.md §3 states it ("sparse reward on the primer model stays within noise of
+its start"). I gave its pre-registered form (≥ 3 points over primer only) 85%. Sparse beat dense
+from the same start by +2.9 [+1.8, +4.0], where I predicted dense 1 point ahead. The dev500 path
+matches dense's, only shallower: 35.4% at step 0, 36.2% at step 30, a dip to 31.6% at step 50
+(dense: 28.0%), back to 36.2% at step 200. The entropy coefficient again climbed (0.58 over steps
+21–60; dense 0.64) toward the 0.2 target from 0.13–0.15. Zero-spread groups averaged 51% over
+steps 50–200 (dense 30%): with a binary reward more groups agree, so the bonus moves the policy
+less. pass@k on dev500 fell from primer only's @1 28.1 / @4 43.4 / @8 51.4% to 28.4 / 40.5 / 47.0%:
+pass@1 unchanged, pass@8 down 4.4 points. Health: format 100%, truncation 0, ~8.5 tokens per
+answer, prose ~0.1%. The run was preempted three times in us-central1-c (at steps ~0, ~35 and
+~20 after resuming) and finished from its step-20 checkpoint in europe-west4-a. Its cost was
+$11.11, $2.68 of it in the three short attempts.
+
+**pass@k on dev500** (8 samples at T = 1; greedy solve in the last column):
+
+| Model | pass@1 | pass@4 | pass@8 | greedy |
+|---|---|---|---|---|
+| base (Qwen3.5-2B) | 1.2% | 3.9% | 6.0% | 5.2% |
+| primer-M + T8 | 28.1% | 43.4% | 51.4% | 35.2% |
+| primer → GRPO dense | 26.6% | 37.6% | 42.8% | 36.2% |
+| primer → GRPO sparse | 28.4% | 40.5% | 47.0% | 36.2% |
+| primer → GRPO dense, entropy target 0.14 (ADR-025) | 28.0% | 39.3% | 45.0% | 36.4% |
+
+GRPO on the primer model kept or slightly lowered pass@1 and cut pass@8 by 4–9 points. That is
+sharpening without discovery (Shen et al.), and here the sharpening doesn't reach greedy accuracy
+either. Greedy dev500 rose by 1 point for both arms, while test2000 didn't move or fell.
+
+**H5 across all three primer → GRPO runs:** none added to the primer (dense −3.1, sparse −0.2, dense with the matched entropy target −0.9, paired vs
+primer only). The primer's gain over GRPO-from-base (+9.9) is SFT on teacher-free data. RL with
+these rewards, this config and 200 steps either kept it (sparse) or cost a little of it (dense).
+
+**Entropy-target ablation predictions** (written 2026-10-24, before `m4-e3-dense-ent014`
+launched; ADR-025: `m4-e3-dense` with `entropy_target` 0.14 instead of 0.2).
+- **The dev dip goes away:** no dev500 eval more than 4 points below step 0 (35.4%), 70%. The bonus
+  coefficient stays below 0.2 on average over steps 21–60, 80%. In `m4-e3-dense` it averaged 0.64.
+- **test2000:** 33–38% (point 35.5%). Paired vs primer only: −2 to +2.5 (point 0). H5's bar (≥ 3
+  with a CI that excludes 0) is met with only 15%. Paired vs `m4-e3-dense`: positive, 75%.
+- **pass@8 on dev500:** above `m4-e3-dense`'s 42.8%, 70%, and below primer only's 51.4%, 75%.
+- **Health:** format ≥ 99%, truncation ≤ 1%, mean completion ≤ 15 tokens; zero-spread groups
+  averaging 30–50% (lower entropy, so more groups agree than in `m4-e3-dense`'s ~30%).
+- **Cost:** $7–10.
+
+**Entropy-target ablation reading (`m4-e3-dense-ent014`, ADR-025).** test2000 **34.8% [32.6,
+36.9]**, move accuracy 55.6%, rating at 50% solve 1214 [1173, 1254]. Paired vs primer only: **−0.9
+[−2.3, +0.4]**, within noise. vs `m4-e3-dense` (target 0.2): +2.1 [+1.1, +3.2]. vs E2 dense v3:
++8.9 [+7.3, +10.5]. So the base-tuned entropy floor explains `m4-e3-dense`'s loss. With the
+target at the primer's own entropy, GRPO keeps the primer's score, but it still doesn't add to
+it. Checked against the predictions:
+- dev500 stayed within 4 points of step 0: its low was 32.0% at step 50, against 28.0% for target
+  0.2. It ended at 36.4%. ✓
+- The bonus coefficient stayed below 0.2 over steps 21–60: **✗**, it averaged 0.59 (target 0.2
+  run: 0.64). Entropy fell below 0.14 by itself (0.106 over steps 1–20), so the controller ramped
+  up anyway. What the lower target changed is where it stopped: entropy averaged 0.109 over
+  steps 21–60 (target 0.2: 0.177) and 0.148 over steps 61–200 (0.208). KL to the start averaged
+  0.114 over steps 121–200, versus 0.253.
+- test2000 inside 33–38% ✓; paired vs primer only inside −2 to +2.5 ✓; H5's bar not met (I gave it
+  15%) ✓; above `m4-e3-dense` ✓.
+- pass@k on dev500: @1 28.0%, @4 39.3%, @8 45.0%. pass@8 is above `m4-e3-dense` (42.8%) ✓ and below
+  primer only (51.4%) ✓.
+- Health: format 100%, truncation 0, ~8.5 tokens per answer, zero-spread groups 36% over steps
+  50–200 (predicted 30–50%) ✓. Training legal rate at T = 1 was 0.988 over steps 180–200 (target
+  0.2 run: 0.977).
+- Cost $10.21, just over the predicted $7–10. Four preemptions in us-central1-c cost $5.74 in
+  attempts that were cut short; the run resumed from steps 20, 30, 30 and 100.
 
 Figures (E2): dev500 solve rate vs dollars spent for all three runs
 (`results/figures/e2_dev_vs_usd.png`), and training metrics per step: move-match rate, legal and
@@ -233,20 +435,21 @@ format rates, length, truncated share, prose share, entropy, dead groups and KL
 | E5b | no legal-move list | | | | |
 | E5c | ~4B model, best recipe | | | | |
 | E5d | LoRA r=8 vs r=64 | | | | |
+| M4 ablation (ADR-025) | primer → GRPO dense, entropy target 0.14 instead of 0.2 | 33–38% (point 35.5%); Δ vs primer only −2 to +2.5 | **34.8% [32.6, 36.9]**; vs primer only −0.9 [−2.3, +0.4]; vs `m4-e3-dense` +2.1 [+1.1, +3.2] | $10.21 (4 preemptions) | done |
 
 ## Hypothesis verdicts
 
 | | Verdict | Evidence |
 |---|---|---|
-| H1 | | |
-| H2 | | |
+| H1 | **holds** | Primer → GRPO beats GRPO from the base on test2000 under both rewards: dense +6.8 [+5.2, +8.4] vs E2 dense v3, sparse +7.4 [+5.8, +9.2] vs E2 sparse v3 (one seed per arm). The gain is the primer's: primer only is +9.9 [+8.2, +11.8] vs E2 dense v3. |
+| H2 | **falsified as stated** | Sparse reward on the primer model stays within noise of its start: −0.2 [−1.6, +1.1] vs primer only. Sparse reward does learn from the *base* model under v3 (4.1% → 28.0%), unlike Chess-R1's 3B, so the "sparse can't learn" premise fails here for the base, not the primer. |
 | H3 | | |
 | H4 | | |
-| H5 | | |
+| H5 | **fails** | Primer only ≈ primer → GRPO for all three RL runs: dense −3.1 [−4.5, −1.6], sparse −0.2 [−1.6, +1.1], dense with the entropy target at the primer's own entropy −0.9 [−2.3, +0.4] (ADR-025). The dense arm's loss was the base-tuned entropy floor; without it RL keeps the primer's score but adds nothing, and pass@8 falls (51.4% → 42.8–47.0%). |
 
 ## Cost summary
 
 | Pool | Ceiling | Spent | Biggest line items |
 |---|---|---|---|
-| compute | 360 | | |
-| vertex | 180 | | |
+| compute | 360 | $131.02 (to M4) | M4 $75.92: SFT primer-M + T8 $22.01 (+ $4.16 stopped primer-M-only run), E3 dense $9.64, E3 sparse $11.11, entropy ablation $10.21, E2 dense v3 $10.19, E2 sparse v3 $8.48, E0 sparse $0.11; M3 $50.15 |
+| vertex | 180 | $0 | none; the Premium Support credit was drawn for Compute Engine instead (BUDGET §1, 2026-10-24) |

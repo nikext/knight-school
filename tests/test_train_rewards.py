@@ -70,23 +70,27 @@ def test_each_completion_is_parsed_once_per_batch(monkeypatch):
 def test_task_function_logs_lengths_prose_and_samples():
     metrics: dict[str, float] = {}
     sunk: list[dict] = []
-    rf = tr.RewardFns("dense", require_think=False, sink=sunk.extend, samples_per_step=2)
+    rf = tr.RewardFns(
+        "dense", require_think=False, sink=sunk.extend, samples_per_step=2, max_completion=1024
+    )
     task = rf.funcs()[0][0]
     completions = [
         comp("The queen takes f7. <answer>Qxf7#</answer>"),
         comp("<answer>Nc3</answer>"),
         comp("hmm"),
+        comp("<answer>Nc3</answer>" + " ramble" * 900),  # v2-style tail: answered, not truncated
     ]
     task(
         completions,
-        completion_ids=[[0] * 12, [0] * 5, [0] * 1024],
+        completion_ids=[[0] * 12, [0] * 5, [0] * 1024, [0] * 1024],
         log_metric=metrics.__setitem__,
         trainer_state=SimpleNamespace(global_step=6),
-        **cols(3),
+        **cols(4),
     )
-    assert metrics["completions/tokens"] == 12 + 5 + 1024
+    assert metrics["completions/tokens"] == 12 + 5 + 1024 + 1024
     assert metrics["completions/p95_length"] > 900
-    assert metrics["reasoning/prose_frac"] == pytest.approx(2 / 3)
+    assert metrics["completions/truncated"] == pytest.approx(1 / 4)
+    assert metrics["reasoning/prose_frac"] == pytest.approx(2 / 4)
     assert (
         len(sunk) == 2
         and sunk[0]["step"] == 7

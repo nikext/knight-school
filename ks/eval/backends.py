@@ -18,6 +18,7 @@ from typing import Any, Protocol
 import chess
 import chess.engine
 
+from ks.chess.parse import STOP
 from ks.eval.profile import Profile
 
 
@@ -146,6 +147,8 @@ class VllmBackend:
             top_k=p.top_k,
             max_tokens=p.max_tokens,
             seed=p.seed,
+            stop=[STOP],  # ADR-022: the parser cuts there anyway; this saves the tokens
+            include_stop_str_in_output=True,
         )
         t0 = time.monotonic()
         convs: Any = [r.messages for r in reqs]

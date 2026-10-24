@@ -1,11 +1,13 @@
 """`make data`: the M1 chain, step by step, each skipped when its inputs and code are unchanged.
 
-puzzles -> evaldb -> probe -> blocklist -> rltrain -> timing -> rewards -> primer -> chessbench
+puzzles -> evaldb -> probe -> blocklist -> rltrain -> timing -> rewards -> primer -> primer_t8 -> chessbench
 """
 
 from __future__ import annotations
 
+import json
 import random
+import shutil
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -13,8 +15,10 @@ from typing import cast
 
 import polars as pl
 import requests
+import zstandard
 
 from ks.chess import board as kb
+from ks.chess import prompt
 from ks.data import blocklist as bl
 from ks.data import evaldb, probe, puzzles, rewards
 from ks.data import manifest as mf
@@ -441,6 +445,59 @@ def step_primer(log: Log, force: bool = False) -> None:
         log(f"primer: {name} {n:,} examples, {len(paths)} shards")
 
 
+def t8_examples(m_paths: list[Path], n: int, seed: int) -> list[dict]:
+    """T8 (ADR-024): n of primer-M's T5 examples, picked at random, re-asked with the RL prompt."""
+    t5 = [ex for ex in pr.read_shards(m_paths) if ex["task"] == "T5"]
+    picked = sorted(random.Random(seed).sample(range(len(t5)), n))
+    return [
+        pr.t8_from_t5(t5[i], prompt.user_text(kb.board_from_fen(t5[i]["fen"])), f"M-T8-{j:07d}")
+        for j, i in enumerate(picked)
+    ]
+
+
+def step_primer_t8(log: Log, force: bool = False) -> None:
+    """primer M-t8: primer-M's shards unchanged, plus one shard of T8 examples (TRAINING.md §5)."""
+    out = PRIMER / "M-t8"
+    m_paths = sorted((PRIMER / "M").glob("shard-*.jsonl.zst"))
+    n = round(pr.T8_SHARE * PRIMER_SIZES["M"])
+    params = {"n": n, "seed": PRIMER_SEED + 8}
+    fp = mf.fingerprint(
+        {"primer_M": mf.output_sha("primer_M")}, params, [prompt, pr.t8_from_t5, t8_examples]
+    )
+    if not force and mf.up_to_date("primer_M-t8", fp, [out]):
+        log("primer_t8: up to date")
+        return
+    t8 = t8_examples(m_paths, n, PRIMER_SEED + 8)
+    out.mkdir(parents=True, exist_ok=True)
+    for old in out.glob("shard-*.jsonl.zst"):
+        old.unlink()
+    for p in m_paths:
+        shutil.copyfile(p, out / p.name)
+    t8_path = out / f"shard-{len(m_paths):05d}.jsonl.zst"
+    blob = "".join(json.dumps(ex, ensure_ascii=False) + "\n" for ex in t8)
+    t8_path.write_bytes(zstandard.ZstdCompressor(level=10).compress(blob.encode()))
+    m = mf.load("primer_M")
+    assert m is not None
+    per_source: dict[str, int] = {}
+    for ex in t8:
+        per_source[ex["source"]] = per_source.get(ex["source"], 0) + 1
+    mf.write(
+        "primer_M-t8",
+        fp,
+        [out],
+        examples=m["examples"] + n,
+        shards=len(m_paths) + 1,
+        per_task=dict(sorted({**m["per_task"], "T8": n}.items())),
+        t8_per_source=per_source,
+        t8_seed=PRIMER_SEED + 8,
+        contains="primer_M",
+        contamination_hits=_verify_primer([t8_path], bl.Blocklist.load(mf.SETS))
+        + m["contamination_hits"],
+        prompt_hash=prompt.prompt_hash(),
+    )
+    log(f"primer_t8: {n:,} T8 examples added to primer-M's {m['examples']:,}")
+
+
 # --- chessbench1k (optional, EVALS.md §1) ------------------------------------------------------
 
 CHESSBENCH_URL = "https://storage.googleapis.com/searchless_chess/data/puzzles.csv"
@@ -544,6 +601,7 @@ STEPS: dict[str, Callable[[Log, bool], None]] = {
     "timing": step_timing,
     "rewards": step_rewards,
     "primer": step_primer,
+    "primer_t8": step_primer_t8,
     "chessbench": step_chessbench,
 }
 

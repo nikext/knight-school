@@ -116,7 +116,12 @@ def _style(ax: Any) -> None:
     ax.set_axisbelow(True)
 
 
-def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> list[Path]:
+def figures(
+    run_ids: list[str],
+    name: str,
+    base_solve: float | None = None,
+    roles: dict[str, str] | None = None,
+) -> list[Path]:
     """Dev solve rate vs dollars (all runs on one axis) and reward components vs step."""
     import matplotlib  # type: ignore[import-not-found]
 
@@ -127,26 +132,53 @@ def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> l
         raise ValueError(f"at most {len(SERIES)} runs per figure; split them into several")
     FIGURES.mkdir(parents=True, exist_ok=True)
     runs = {r: (RESULTS / r) for r in run_ids}
-    color = dict(zip(run_ids, SERIES, strict=False))
+    color: dict[str, str] = dict(zip(run_ids, SERIES, strict=False))
+    style = dict.fromkeys(run_ids, "-")
+    label = {r: r for r in run_ids}
+    if roles:  # colour = start point, line style = reward (ks.eval.compare.ROLES)
+        from ks.eval.compare import ROLES
+
+        for r, role in roles.items():
+            text, slot, ls = ROLES[role]
+            color[r], style[r], label[r] = (INK_2 if slot is None else SERIES[slot]), ls, text
     paths = []
 
     fig, ax = plt.subplots(figsize=(6.4, 4.0), facecolor=SURFACE)
     _style(ax)
+    ends: list[tuple[float, float]] = []  # (usd, solve %) of each run's last dev eval
     for r, d in runs.items():
         dev = pl.read_csv(d / "dev.csv")
         c = color[r]
         ax.fill_between(
             dev["usd_cum"], dev["solve_lo"] * 100, dev["solve_hi"] * 100, color=c, alpha=0.15, lw=0
         )
-        ax.plot(dev["usd_cum"], dev["solve"] * 100, color=c, lw=2, marker="o", ms=4, label=r)
+        ax.plot(
+            dev["usd_cum"],
+            dev["solve"] * 100,
+            color=c,
+            ls=style[r],
+            lw=2,
+            marker="o",
+            ms=4,
+            label=label[r],
+        )
+        ends.append((dev["usd_cum"][-1], dev["solve"][-1] * 100))
+    # End labels, nudged apart vertically so close finishes don't print over each other.
+    lo, hi = ax.get_ylim()
+    gap, dx = 0.035 * (hi - lo), 0.012 * (ax.get_xlim()[1] - ax.get_xlim()[0])
+    placed: list[float] = []
+    for x, y in sorted(ends, key=lambda e: e[1]):
+        ty = max(y, placed[-1] + gap) if placed else y
+        placed.append(ty)
         ax.annotate(
-            f"{dev['solve'][-1] * 100:.1f}%",
-            (dev["usd_cum"][-1], dev["solve"][-1] * 100),
-            xytext=(4, 0),
-            textcoords="offset points",
+            f"{y:.1f}%",
+            (x, y),
+            xytext=(x + dx, ty),
+            textcoords="data",
             fontsize=8,
             color=INK,
             va="center",
+            ha="left",
         )
     if base_solve is not None:
         ax.axhline(base_solve * 100, color=INK_2, lw=1, ls="--")
@@ -173,7 +205,7 @@ def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> l
         ("legal_rate", "legal rate", False),
         ("format_rate", "format rate", False),
         ("len_mean", "completion tokens (mean, log)", True),
-        ("clipped", "share truncated at max tokens", False),
+        ("truncated", "share truncated at max tokens", False),
         ("prose_frac", "share with prose before <answer>", False),
         ("entropy", "mean token entropy", False),
         ("frac_zero_std", "share of groups with no reward spread", False),
@@ -184,8 +216,10 @@ def figures(run_ids: list[str], name: str, base_solve: float | None = None) -> l
         _style(ax)
         for r, d in runs.items():
             s = pl.read_csv(d / "steps.csv")
-            if col in s.columns:
-                ax.plot(s["step"], s[col], color=color[r], lw=1.5, label=r)
+            # before ADR-022, TRL's clipped ratio was the truncated share
+            col_r = "clipped" if col == "truncated" and col not in s.columns else col
+            if col_r in s.columns:
+                ax.plot(s["step"], s[col_r], color=color[r], ls=style[r], lw=1.5, label=label[r])
         if log:
             ax.set_yscale("log")
         ax.set_title(title, color=INK, fontsize=9, loc="left")

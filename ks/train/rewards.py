@@ -7,9 +7,11 @@ weight 0: they're logged, not trained on. Each completion is parsed once per
 step, and every function reads the same scores.
 
 The task function also logs, through TRL's `log_metric`: the p95 completion
-length, completion tokens, and how much prose comes before `<answer>`. The
-base model answers directly (ADR-017), so that prose is the sign that RL grew
-reasoning.
+length, completion tokens, the share truncated at the token cap, and how much
+prose comes before `<answer>`. The base model answers directly (ADR-017), so
+that prose is the sign that RL grew reasoning. TRL's own `clipped_ratio` counts
+every completion that doesn't end in EOS, so under a `</answer>` stop string
+(ADR-022) it counts the stopped ones too.
 """
 
 from __future__ import annotations
@@ -20,6 +22,7 @@ from typing import Any
 import numpy as np
 
 from ks.chess import rewards as kr
+from ks.chess.parse import STOP
 
 Sink = Callable[[list[dict[str, Any]]], None]
 COMPONENTS = ("sparse", "dense", "dense_norm", "legal")
@@ -49,8 +52,10 @@ class RewardFns:
         require_think: bool,
         sink: Sink | None = None,
         samples_per_step: int = 0,
+        max_completion: int | None = None,
     ) -> None:
         self.task = task
+        self.max_completion = max_completion
         self.require_think = require_think
         self.sink = sink
         self.samples_per_step = samples_per_step
@@ -97,6 +102,12 @@ class RewardFns:
             prose = [prose_before_answer(t) for t in texts]
             log_metric("completions/p95_length", p95(lengths))
             log_metric("completions/tokens", float(sum(lengths)))
+            if self.max_completion and lengths:
+                cap = [
+                    n >= self.max_completion and STOP not in t
+                    for n, t in zip(lengths, texts, strict=True)
+                ]
+                log_metric("completions/truncated", float(np.mean(cap)))
             log_metric("reasoning/prose_frac", float(np.mean([p > 0 for p in prose])))
             log_metric("reasoning/prose_chars_mean", float(np.mean(prose)))
         if self.sink is None or not self.samples_per_step:

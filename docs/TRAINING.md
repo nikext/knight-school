@@ -45,7 +45,8 @@ user:   Position (FEN): r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w
 - The legal moves are sorted the way DATA.md §4 says. E5b drops that line.
 - Models with native thinking use it in place of `<think>`. Decided in M2:
   the non-thinking template for every arm (ADR-017).
-- **Parser** (`ks.chess.parse`, built in M2): take the last
+- **Parser** (`ks.chess.parse`, built in M2): the response ends at its first
+  `</answer>` (ADR-022; generation stops there too). Take that
   `<answer>…</answer>` and normalise it: strip whitespace, `**`, backticks and
   quotes, a leading move number (`12.`, `12...`), a trailing period and
   `!`/`?` glyphs; tolerate a missing or extra `+`/`#` and `0-0`/`0-0-0`. The
@@ -96,15 +97,17 @@ each component separately.
 | steps | 200 | about 12.8k prompts; extend only if the dev curve is still rising and the budget allows |
 | dev eval | every 25 steps on dev500, greedy | every 10 from config v2 (ADR-021) |
 | entropy bonus | none (v1, ADR-019) | **v2 (ADR-021):** adaptive (Skywork-OR1, TRL `use_adaptive_entropy`), target 0.2, delta 0.02, because v1 collapsed by step 25 |
+| stop | none (v1, v2) | **v3 (ADR-022):** stop at the first `</answer>`, kept in the output, because v2's post-answer tail ran to the cap |
 
-- **Frozen config:** `configs/train/grpo.yaml`, v1 by ADR-019, revised once to v2 by
-  ADR-021 (its step-50 check passed in `m3-e2-dense-v2`). Clip-higher (`epsilon_high`)
+- **Frozen config:** `configs/train/grpo.yaml`, v1 by ADR-019, revised to v2 by ADR-021 (its
+  step-50 check passed in `m3-e2-dense-v2`) and to **v3 by ADR-022** (M4): every rollout stops
+  at the first `</answer>`. Clip-higher (`epsilon_high`)
   is a no-op in this setup: one optimizer pass per generation batch keeps the PPO ratio at 1.
   Known limitation of v2: nothing stops generation after `</answer>`. In dense v2, the ~1% of
   completions that ran on to the cap held TRL's token-weighted entropy above target and
   switched the bonus off from step ~90. In sparse v2 that tail grew to ~90% of completions
-  after step 150, steps took ~4× longer, and the answers stopped changing. A v3 with a
-  `</answer>` stop string is proposed for M4 (ADR-021).
+  after step 150, steps took ~4× longer, and the answers stopped changing. v3 (ADR-022) adds
+  the `</answer>` stop string, and both E2 arms are re-run under it in M4.
 
 - **Logging per step:** each reward component (mean and std), legal rate,
   format rate, completion length (mean and p95), KL, entropy, generation and
@@ -126,6 +129,20 @@ each component separately.
   with a short **templated** think block (checks, captures and threats
   listed by python-chess, still teacher-free). Record it in an ADR. The
   format reward then handles the rest.
+
+**T8 used in M4 (ADR-024):** primer-M alone broke the RL format (probe format 0.00 at the first
+checkpoint: bare moves). T8 = 26k copies of T5 examples (2%) asked with the RL prompt and
+answered `<answer>SAN</answer>`, with **no** think block, so the primer arms get no prompt scaffold
+the E2 arms lack. Built by `ks data primer_t8` into `data/primer/M-t8` (primer-M + one shard).
+
+**Built in M4 (ADR-023):** `ks.train.sft`, `configs/train/sft.yaml`, job `configs/jobs/m4-sft.sh`.
+fp32 master weights with bf16 autocast, every language-model parameter trained (the vision tower
+frozen). **Not packed:** each optimizer step is a random sample of 1,728 examples (~0.25M tokens),
+sorted by length and cut into padded micro-batches of 64 (3.5% padding). Packing would need
+flash-attn, and Qwen3.5's DeltaNet convolution fallback would leak tokens across packed
+examples. Gradient checkpointing is on. A short probe of the RL prompt (format and legal rate
+on 32 dev500 positions) runs at every checkpoint, as the early warning for T8. The final model
+is bf16, with the base model's config and tokenizer files.
 
 **Frozen in M3 (ADR-019):** `configs/train/grpo.yaml` holds exactly the values above,
 plus `micro_batch: 32` and `vllm_mem: 0.45`, which affect speed only. Arms change only the factor
@@ -151,10 +168,10 @@ RL removed this in ~10 steps: by step 13 the mean length was 18 tokens, legal 87
 
 ## 7. Checkpointing, preemption, resume
 
-- Every ~15 minutes (GRPO: every 25 steps; SFT: by wall clock), write to
-  `gs://$BUCKET/runs/<id>/ckpt/` and keep the last 2. LoRA adapters are
-  small. Full-FT SFT keeps one optimizer state for resume and deletes it when
-  the run finishes.
+- Every ~15 minutes (GRPO: every 25 steps, every 10 from v2; SFT: every 30 min by wall
+  clock, ADR-023), write to `gs://$BUCKET/runs/<id>/ckpt/` and keep the last 2. LoRA adapters
+  are small. Full-FT SFT keeps one ~22 GB optimizer state for resume, copied in a background
+  thread, and deletes it when the run finishes.
 - Preemption gives about 30 s notice. Don't rely on it; rely on the periodic
   checkpoints. On SIGTERM, flush metrics and write a `preempted` marker.
 - `ks launch --watch` relaunches a preempted run from its last checkpoint,
@@ -191,7 +208,11 @@ RL removed this in ~10 steps: by step 13 the mean length was 18 tokens, legal 87
 - **M3 additions** (ADR-018): `flash-linear-attention`/`fla-core` 0.5.2 (Triton kernels for
   Qwen3.5's DeltaNet layers in training) and `tensorboardX` 2.6.5. TRL 1.16.0 was still the
   newest release on 2026-10-22, so the pins are unchanged.
-- **Current image (M3, config v2 runs, ADR-021):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:35e9bf043759@sha256:8808004de26e22080fbc678338d6871a15af1f831588ce8c27a45782f0b0e01e`
+- **SFT image (M4, primer SFT and the E3 arms, ADR-023):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:1a92ddf79865@sha256:d8ebb5f19ae14b1a3ddc10fc7122c0b604166e6797ce1d2721939ef350da18f2`
+  (built 2026-10-23 from 1a92ddf, 11 min 27 s on Cloud Build; adds `ks.train.sft` and the pass@8 job step; GRPO code as in 91af7e4).
+- **E2 v3 image (M4, ADR-022):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:91af7e44bf9f@sha256:c377f7f110a18a69acf5361c37e267f4a8e3641f7e50b3a2a0f141854f106e48`
+  (built 2026-10-23 from 91af7e4, 11 min 32 s on Cloud Build).
+- **M3 image (config v2 runs, ADR-021):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:35e9bf043759@sha256:8808004de26e22080fbc678338d6871a15af1f831588ce8c27a45782f0b0e01e`
   (built 2026-10-22 from 35e9bf0, 12 min 54 s on Cloud Build).
 - **E2 v1 image (M3):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:25b5dd417d43@sha256:b1127f781cb392cf18aa545759c02d90763c1d2403645a36a4f10c95f5004606` (`m3-e2-dense`, `m3-e2-sparse{,-r2}`).
 - **Earlier image (M2):** `us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:90bfc56fc862@sha256:5750820ecc59b72928dc82f11db31cef6e5b5e404c69d12ac7b345e7437b7e7c`.
