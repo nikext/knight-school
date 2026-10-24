@@ -1,0 +1,18 @@
+# E0 (probe500) on the E3 primer -> GRPO sparse model (task M4 "Done when": both primer -> GRPO arms on
+# probe500). m4-e3-sparse ran test2000 and pass@8 but, like the E2 sparse arms, not E0. This runs only
+# the probe on its final merged model, on one spot L4 as m3-e2-dense-eval did (~0.25 h, ~$0.14).
+# Same image as the E3 runs.
+id: m4-e3-sparse-e0
+milestone: M4
+description: "E0 (probe500) on the m4-e3-sparse final model"
+machine: g2-standard-8
+gpus: 1
+zones: [us-central1-a, us-central1-b, us-central1-c]
+max_hours: 0.5
+max_attempts: 2
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:1a92ddf79865@sha256:d8ebb5f19ae14b1a3ddc10fc7122c0b604166e6797ce1d2721939ef350da18f2
+command: "cd /app && ks eval qwen3.5-2b --set probe500 --ckpt gs://knight-school-nt26-knight-school/runs/m4-e3-sparse/final/merged --run m4-e3-sparse --out /out/eval"
+env:
+  KS_PRICE_PER_HOUR: "0.541"
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
