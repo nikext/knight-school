@@ -145,6 +145,7 @@ def figures(
 
     fig, ax = plt.subplots(figsize=(6.4, 4.0), facecolor=SURFACE)
     _style(ax)
+    ends: list[tuple[float, float]] = []  # (usd, solve %) of each run's last dev eval
     for r, d in runs.items():
         dev = pl.read_csv(d / "dev.csv")
         c = color[r]
@@ -161,14 +162,23 @@ def figures(
             ms=4,
             label=label[r],
         )
+        ends.append((dev["usd_cum"][-1], dev["solve"][-1] * 100))
+    # End labels, nudged apart vertically so close finishes don't print over each other.
+    lo, hi = ax.get_ylim()
+    gap, dx = 0.035 * (hi - lo), 0.012 * (ax.get_xlim()[1] - ax.get_xlim()[0])
+    placed: list[float] = []
+    for x, y in sorted(ends, key=lambda e: e[1]):
+        ty = max(y, placed[-1] + gap) if placed else y
+        placed.append(ty)
         ax.annotate(
-            f"{dev['solve'][-1] * 100:.1f}%",
-            (dev["usd_cum"][-1], dev["solve"][-1] * 100),
-            xytext=(4, 0),
-            textcoords="offset points",
+            f"{y:.1f}%",
+            (x, y),
+            xytext=(x + dx, ty),
+            textcoords="data",
             fontsize=8,
             color=INK,
             va="center",
+            ha="left",
         )
     if base_solve is not None:
         ax.axhline(base_solve * 100, color=INK_2, lw=1, ls="--")

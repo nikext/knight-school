@@ -359,6 +359,19 @@ answer, prose ~0.1%. The run was preempted three times in us-central1-c (at step
 ~20 after resuming) and finished from its step-20 checkpoint in europe-west4-a. Its cost was
 $11.11, $2.68 of it in the three short attempts.
 
+**pass@k on dev500** (8 samples at T = 1; greedy solve in the last column):
+
+| Model | pass@1 | pass@4 | pass@8 | greedy |
+|---|---|---|---|---|
+| base (Qwen3.5-2B) | 1.2% | 3.9% | 6.0% | 5.2% |
+| primer-M + T8 | 28.1% | 43.4% | 51.4% | 35.2% |
+| primer → GRPO dense | 26.6% | 37.6% | 42.8% | 36.2% |
+| primer → GRPO sparse | 28.4% | 40.5% | 47.0% | 36.2% |
+
+GRPO on the primer model kept or slightly lowered pass@1 and cut pass@8 by 4–9 points. That is
+sharpening without discovery (Shen et al.), and here the sharpening doesn't reach greedy accuracy
+either. Greedy dev500 rose by 1 point for both arms, while test2000 didn't move or fell.
+
 **H5 across both arms:** neither reward added to the primer (dense −3.1, sparse −0.2 paired vs
 primer only). The primer's gain over GRPO-from-base (+9.9) is SFT on teacher-free data. RL with
 these rewards, this config and 200 steps either kept it (sparse) or cost a little of it (dense).
@@ -402,11 +415,11 @@ format rates, length, truncated share, prose share, entropy, dead groups and KL
 
 | | Verdict | Evidence |
 |---|---|---|
-| H1 | | |
-| H2 | | |
+| H1 | **holds** | Primer → GRPO beats GRPO from the base on test2000 under both rewards: dense +6.8 [+5.2, +8.4] vs E2 dense v3, sparse +7.4 [+5.8, +9.2] vs E2 sparse v3 (one seed per arm). The gain is the primer's: primer only is +9.9 [+8.2, +11.8] vs E2 dense v3. |
+| H2 | **falsified as stated** | Sparse reward on the primer model stays within noise of its start: −0.2 [−1.6, +1.1] vs primer only. Sparse reward does learn from the *base* model under v3 (4.1% → 28.0%), unlike Chess-R1's 3B, so the "sparse can't learn" premise fails here for the base, not the primer. |
 | H3 | | |
 | H4 | | |
-| H5 | | |
+| H5 | **fails** (config v3) | Primer only ≈ primer → GRPO: dense −3.1 [−4.5, −1.6], sparse −0.2 [−1.6, +1.1]. pass@8 on dev500 fell (51.4% → 42.8% dense, 47.0% sparse). The entropy-target ablation (ADR-025) tests whether v3's entropy floor caused the dense drop. |
 
 ## Cost summary
 
