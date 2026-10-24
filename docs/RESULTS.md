@@ -75,7 +75,7 @@ $/1k counts the 105 s of generation only; the job cost $0.13 with boot.
 | E2 base → GRPO dense, v2 | 22–33% (point 28%); see below | **27.2% [25.2, 29.1]** | 43.6% [42.1, 45.2] | 100.0% | reference for v2 arms; vs dense v1 +3.4 [1.8, 4.8] | $9.22 with both evals (attempt 1 a $0 stockout) |
 | E2 base → GRPO sparse, v2 | 16–30% (point 24%); see below | **23.5% [21.6, 25.4]** | 38.7% [37.2, 40.3] | 98.1% | −3.6 [−4.9, −2.4] at step 200; dev500 steps 100–150: −0.3 [−2.0, 1.4] | $12.16 + $5.35 (resumed from step 180 as `-r2`) |
 | E2 base → GRPO dense, v3 | 24–30% (point 27%); see below | **25.8% [23.9, 27.8]** | 43.2% [41.7, 44.7] | 100.0% | **reference for E3 (H1)**; vs dense v2 −1.4 [−2.6, −0.1] | $9.99 with both evals (attempt 1 preempted after 4 min, $0.20) |
-| E2 base → GRPO sparse, v3 | 22–29% (point 25.5%); see below | | | | | |
+| E2 base → GRPO sparse, v3 | 22–29% (point 25.5%); see below | **28.0% [26.1, 30.0]** | 44.3% [42.7, 45.9] | 99.9% | +2.2 [+1.1, +3.4]; vs sparse v2 +4.5 [+3.0, +6.0] | $8.48 with test2000 |
 | E3 primer-M (+ T8) only | 18–42% (point 30%) if the format holds; see below | **35.7% [33.6, 37.9]** | 55.8% [54.3, 57.4] | 100.0% | +9.9 [+8.2, +11.8] vs dense v3 | $22.01 SFT + evals (+ $4.16 stopped primer-M-only attempt) |
 | E3 primer-M (+ T8) → GRPO sparse | 25–48% (point 37%) | **35.4% [33.4, 37.6]** | 56.0% [54.5, 57.5] | 99.8% | **+9.7 [+8.0, +11.3]**; vs primer only −0.2 [−1.6, +1.1]; vs primer → dense +2.9 [+1.8, +4.0] | $11.11 (3 preemptions, resumed from step 20) |
 | E3 primer-M (+ T8) → GRPO dense | 26–50% (point 38%) | **32.6% [30.5, 34.7]** | 54.5% [53.1, 56.1] | 100.0% | **+6.8 [+5.2, +8.4]** (H1); vs primer only −3.1 [−4.5, −1.6] | $9.64 (preempted at step 140, resumed) |
@@ -244,6 +244,17 @@ eight samples are still right or all wrong, so there is little signal for it to 
 didn't move (P1 1.6%, P2 4.0%, P3 0%, P4 50.4%). Cost $9.99 for the attempt that ran, $10.19
 with the preempted one: the top of the $7–10 range. Dense v3 is the E3 reference: the primer
 arms run the same config and differ only in their start point.
+
+**E2 v3 reading (sparse, `m4-e2-sparse-v3`).** test2000 **28.0% [26.1, 30.0]**, inside the
+predicted 22–29% and above the point (25.5%). Paired vs dense v3 it is **+2.2 [+1.1, +3.4]** (94
+puzzles solved only by sparse, 50 only by dense), where I predicted −1.5 (range −4 to +1). So
+sparse v3 beat dense v3, and the miss is in sign as well as size. vs sparse v2: +4.5 [+3.0, +6.0];
+v3 rescued the arm that v2's post-answer tail had wrecked. dev500 reached 22.8% by step 20 and
+stayed at 24–29% to step 200 (27.6% at the end). Health as predicted: truncation ≤ 0.8% after
+step 10, prose 0.02% over steps 180–200, mean completion ≤ 16.8 tokens after step 20, entropy
+coefficient > 0 on 84% of steps 30–200, median step 32 s. As with dense v3, the zero-spread
+share missed (80% over steps 50–200, predicted ≤ 50%). $8.48, inside $7–10. With both v3 arms
+in, GRPO from the base lands at 26–28% whichever reward it uses: the plateau E2 found holds.
 
 **E3 predictions** (written 2026-10-23, before the primer-M SFT launched; no primer-trained 2B
 model exists yet. The only SFT run so far is the laptop wiring test on Qwen3.5-0.8B, with 256
