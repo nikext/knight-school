@@ -15,6 +15,7 @@ bootstrap CIs. Arm-vs-arm differences use a paired bootstrap. Model:
 | base (E2, config v3, `m4-e2-dense-v3`) → GRPO dense | 1.6% [0.0, 4.0] | 4.0% [0.8, 8.0] | 0.0% | 50.4% [41.6, 59.2] | no change beyond noise (E2 v3 predictions) |
 | primer-M + T8 (`m4-sft-primer-m-t8`) | 97.6% [94.4, 100.0] | 14.4% [8.8, 20.8] | 92.0% [87.2, 96.0] | 80.0% [72.8, 86.4] | P1 80–99% (point 93%), P2 20–75% (45%), P3 25–85% (55%), P4 85–100% (95%) (E3 predictions) |
 | primer-M + T8 → GRPO dense (`m4-e3-dense`) | 97.6% [94.4, 100.0] | 7.2% [3.2, 12.0] | 91.2% [85.6, 96.0] | 80.0% [72.8, 86.4] | within ±10 points of the primer-M row on each task (E3 predictions) |
+| primer-M + T8 → GRPO sparse (`m4-e3-sparse`, job `m4-e3-sparse-e0`) | 98.4% [96.0, 100.0] | 12.8% [7.2, 19.2] | 90.4% [84.8, 95.2] | 80.0% [72.8, 86.4] | not predicted (E0 on sparse added for M4's Done-when) |
 
 Base row: `m2-screen-a100-r4`, `results/eval/probe500/qwen3.5-2b.md`. **It
 mostly measures copying of the format hint, not knowledge.** Qwen3.5-2B
@@ -450,5 +451,5 @@ format rates, length, truncated share, prose share, entropy, dead groups and KL
 
 | Pool | Ceiling | Spent | Biggest line items |
 |---|---|---|---|
-| compute | 360 | | |
-| vertex | 180 | | |
+| compute | 360 | $131.02 (to M4) | M4 $75.92: SFT primer-M + T8 $22.01 (+ $4.16 stopped primer-M-only run), E3 dense $9.64, E3 sparse $11.11, entropy ablation $10.21, E2 dense v3 $10.19, E2 sparse v3 $8.48, E0 sparse $0.11; M3 $50.15 |
+| vertex | 180 | $0 | none; the Premium Support credit was drawn for Compute Engine instead (BUDGET §1, 2026-10-24) |

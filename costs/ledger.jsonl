@@ -146,3 +146,4 @@
 {"ts":"2026-10-24T23:39:23Z","event":"end","id":"m4-e3-dense-ent014","attempt":5,"hours":1.4281,"actual_usd":4.4693,"status":"done","source":"gcs-marker","zone":"us-central1-c","note":"exit code 0"}
 {"ts":"2026-10-24T23:40:22Z","event":"start","id":"m4-e3-sparse-e0","attempt":1,"milestone":"M4","pool":"compute","kind":"gce-spot","machine":"g2-standard-8","zones":["us-central1-a","us-central1-b","us-central1-c"],"max_hours":0.5,"price_per_hour":0.540969,"worst_case_usd":0.2841,"run_budget_usd":0.5682,"approved":"user, in session 2026-10-24","contingency":false,"instance":"ks-m4-e3-sparse-e0-a1"}
 {"ts":"2026-10-24T23:40:22Z","event":"created","id":"m4-e3-sparse-e0","attempt":1,"instance":"ks-m4-e3-sparse-e0-a1","zone":"us-central1-a"}
+{"ts":"2026-10-24T23:52:59Z","event":"end","id":"m4-e3-sparse-e0","attempt":1,"hours":0.2061,"actual_usd":0.1115,"status":"done","source":"gcs-marker","zone":"us-central1-a","note":"exit code 0"}
