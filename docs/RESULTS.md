@@ -331,6 +331,17 @@ tokens per answer. E0 stayed within ±10 points of the primer row on every task 
 14.4 → 7.2%). The arm was preempted at step 140 (us-central1-c) and resumed from its step-140
 checkpoint in europe-west4-a; dev500 was continuous across the restart (31.4% → 32.8%).
 
+**Entropy-target ablation predictions** (written 2026-10-24, before `m4-e3-dense-ent014`
+launched; ADR-025: `m4-e3-dense` with `entropy_target` 0.14 instead of 0.2).
+- **The dev dip goes away:** no dev500 eval more than 4 points below step 0 (35.4%), 70%. The bonus
+  coefficient stays below 0.2 on average over steps 21–60, 80%. In `m4-e3-dense` it averaged 0.64.
+- **test2000:** 33–38% (point 35.5%). Paired vs primer only: −2 to +2.5 (point 0). H5's bar (≥ 3
+  with a CI that excludes 0) is met with only 15%. Paired vs `m4-e3-dense`: positive, 75%.
+- **pass@8 on dev500:** above `m4-e3-dense`'s 42.8%, 70%, and below primer only's 51.4%, 75%.
+- **Health:** format ≥ 99%, truncation ≤ 1%, mean completion ≤ 15 tokens; zero-spread groups
+  averaging 30–50% (lower entropy, so more groups agree than in `m4-e3-dense`'s ~30%).
+- **Cost:** $7–10.
+
 Figures (E2): dev500 solve rate vs dollars spent for all three runs
 (`results/figures/e2_dev_vs_usd.png`), and training metrics per step: move-match rate, legal and
 format rates, length, truncated share, prose share, entropy, dead groups and KL

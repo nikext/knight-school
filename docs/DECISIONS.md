@@ -651,3 +651,24 @@ planned the T8 fallback for this case.
 **Consequences:** the primer arms of E3 start from `m4-sft-primer-m-t8`, and the write-up calls
 the primer "primer-M + T8". The rerun costs another ~$21; the stopped attempt cost $4.16. If the
 format still breaks with 2%, the next step is a larger T8 share. That needs the user's yes.
+
+### ADR-025: Ablation: primer → GRPO dense with the entropy target at the primer's own entropy
+**Status:** accepted (2026-10-24, M4; the user approved it within the M4 allocation)
+**Context:** `m4-e3-dense` lowered the primer model's test2000 score by 3.1 points [−4.5, −1.6]
+(H5 fails). Config v3's adaptive entropy bonus (ADR-021) has a target of 0.2, set from the base
+model's runs. The primer model starts much sharper: token entropy 0.13–0.15 over steps 1–9.
+So the controller raised the bonus coefficient by 0.02 every step, to ~0.64 by steps 21–60.
+Base-model runs sat at 0.12–0.18. dev500 fell from 36.8% (step 20) to 28.0% (step 50) while the
+coefficient climbed, then recovered to 36.2% by step 200.
+**Decision:** one ablation run, `m4-e3-dense-ent014`. It is `m4-e3-dense` with
+`entropy_target: 0.14`, the mean entropy of steps 1–5 (0.143), set with `--set` in the run
+config and recorded in run.json. Seed, data, steps and reward are unchanged. The controller still
+works against collapse below the primer's own entropy, but it no longer pushes the policy above
+it. The bonus wasn't switched off entirely: that would also remove the protection against v1's
+entropy collapse and confound the answer. The run is outside the frozen protocol on purpose.
+It is reported as an ablation of config v3 for a sharp start, not as an E3 arm. It used the
+second-seed slot of task M4 §6, so no second seed of primer → dense was run.
+**Consequences:** if this arm matches or beats primer only and avoids the dev dip, the H5 failure
+is attributed to the base-tuned entropy floor, and M5 should set the target per start point.
+If it also falls below primer only, GRPO with this reward doesn't add to a primer that already
+imitates puzzle solutions, whatever the entropy control.
