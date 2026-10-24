@@ -1,16 +1,16 @@
 # Budget: the rules for spending money
 
-The user has two Google Cloud credits (read from Billing → Credits on
-2026-10-21; details in ADR-013). This project must never cost them real money.
+The user has two Google Cloud credits (first read from Billing → Credits on
+2026-10-21, details in ADR-013; last re-read 2026-10-24). This project must never cost them real money.
 This file is the contract, `costs/caps.yaml` is its machine-readable form,
 and `ks.cloud` enforces it in code.
 
 ## 1. Numbers
 
-| Pool | Credit | Left (2026-10-21) | Expires | Ceiling | Usable |
+| Pool | Credit | Left (2026-10-24) | Expires | Ceiling | Usable |
 |---|---|---|---|---|---|
-| `compute` | Google Developer Program annual: all of Google Cloud | $440.94 | **2026-11-12** | **$360** | now → jobs must **end by 2026-11-10 00:00Z** |
-| `vertex` | Marketing – GDP Premium Support 4: "certain usage", assumed Gemini only (unverified) | $209.26 | 2027-04-08 | **$180** | from **2026-11-13** (except the M0 smoke call) |
+| `compute` | Google Developer Program annual: all of Google Cloud | $423.38 | **2026-11-12** | **$360** | now → jobs must **end by 2026-11-10 00:00Z** |
+| `vertex` | Marketing – GDP Premium Support 4: "certain usage", covers Compute Engine (seen 2026-10-24), Gemini assumed | $85.73 | 2027-04-08 | **$180** | from **2026-11-13** (except the M0 smoke call) |
 
 Each ceiling is `min(planned ceiling, 0.9 × remaining)`. The 10% reserve
 absorbs billing lag, storage, egress and rounding, and nothing is ever planned
@@ -30,6 +30,21 @@ budget. After the annual credit is gone, Gemini can only draw on the
 Marketing credit. The first post-expiry call is a 1-cent scope test; if the
 next day's Billing → Reports shows it as net cost, the vertex pool goes to
 $0 and Gemini baselines are dropped.
+
+**Update 2026-10-24: the Marketing credit pays for Compute Engine, and Google
+draws it first.** From 2026-10-21 to 24 it fell $123.53 and the annual credit
+fell $17.56. Over the same days the kill switch's budget readings put this
+project at $105.48 gross (`ks-total-gross`), $0 of it Vertex
+(`ks-vertex-gross`), and $0 net (`ks-net`). Other projects can account for at
+most the remaining ~$36, so at least ~$88 of our GPU spend came out of the
+Marketing credit. The drain ADR-013 guarded against runs the other way: GPU
+work is eating the Gemini credit. At this rate it is gone before 2026-11-13,
+so nothing may be left for Gemini baselines (or for compute after the annual
+credit expires). The gate stays safe, because Gemini calls need a credit
+reading under 7 days old. The vertex pool's re-plan is the user's decision
+and is still open. To split a credit reading into our share and other
+projects', read the latest `ks-total-gross` and `ks-net` from the kill
+switch's logs (`jsonPayload.message:"ks-killswitch"`).
 
 **After 2026-11-12, compute and storage are not covered** unless that test
 shows otherwise. The bucket and registry are emptied by 2026-11-11 (M6
