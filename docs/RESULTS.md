@@ -367,12 +367,13 @@ $11.11, $2.68 of it in the three short attempts.
 | primer-M + T8 | 28.1% | 43.4% | 51.4% | 35.2% |
 | primer → GRPO dense | 26.6% | 37.6% | 42.8% | 36.2% |
 | primer → GRPO sparse | 28.4% | 40.5% | 47.0% | 36.2% |
+| primer → GRPO dense, entropy target 0.14 (ADR-025) | 28.0% | 39.3% | 45.0% | 36.4% |
 
 GRPO on the primer model kept or slightly lowered pass@1 and cut pass@8 by 4–9 points. That is
 sharpening without discovery (Shen et al.), and here the sharpening doesn't reach greedy accuracy
 either. Greedy dev500 rose by 1 point for both arms, while test2000 didn't move or fell.
 
-**H5 across both arms:** neither reward added to the primer (dense −3.1, sparse −0.2 paired vs
+**H5 across all three primer → GRPO runs:** none added to the primer (dense −3.1, sparse −0.2, dense with the matched entropy target −0.9, paired vs
 primer only). The primer's gain over GRPO-from-base (+9.9) is SFT on teacher-free data. RL with
 these rewards, this config and 200 steps either kept it (sparse) or cost a little of it (dense).
 
@@ -386,6 +387,29 @@ launched; ADR-025: `m4-e3-dense` with `entropy_target` 0.14 instead of 0.2).
 - **Health:** format ≥ 99%, truncation ≤ 1%, mean completion ≤ 15 tokens; zero-spread groups
   averaging 30–50% (lower entropy, so more groups agree than in `m4-e3-dense`'s ~30%).
 - **Cost:** $7–10.
+
+**Entropy-target ablation reading (`m4-e3-dense-ent014`, ADR-025).** test2000 **34.8% [32.6,
+36.9]**, move accuracy 55.6%, rating at 50% solve 1214 [1173, 1254]. Paired vs primer only: **−0.9
+[−2.3, +0.4]**, within noise. vs `m4-e3-dense` (target 0.2): +2.1 [+1.1, +3.2]. vs E2 dense v3:
++8.9 [+7.3, +10.5]. So the base-tuned entropy floor explains `m4-e3-dense`'s loss. With the
+target at the primer's own entropy, GRPO keeps the primer's score, but it still doesn't add to
+it. Checked against the predictions:
+- dev500 stayed within 4 points of step 0: its low was 32.0% at step 50, against 28.0% for target
+  0.2. It ended at 36.4%. ✓
+- The bonus coefficient stayed below 0.2 over steps 21–60: **✗**, it averaged 0.59 (target 0.2
+  run: 0.64). Entropy fell below 0.14 by itself (0.106 over steps 1–20), so the controller ramped
+  up anyway. What the lower target changed is where it stopped: entropy averaged 0.109 over
+  steps 21–60 (target 0.2: 0.177) and 0.148 over steps 61–200 (0.208). KL to the start averaged
+  0.114 over steps 121–200, versus 0.253.
+- test2000 inside 33–38% ✓; paired vs primer only inside −2 to +2.5 ✓; H5's bar not met (I gave it
+  15%) ✓; above `m4-e3-dense` ✓.
+- pass@k on dev500: @1 28.0%, @4 39.3%, @8 45.0%. pass@8 is above `m4-e3-dense` (42.8%) ✓ and below
+  primer only (51.4%) ✓.
+- Health: format 100%, truncation 0, ~8.5 tokens per answer, zero-spread groups 36% over steps
+  50–200 (predicted 30–50%) ✓. Training legal rate at T = 1 was 0.988 over steps 180–200 (target
+  0.2 run: 0.977).
+- Cost $10.21, just over the predicted $7–10. Four preemptions in us-central1-c cost $5.74 in
+  attempts that were cut short; the run resumed from steps 20, 30, 30 and 100.
 
 Figures (E2): dev500 solve rate vs dollars spent for all three runs
 (`results/figures/e2_dev_vs_usd.png`), and training metrics per step: move-match rate, legal and
@@ -410,6 +434,7 @@ format rates, length, truncated share, prose share, entropy, dead groups and KL
 | E5b | no legal-move list | | | | |
 | E5c | ~4B model, best recipe | | | | |
 | E5d | LoRA r=8 vs r=64 | | | | |
+| M4 ablation (ADR-025) | primer → GRPO dense, entropy target 0.14 instead of 0.2 | 33–38% (point 35.5%); Δ vs primer only −2 to +2.5 | **34.8% [32.6, 36.9]**; vs primer only −0.9 [−2.3, +0.4]; vs `m4-e3-dense` +2.1 [+1.1, +3.2] | $10.21 (4 preemptions) | done |
 
 ## Hypothesis verdicts
 
@@ -419,7 +444,7 @@ format rates, length, truncated share, prose share, entropy, dead groups and KL
 | H2 | **falsified as stated** | Sparse reward on the primer model stays within noise of its start: −0.2 [−1.6, +1.1] vs primer only. Sparse reward does learn from the *base* model under v3 (4.1% → 28.0%), unlike Chess-R1's 3B, so the "sparse can't learn" premise fails here for the base, not the primer. |
 | H3 | | |
 | H4 | | |
-| H5 | **fails** (config v3) | Primer only ≈ primer → GRPO: dense −3.1 [−4.5, −1.6], sparse −0.2 [−1.6, +1.1]. pass@8 on dev500 fell (51.4% → 42.8% dense, 47.0% sparse). The entropy-target ablation (ADR-025) tests whether v3's entropy floor caused the dense drop. |
+| H5 | **fails** | Primer only ≈ primer → GRPO for all three RL runs: dense −3.1 [−4.5, −1.6], sparse −0.2 [−1.6, +1.1], dense with the entropy target at the primer's own entropy −0.9 [−2.3, +0.4] (ADR-025). The dense arm's loss was the base-tuned entropy floor; without it RL keeps the primer's score but adds nothing, and pass@8 falls (51.4% → 42.8–47.0%). |
 
 ## Cost summary
 

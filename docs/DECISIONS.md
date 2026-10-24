@@ -672,3 +672,53 @@ second-seed slot of task M4 §6, so no second seed of primer → dense was run.
 is attributed to the base-tuned entropy floor, and M5 should set the target per start point.
 If it also falls below primer only, GRPO with this reward doesn't add to a primer that already
 imitates puzzle solutions, whatever the entropy control.
+
+### ADR-026: M4 main result: the primer's gain is SFT; RL on top adds nothing; M5 re-prioritised
+**Status:** accepted (2026-10-25, M4)
+**Context:** M4 ran E3 under config v3 (ADR-022) with one seed per arm. The arms: primer-M + T8
+SFT (ADR-024), then GRPO dense and GRPO sparse from it, both E2 arms re-run under v3, and one
+ablation of the entropy target (ADR-025). test2000 solve, with paired deltas:
+
+| Arm | Solve | vs E2 dense v3 | vs primer only |
+|---|---|---|---|
+| E2 base → dense v3 | 25.8% [23.9, 27.8] | — | −9.9 |
+| E2 base → sparse v3 | 28.0% [26.1, 30.0] | +2.2 [+1.1, +3.4] | — |
+| primer-M + T8 only | **35.7% [33.6, 37.9]** | **+9.9 [+8.2, +11.8]** | — |
+| primer → dense (target 0.2) | 32.6% [30.5, 34.7] | +6.8 [+5.2, +8.4] | −3.1 [−4.5, −1.6] |
+| primer → sparse (target 0.2) | 35.4% [33.4, 37.6] | +9.7 [+8.0, +11.3] | −0.2 [−1.6, +1.1] |
+| primer → dense (target 0.14) | 34.8% [32.6, 36.9] | +8.9 [+7.3, +10.5] | −0.9 [−2.3, +0.4] |
+
+**Decision (reading):**
+- **H1 holds; H2 is falsified as stated; H5 fails.** A teacher-free primer lifts test2000 by
+  ~10 points over GRPO from the base model, for $22 of SFT (base → GRPO costs ~$9). Putting GRPO
+  on top keeps that gain at best (sparse, or dense with a matched entropy target) and costs 3 points
+  at worst (dense with the base-tuned entropy floor). pass@8 on dev500 falls under every RL arm
+  (51.4% → 42.8–47.0%): RL sharpens without discovering new solutions (Shen et al.), and the
+  sharpening doesn't reach greedy accuracy either.
+- **What the primer is:** half of T5's 390k "Best move?" examples are `primer_pool` puzzle
+  positions answered with the puzzle's own solution. So primer-M is partly supervised imitation of
+  the RL task, and the +9.9 can't yet be split into "board knowledge" and "move imitation". E0
+  shows the knowledge did go in (P3 board-after-move 0% → 92%, P1 square 5% → 98%). Whether it is
+  what raised the solve rate is H4's question.
+- **Config v3's entropy floor (0.2) is tuned for the base model.** Applied to a sharper start it
+  pushes the policy away from the primer, until the target is set from the start's own entropy.
+  That is a property of the controller, not of the primer. The headline doesn't depend on it:
+  both target settings land within noise of primer only or below.
+
+**Consequences for M5 (task file priority list):**
+1. **E5a (rules-only primer, T1–T4) → GRPO dense moves to first.** It is the cleanest test of the
+   project's question, "does knowledge raise the RL ceiling?", with no move imitation in the
+   primer. Report rules-only SFT on its own as well. Plan the format risk up front: without T5
+   there is no bare-move habit to break, but check the probe at the first checkpoint.
+2. **Every primer arm reports primer-only and primer → GRPO,** so H5 is measured per arm. The SFT
+   eval is ~$0.1, since the SFT job already runs it.
+3. **Set the entropy target per start point**: the mean entropy of steps 1–5, as in ADR-025.
+   Otherwise the controller penalises a sharp start. This changes v3 for primer starts only,
+   because the E2 arms are already done. It needs an ADR and the user's yes before M5.
+4. **E4 primer-S** stays as the cheap second point, now read on primer-only as well as
+   post-RL.
+5. **E5b, E5c, E5d** keep their order after these.
+- **README headline (draft, finalised in M6):** "A teacher-free chess primer (SFT on
+  python-chess rules and Stockfish/puzzle moves, no LLM-written traces) lifts Qwen3.5-2B from 26%
+  to 36% on 2,000 held-out Lichess puzzles, ten points above GRPO alone. GRPO on top of the primer
+  adds nothing: it keeps the gain at best and narrows the model's sampling."
