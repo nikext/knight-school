@@ -1,0 +1,30 @@
+# E5b (task M5, RESEARCH.md §4): primer-M + T8 (m4-sft-primer-m-t8) -> GRPO dense under config v4
+# with the prompt's legal-move line dropped (legal_list=false, the only change), 200 steps, same
+# data, seed and reward. The dev curve and every final eval use the no-list prompt (profile
+# qwen3.5-2b-nolist). START_CKPT also evaluates the primer-only model and the base model on
+# test2000 without the list. The with-list references: m4-sft-primer-m-t8 (primer only),
+# m4-e3-dense-ent014 (~v4 GRPO dense), qwen3.5-2b (base). Then E0 and pass@8 on dev500.
+# Spot handling as in M3 (ADR-020): us-central1-c first, stockouts waited out for up to 12 h.
+id: m5-e5b-dense-nolist
+milestone: M5
+description: "E5b: primer-M + T8 -> GRPO dense (config v4) without the legal-move list, 200 steps"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-c, europe-west4-a, us-central1-a]
+max_hours: 4.5
+max_attempts: 6
+stockout_wait_hours: 12
+run_budget_usd: 22
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:7190e0411a2e@sha256:ab42254beb7e24340357ec8e32703bd341f35cb0c93df53638ab22f2fd2b636c
+command: "bash configs/jobs/m3-grpo.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  MODEL: "qwen3.5-2b-nolist"
+  TRAIN_CONFIG: "configs/train/grpo_dense.yaml"
+  TRAIN_SETS: "name=m5-e5b-dense-nolist legal_list=false init_ckpt=gs://knight-school-nt26-knight-school/runs/m4-sft-primer-m-t8/final/merged"
+  START_CKPT: "gs://knight-school-nt26-knight-school/runs/m4-sft-primer-m-t8/final/merged"
+  TEST_SET: "test2000"
+  PROBE: "1"
+  PASSK: "1"
