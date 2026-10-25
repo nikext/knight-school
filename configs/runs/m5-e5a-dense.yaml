@@ -1,0 +1,27 @@
+# E5a GRPO (task M5, ADR-026 §1): the rules-only primer (m5-sft-rules-m) -> GRPO dense under
+# config v4 (ADR-027: entropy target min(0.2, mean of steps 1-5)), 200 steps, same data, seed and
+# reward as the E2/E3 dense arms. Then test2000, E0 (probe500) and pass@8 on dev500. H4 compares it
+# with E2 dense v3 (= v4 for the base start) and with primer-M -> GRPO dense at the ~v4 target
+# (m4-e3-dense-ent014). Image 7190e0411a2e = v4; its laptop smoke passed (ADR-027).
+# Spot handling as in M3 (ADR-020): us-central1-c first, stockouts waited out for up to 12 h.
+id: m5-e5a-dense
+milestone: M5
+description: "E5a: rules-only primer -> GRPO dense (config v4), 200 steps"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-c, europe-west4-a, us-central1-a]
+max_hours: 4
+max_attempts: 6
+stockout_wait_hours: 12
+run_budget_usd: 22
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:7190e0411a2e@sha256:ab42254beb7e24340357ec8e32703bd341f35cb0c93df53638ab22f2fd2b636c
+command: "bash configs/jobs/m3-grpo.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/grpo_dense.yaml"
+  TRAIN_SETS: "name=m5-e5a-dense init_ckpt=gs://knight-school-nt26-knight-school/runs/m5-sft-rules-m/final/merged"
+  TEST_SET: "test2000"
+  PROBE: "1"
+  PASSK: "1"
