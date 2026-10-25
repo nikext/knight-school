@@ -12,7 +12,7 @@ description: "E5a: rules-only primer + 10% T9 SFT (full fine-tune), then dev500,
 machine: a2-ultragpu-1g
 gpus: 1
 zones: [us-central1-c, europe-west4-a, us-central1-a]
-max_hours: 10
+max_hours: 7.5  # was 10; lowered for attempt 2 (resume from step 232) to fit the $40 run budget
 max_attempts: 6
 stockout_wait_hours: 12
 run_budget_usd: 40

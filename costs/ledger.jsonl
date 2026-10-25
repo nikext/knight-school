@@ -155,3 +155,4 @@
 {"ts":"2026-10-25T14:12:00Z","event":"end","id":"m5-sft-rules-m-t9","attempt":1,"hours":0.7716,"actual_usd":2.4148,"status":"vanished","source":"audit-log","zone":"us-central1-c"}
 {"ts":"2026-10-25T15:17:43Z","event":"start","id":"m5-sft-rules-m-t9-10","attempt":1,"milestone":"M5","pool":"compute","kind":"gce-spot","machine":"a2-ultragpu-1g","zones":["us-central1-c","europe-west4-a","us-central1-a"],"max_hours":10.0,"price_per_hour":3.12961,"worst_case_usd":32.861,"run_budget_usd":40.0,"approved":"user, in session 2026-10-25","contingency":false,"instance":"ks-m5-sft-rules-m-t9-10-a1"}
 {"ts":"2026-10-25T15:17:43Z","event":"created","id":"m5-sft-rules-m-t9-10","attempt":1,"instance":"ks-m5-sft-rules-m-t9-10-a1","zone":"us-central1-c"}
+{"ts":"2026-10-25T18:09:00Z","event":"end","id":"m5-sft-rules-m-t9-10","attempt":1,"hours":2.8204,"actual_usd":8.8268,"status":"preempted","source":"audit-log","zone":"us-central1-c"}
