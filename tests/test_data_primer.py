@@ -214,6 +214,19 @@ def test_generate_never_emits_blocked_or_rl_positions_and_is_deterministic():
     assert msgs[1]["content"].startswith("Position (FEN): ")
 
 
+def test_rules_weights_draw_only_t1_to_t4_in_primer_m_proportions():
+    assert sum(pr.RULES_WEIGHTS.values()) == pytest.approx(1.0)
+    m_share = sum(pr.WEIGHTS[t] for t in pr.RULES_WEIGHTS)
+    for t, w in pr.RULES_WEIGHTS.items():
+        assert w == pytest.approx(pr.WEIGHTS[t] / m_share)
+    ev, pz = _sources()
+    out = list(
+        pr.generate(200, ev, pz, frozenset(), set(), 7, "R", pr.GenStats(), pr.RULES_WEIGHTS)
+    )
+    assert {ex["task"] for ex in out} == {"T1", "T2", "T3", "T4"}
+    assert not any("Legal moves:" in ex["messages"][1]["content"] for ex in out)
+
+
 def test_source_hands_out_each_position_once():
     ev, _ = _sources(50)
     seen = [ev.take().board.fen() for _ in range(20)]

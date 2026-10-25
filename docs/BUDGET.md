@@ -1,16 +1,16 @@
 # Budget: the rules for spending money
 
 The user has two Google Cloud credits (first read from Billing → Credits on
-2026-10-21, details in ADR-013; last re-read 2026-10-24). This project must never cost them real money.
+2026-10-21, details in ADR-013; last re-read 2026-10-25). This project must never cost them real money.
 This file is the contract, `costs/caps.yaml` is its machine-readable form,
 and `ks.cloud` enforces it in code.
 
 ## 1. Numbers
 
-| Pool | Credit | Left (2026-10-24) | Expires | Ceiling | Usable |
+| Pool | Credit | Left (2026-10-25) | Expires | Ceiling | Usable |
 |---|---|---|---|---|---|
-| `compute` | Google Developer Program annual: all of Google Cloud | $423.38 | **2026-11-12** | **$360** | now → jobs must **end by 2026-11-10 00:00Z** |
-| `vertex` | Marketing – GDP Premium Support 4: "certain usage", covers Compute Engine (seen 2026-10-24), Gemini assumed | $85.73 | 2027-04-08 | **$180** | from **2026-11-13** (except the M0 smoke call) |
+| `compute` | Google Developer Program annual: all of Google Cloud | $421.11 | **2026-11-12** | **$360** | now → jobs must **end by 2026-11-10 00:00Z** |
+| `vertex` | Marketing – GDP Premium Support 4: "certain usage", covers Compute Engine (seen 2026-10-24), Gemini assumed | $76.28 | 2027-04-08 | **$180** | from **2026-11-13** (except the M0 smoke call) |
 
 Each ceiling is `min(planned ceiling, 0.9 × remaining)`. The 10% reserve
 absorbs billing lag, storage, egress and rounding, and nothing is ever planned

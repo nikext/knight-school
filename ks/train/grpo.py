@@ -39,6 +39,43 @@ from ks.train.rewards import RewardFns
 from ks.train.trim import install_sorted_batches, trimmed
 
 COLUMNS = ["fen", "solution_uci", "is_last", "legal_san", "wp"]
+ENTROPY_FILE = "ks_entropy_target.json"  # in every checkpoint when the target comes from the start
+NO_BONUS = -1.0  # an entropy target no token entropy is ever at or below
+
+
+class StartTarget:
+    """ADR-027: no entropy bonus for the first `steps` steps, then the target is min(cap, their mean).
+
+    The entropies are the controller's own (window-global mean per optimizer step). The state goes
+    into every checkpoint, so a resume carries on with the same target and a partial window.
+    """
+
+    def __init__(self, steps: int, cap: float, window: list[float] | None = None) -> None:
+        self.steps, self.cap = steps, cap
+        self.window = list(window or [])
+        self.target = self._target()
+
+    def _target(self) -> float:
+        if not self.steps:
+            return self.cap
+        if len(self.window) < self.steps:
+            return NO_BONUS
+        return min(self.cap, sum(self.window) / self.steps)
+
+    def step(self, step: int, entropy: float) -> float | None:
+        """Record optimizer step `step`'s entropy. Returns the new target when the window fills."""
+        if step > self.steps or len(self.window) >= self.steps:
+            return None
+        self.window.append(entropy)
+        self.target = self._target()
+        return self.target if len(self.window) == self.steps else None
+
+    def state(self) -> dict[str, Any]:
+        return {"steps": self.steps, "cap": self.cap, "window": self.window, "target": self.target}
+
+    @classmethod
+    def from_state(cls, d: dict[str, Any]) -> StartTarget:
+        return cls(d["steps"], d["cap"], d["window"])
 
 
 def now_iso() -> str:
@@ -409,6 +446,8 @@ def main(
         )
         push_out()
 
+    start = StartTarget(cfg.entropy_start_steps, cfg.entropy_target)
+
     class Hooks(TrainerCallback):
         def on_train_begin(self, args: Any, state: Any, control: Any, **kw: Any) -> None:
             if cfg.eval_every and cfg.eval_at_start and state.global_step == 0:
@@ -432,6 +471,8 @@ def main(
             row["mem_peak_gib"] = round(torch.cuda.max_memory_allocated() / 2**30, 2)
             row["mem_used_gib"] = round((total - free) / 2**30, 2)
             torch.cuda.reset_peak_memory_stats()
+            row["entropy_target"] = trainer.args.entropy_target
+            row["entropy_ctrl"] = trainer._last_world_entropy  # what the target is compared with
             if trainer.total_columns:
                 row["trim_frac"] = round(trainer.trimmed_columns / trainer.total_columns, 3)
             trainer.trimmed_columns = trainer.total_columns = 0
@@ -442,11 +483,18 @@ def main(
             )
 
         def on_step_end(self, args: Any, state: Any, control: Any, **kw: Any) -> None:
+            if (t := start.step(state.global_step, trainer._last_world_entropy)) is not None:
+                trainer.args.entropy_target = t
+                info["entropy_start"] = start.state()
+                info_path.write_text(json.dumps(info, indent=1))
+                log(f"entropy target {t:.4f} from steps 1-{start.steps}: {start.window}")
             if cfg.eval_every and state.global_step % cfg.eval_every == 0:
                 dev_eval(state.global_step)
 
         def on_save(self, args: Any, state: Any, control: Any, **kw: Any) -> None:
             local = Path(args.output_dir) / f"checkpoint-{state.global_step}"
+            if cfg.entropy_start_steps:
+                (local / ENTROPY_FILE).write_text(json.dumps(start.state()))
             try:
                 n = kc.push(store, local, ckpt_root, cfg.keep_last)
             except (
@@ -466,7 +514,12 @@ def main(
     if (step := kc.latest(store, ckpt_root)) is not None:
         resume = str(kc.pull(store, ckpt_root, step, work / "resume"))
         log(f"resuming from checkpoint {step}")
+        if cfg.entropy_start_steps:
+            start = StartTarget.from_state(json.loads((Path(resume) / ENTROPY_FILE).read_text()))
     info["resumed_from"] = step
+    trainer.args.entropy_target = start.target  # read by TRL's controller every step
+    if cfg.entropy_start_steps:
+        log(f"entropy target {start.target} (from the start: {start.state()})")
     if resume is not None and step is not None and step >= cfg.steps:
         # Preempted between the last checkpoint and the final save. trainer.train() would run
         # one step past max_steps here (seen in the laptop smoke), so load the adapter and skip.

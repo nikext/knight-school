@@ -722,3 +722,74 @@ ablation of the entropy target (ADR-025). test2000 solve, with paired deltas:
   python-chess rules and Stockfish/puzzle moves, no LLM-written traces) lifts Qwen3.5-2B from 26%
   to 36% on 2,000 held-out Lichess puzzles, ten points above GRPO alone. GRPO on top of the primer
   adds nothing: it keeps the gain at best and narrows the model's sampling."
+
+### ADR-027: GRPO config v4: the entropy target comes from the start, min(0.2, steps 1–5)
+**Status:** accepted (2026-10-25, M5; the user chose this rule at the start of M5, as ADR-026 §3
+asked). Supersedes ADR-022's frozen config for M5 arms.
+**Context:** v3's adaptive entropy bonus has a fixed target of 0.2, fitted on the base model,
+whose rollouts start at a token entropy of 0.80–0.88 (E2 v3, steps 1–5). The primer-M start sits
+at 0.13–0.15. The controller then raised the bonus every step, and GRPO dense lost 3.1 points
+against primer only (ADR-025). With the target at 0.14, the loss went to −0.9, within noise. M5's
+starts (rules-only SFT, primer-S SFT, primer-M without the legal-move list) have entropies that
+nobody has measured yet.
+**Decision:** **v4 = v3 + `entropy_start_steps: 5`** (`configs/train/grpo.yaml`).
+- Steps 1–5 run with no entropy bonus: the target is −1, which no entropy reaches, so the
+  coefficient stays at its initial 0. After step 5 the target becomes **min(0.2, the mean
+  entropy of steps 1–5)** and stays fixed. The entropy is the controller's own: the token-weighted
+  mean over the step's 512 completions (TRL's `_last_world_entropy`). The logged `entropy` is a
+  mean of per-micro-batch means instead. With M4's short completions the two agree to within
+  0.001–0.006, at steps 190 and 200 of five runs (each run's `entropy_ctrl_state.json` against
+  its steps.csv). With long, varied completions they can differ by much more: 1.58 vs 1.28 in the
+  laptop smoke. steps.csv now logs both (`entropy_ctrl` is the controller's).
+- **Why cap at 0.2:** a target above the start's entropy is what failed in ADR-025. A target at a
+  high start's entropy (0.85 for the base) would block the sharpening RL needs. v1 collapsed to
+  0.06 with no bonus. v2 and v3 held 0.2 and learned.
+- **For a start above 0.2, v4 is v3.** In v3, steps 1–5 also apply no bonus when the entropy is
+  above the target (E2 v3: coefficient 0.0 throughout steps 1–5), and from step 6 the target is
+  0.2 in both. So the E2 arms are v4 runs as they stand.
+- **For primer-M, `m4-e3-dense-ent014` is the v4-equivalent arm.** v4 would set the target at
+  ≈0.14 (steps 1–5 of `m4-e3-dense`: 0.143). ent014 used 0.14 from step 1, with a small bonus in
+  steps 2–4. M5 compares its primer arms with it and says that it is "≈ v4", not v4.
+- **Bookkeeping:** the state (window, target) goes into every checkpoint as
+  `ks_entropy_target.json`, so a resume keeps the target, or continues a partial window. run.json
+  records `entropy_start`, and steps.csv gets an `entropy_target` column.
+- **Tested:** unit tests for the rule (`tests/test_train_entropy.py`). A laptop smoke run
+  (Qwen3.5-0.8B) fills the window, checkpoints in the middle of it, and resumes.
+**Consequences:** every M5 GRPO arm runs v4. No v3 arm is re-run. The write-up calls the M5
+arms "v4" and the E2/E3 arms "v3 (= v4 for the base start)".
+
+### ADR-028: M5 primer sets: rules-M for E5a, S-t8 for E4, chessbench1k filtered out
+**Status:** accepted (2026-10-25, M5)
+**Context:** E5a needs a rules-only primer "matched to M's tokens" (DATA.md §7). E4 needs primer-S,
+but primer-S on its own has the T5 format break that primer-M had: `m4-sft-primer-m` lost the RL
+answer format by step 53, after ~92k examples, and S has 130k. Task M5 §1 also asks every new
+set to drop positions on chessbench1k lines, which aren't in the blocklist (EVALS.md §1). It
+also lists primer-L, which the M3 re-plan dropped.
+**Decision:**
+- **rules-M** (`data/primer/rules-M`, `manifests/primer_rules-M.json`, step `primer_rules`):
+  T1–T4 with their primer-M weights renormalised (20/30/30/20%). It uses the same generator and
+  frozen formats (`ks.data.primer`). As for T1–T4 in primer-M, half the positions come from
+  `primer_pool` puzzles and half from the eval DB, and each position is used once (seed 2031).
+  **Size: 1,455,000 examples**, which is primer-M's 186.47M tokens divided by 128.15, the mean
+  tokens of primer-M's T1–T4 examples. "Matched to M's tokens" is read as total tokens, so the
+  SFT compute is matched (SFT pays for every token). T1–T4 answers are long (move lists, FENs),
+  so rules-M carries about twice primer-M's answer tokens. **Measured** (Qwen3.5-2B tokenizer):
+  186.97M tokens (primer-M 186.47M), 53.2M of them answer tokens (primer-M 28.1M). T2 and T3 hold
+  89% of the answer tokens. 727,151 positions came from puzzles and 727,849 from the eval DB.
+  1,021 items were dropped and redrawn: 552 for the blocklist or chessbench1k, 469 for rl_train.
+- **No T8 for rules-M.** T8 answers the RL prompt with the T5 move, which would bring move
+  imitation back into the one arm meant to have none. If the format breaks (RESULTS.md, E5a stop
+  rule), the fix must carry no move choice, for example RL-format prompts answered with the base
+  model's own greedy move. That needs the user's yes.
+- **S-t8** (`data/primer/S-t8`, step `primer_s_t8`): primer-S's three shards unchanged, plus the
+  **2,489** T8 examples of M-t8 whose T5 original lies in S. That is 1.88% of 132,489 (M-t8:
+  1.96%). The step recomputes `t8_examples`' picks, checks each T8 example's FEN against its T5
+  original, and checks that S's T8 examples are a prefix of M-t8's T8 shard. So S-t8 ⊂ M-t8 as
+  S ⊂ M, and E4's two points differ in size only.
+- **chessbench1k:** rules-M drops every item that shows or reveals a position on a chessbench1k
+  line, as it drops blocklisted ones. Both manifests count hits against the blocklist plus
+  chessbench1k (`contamination_keys`). S-t8 is clean by construction, since chessbench1k was
+  built to exclude anything touching primer-M, and the check confirms it.
+- **primer-L stays dropped** (M3 re-plan, BUDGET.md §2). Nothing is generated for it.
+**Consequences:** the E5a SFT costs about what primer-M's did (~$22). The E4 SFT is ~10% of that.
+`ks primer-tokens --set rules-M --set S-t8` records the token counts.

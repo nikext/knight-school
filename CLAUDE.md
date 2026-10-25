@@ -145,10 +145,10 @@ notification. For a run that lasts hours, use the default 300 s interval.
   "Done when" is met.
 - Experiment tracking: **TensorBoard logs in GCS + metric CSVs committed to `results/`**.
 - Kill switch may disable billing at net ≥ $5: **yes** (deployed with `KS_DETACH_BILLING=1`).
-- Credits (read 2026-10-24, re-read weekly):
-  - compute: GDP annual, **$423.38** left, all of Google Cloud, **expires 2026-11-12**
-  - vertex: Marketing – GDP Premium Support 4, **$85.73** left, expires 2027-04-08,
+- Credits (read 2026-10-25, re-read weekly):
+  - compute: GDP annual, **$421.11** left, all of Google Cloud, **expires 2026-11-12**
+  - vertex: Marketing – GDP Premium Support 4, **$76.28** left, expires 2027-04-08,
     usable from 2026-11-13. Not Gemini-only: Google has been drawing it for our
-    Compute Engine spend before the annual credit (−$123.53 from 2026-10-21 to 24).
+    Compute Engine spend before the annual credit (−$132.98 from 2026-10-21 to 25).
 
   ADR-013 has the schedule this forces.

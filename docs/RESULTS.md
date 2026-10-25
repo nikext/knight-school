@@ -431,11 +431,44 @@ format rates, length, truncated share, prose share, entropy, dead groups and KL
 
 | ID | Arm | Predicted | Result | Run $ | Status |
 |---|---|---|---|---|---|
-| E5a | rules-only primer → GRPO dense | | | | |
+| E5a | rules-only primer (SFT only) | 3–12% (point 6%) if the format holds | | | |
+| E5a | rules-only primer → GRPO dense (v4) | 24–33% (point 28%); Δ vs E2 dense v3 +2 (−2 to +7) | | | |
 | E5b | no legal-move list | | | | |
-| E5c | ~4B model, best recipe | | | | |
+| E5c | ~4B model, best recipe | | | | ⏭️ doesn't fit the M5 line (user's choice at the M5 start: E5a, E4, E5b, E5d) |
 | E5d | LoRA r=8 vs r=64 | | | | |
 | M4 ablation (ADR-025) | primer → GRPO dense, entropy target 0.14 instead of 0.2 | 33–38% (point 35.5%); Δ vs primer only −2 to +2.5 | **34.8% [32.6, 36.9]**; vs primer only −0.9 [−2.3, +0.4]; vs `m4-e3-dense` +2.1 [+1.1, +3.2] | $10.21 (4 preemptions) | done |
+
+**M5 plan** (agreed with the user on 2026-10-25): E5a, E4, E5b, E5d in that order, within the
+$110 M5 line (~$75 planned). E5c is skipped. Every GRPO arm runs config v4 (ADR-027: the entropy
+target is min(0.2, the mean of steps 1–5)). For the base start, v4 is the same as v3. For
+primer-M it is ≈ the ent014 ablation, which is therefore the "primer-M → GRPO dense" reference
+for M5.
+
+**E5a predictions** (written 2026-10-25, before `m5-sft-rules-m` launched; no model has trained
+on rules-M yet). Rules-M (ADR-028) is T1–T4 only: 1,455,000 examples, as many tokens as primer-M,
+with about twice its answer tokens. No answer is a move choice, no prompt shows the legal-move
+line, and no example uses `<answer>` tags.
+- **Format.** Without T5 there is no bare-move habit on a near-identical prompt, which is what
+  broke primer-M's format. But 1.46M bare answers to FEN questions could still teach the model to
+  answer the RL prompt bare, or with a move list. Probe format ≥ 50% at the first checkpoint: 70%.
+  Final dev500 format ≥ 90%: 60%. **Pre-registered stop rule**, as in E3: if the probe format is
+  below 50% at two checkpoints in a row, I stop the VM and ask the user. A T8-style fix would
+  have to carry no move choice (ADR-028).
+- **Rules-only SFT on its own (test2000), if the format holds:** solve 3–12% (point 6%), move
+  accuracy 15–28%, legal ≥ 97%. Knowing the captures and checks may raise the base model's move
+  choice a little, but nothing in rules-M says which move wins.
+- **E0:** P1 square 90–99% (point 97%), P2 legal count 10–40% (20%), P3 FEN after a move 85–97%
+  (92%), P4 in check 75–95% (85%). That is primer-M's level or above, since rules-M has 2.2×
+  primer-M's T1–T4 examples.
+- **v4's entropy start:** above 0.2, so the target stays 0.2 and the arm runs as v3: 70%.
+- **Rules → GRPO dense (H4):** test2000 24–33% (point 28%), paired vs E2 dense v3 (25.8%) +2
+  (range −2 to +7). H4 asks for at least half of the full primer's post-RL gain. Against
+  primer-M → GRPO dense at the ≈ v4 target (ent014, 34.8%, +9.0 paired over E2 dense v3), the bar
+  is ≥ 30.3%. I give that 25%. "Rules-only ≈ no primer" (Δ < 3 or a CI that includes 0): 55%.
+- **pass@8 on dev500:** rules-only SFT 5–15% (base 6.0%). After GRPO 30–42%, a few points above
+  its greedy dev500 score, as for the primer arms (greedy 36%, pass@8 43–47%).
+- **Health after GRPO:** format ≥ 99%, ~9 tokens per answer, truncation ≤ 1%.
+- **Cost:** SFT 6.5–8 h, $20–26 (point $22). GRPO $8–12.
 
 ## Hypothesis verdicts
 

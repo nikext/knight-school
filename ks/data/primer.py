@@ -32,6 +32,9 @@ PIECE_ORDER = [chess.KING, chess.QUEEN, chess.ROOK, chess.BISHOP, chess.KNIGHT, 
 
 # Share of examples per task (by example count; M2 records tokens per task).
 WEIGHTS = {"T1": 0.10, "T2": 0.15, "T3": 0.15, "T4": 0.10, "T5": 0.30, "T6": 0.10, "T7": 0.10}
+# primer rules-M (E5a, ADR-028): T1-T4 only, in the proportions they have in primer-M. No answer
+# is ever a move choice.
+RULES_WEIGHTS = {"T1": 0.20, "T2": 0.30, "T3": 0.30, "T4": 0.20}
 # T1-T5 draw half their positions from primer_pool puzzles, half from the eval DB.
 # T6 and T7 need an engine score and PV, so they use the eval DB only.
 PUZZLE_SHARE = 0.5
@@ -382,6 +385,7 @@ def generate(
     seed: int,
     prefix: str,
     stats: GenStats,
+    weights: dict[str, float] = WEIGHTS,
 ) -> Iterator[dict[str, Any]]:
     """n examples in a seeded task order. Each source position is used at most once.
 
@@ -390,10 +394,10 @@ def generate(
     separable, RESEARCH.md H5); a fresh position is drawn instead.
     """
     rng = random.Random(seed)
-    tasks, weights = list(WEIGHTS), list(WEIGHTS.values())
+    tasks, shares = list(weights), list(weights.values())
     i = 0
     while i < n:
-        task = rng.choices(tasks, weights)[0]
+        task = rng.choices(tasks, shares)[0]
         gen = rng.choice(VARIANTS[task])
         use_puzzle = task not in EVALDB_ONLY and rng.random() < PUZZLE_SHARE
         src = puzzle if use_puzzle else evaldb

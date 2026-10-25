@@ -180,7 +180,8 @@ reveal a blocklisted or rl_train position are dropped. The examples carry
 | primer-S | ~15M | **18.6M** total, 2.8M answer (130k examples) | M1 |
 | primer-M | ~150M | **186.5M** total, 28.1M answer (1.3M examples) | M1 |
 | primer-L | ~450M | | dropped in the M3 re-plan (BUDGET.md §2) |
-| primer-rules-M | T1–T4 only, matched to M's tokens | | M5 (E5a) |
+| primer-rules-M | T1–T4 only, matched to M's tokens | **187.0M** total, 53.2M answer (1,455,000 examples; ADR-028) | M5 (E5a) |
+| primer-S-t8 | S + its 2,489 T8 examples (nested in M-t8) | **19.2M** total, 2.8M answer (132,489 examples; ADR-028) | M5 (E4) |
 
 M1 can't know the final tokenizer yet, so it generates by example count with
 a ~20% margin. A 3k-example sample measured **139 tokens per example** with

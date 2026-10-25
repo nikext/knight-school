@@ -299,11 +299,15 @@ def bins_figure(
 @app.command("primer-tokens")
 def primer_tokens(
     model: Annotated[str, typer.Argument(help="Profile of the chosen main model.")],
+    sets: Annotated[
+        list[str] | None,
+        typer.Option("--set", help="Primer dirs under data/primer/; default S, M."),
+    ] = None,
 ) -> None:
-    """Count primer S/M tokens with the model's tokenizer and record them in the manifests."""
+    """Count primer tokens with the model's tokenizer and record them in the manifests."""
     from ks.data.tokens import count, write_manifests
 
-    counts = count(model)
+    counts = count(model, tuple(sets or ("S", "M")))
     write_manifests(counts)
     for name, c in counts.items():
         typer.echo(

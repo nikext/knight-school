@@ -1,6 +1,7 @@
 """`make data`: the M1 chain, step by step, each skipped when its inputs and code are unchanged.
 
 puzzles -> evaldb -> probe -> blocklist -> rltrain -> timing -> rewards -> primer -> primer_t8 -> chessbench
+-> primer_rules -> primer_s_t8 (M5)
 """
 
 from __future__ import annotations
@@ -42,6 +43,10 @@ PRIMER_SEED = 2026
 PRIMER_SHARD = 50_000
 # Example counts: token targets (DATA.md §7) x 1.2 / 139 tokens per example (Qwen3 tokenizer, 3k sample).
 PRIMER_SIZES = {"M": 1_300_000, "S": 130_000}  # S = the first 130k examples of M (nested)
+# M5 (ADR-028). rules-M (E5a) matches primer-M's 186.5M tokens: 186,470,674 / 128.15, the mean
+# tokens of primer-M's T1-T4 examples (manifests/primer_M.json).
+RULES_N = 1_455_000
+RULES_SEED = PRIMER_SEED + 5
 
 FILTERED = mf.DATA / "puzzles" / "filtered.parquet"
 SPLITS = mf.DATA / "splits"
@@ -378,14 +383,16 @@ def _primer_sources(seed: int, need_puzzle: int) -> tuple[pr.Source, pr.Source]:
     )
 
 
-def _verify_primer(paths: list[Path], block: bl.Blocklist) -> int:
+def _verify_primer(
+    paths: list[Path], block: bl.Blocklist, extra: frozenset[str] = frozenset()
+) -> int:
     """contamination_hits: re-derive each example's prompt key and check every recorded key."""
     hits = 0
     for ex in pr.read_shards(paths):
         keys = ex["keys"]
         if kb.key(kb.board_from_fen(ex["fen"])) != keys[0]:
             raise AssertionError(f"{ex['id']}: recorded key doesn't match its FEN")
-        hits += any(k in block.keys for k in keys)
+        hits += any(k in block.keys or k in extra for k in keys)
     return hits
 
 
@@ -592,6 +599,144 @@ def step_chessbench(log: Log, force: bool = False) -> None:
     log(f"chessbench: {picked.height} puzzles ({cb.height - pool.height} excluded)")
 
 
+# --- M5 primer sets (ADR-028) --------------------------------------------------------------
+
+
+def _chessbench_keys() -> frozenset[str]:
+    """Every position on a chessbench1k line. It isn't in the blocklist, so M5 sets drop these too."""
+    cb = pl.read_csv(_sets_csv("chessbench1k"), schema_overrides={"PuzzleId": pl.String})
+    return frozenset(bl.puzzle_keys(cb))
+
+
+def _task_counts(paths: list[Path]) -> tuple[dict[str, int], dict[str, int]]:
+    per_task: dict[str, int] = {}
+    per_source: dict[str, int] = {}
+    for ex in pr.read_shards(paths):
+        per_task[ex["task"]] = per_task.get(ex["task"], 0) + 1
+        per_source[ex["source"]] = per_source.get(ex["source"], 0) + 1
+    return dict(sorted(per_task.items())), per_source
+
+
+def step_primer_rules(log: Log, force: bool = False) -> None:
+    """primer rules-M (E5a): T1-T4 only, as many tokens as primer-M, no move answers."""
+    out = PRIMER / "rules-M"
+    inputs = {
+        "evaldb_sample": mf.output_sha("evaldb_sample"),
+        "rl_train_candidates": mf.output_sha("rl_train_candidates"),
+        "blocklist": mf.output_sha("blocklist"),
+        "chessbench1k": mf.output_sha("chessbench1k"),
+    }
+    params = {"n": RULES_N, "seed": RULES_SEED, "shard": PRIMER_SHARD, "weights": pr.RULES_WEIGHTS}
+    fp = mf.fingerprint(inputs, params, [pr, kb, puzzles, _primer_sources, step_primer_rules])
+    if not force and mf.up_to_date("primer_rules-M", fp, [out]):
+        log("primer_rules: up to date")
+        return
+    block = bl.Blocklist.load(mf.SETS)
+    cb_keys = _chessbench_keys()
+    rl_keys = set(pl.read_parquet(CANDIDATES)["key"].to_list())
+    # every task draws half its positions from puzzles; 30% slack for skips and drops
+    need_puzzle = int(RULES_N * pr.PUZZLE_SHARE * 1.3)
+    ev_src, pz_src = _primer_sources(RULES_SEED, need_puzzle)
+    stats = pr.GenStats()
+    t = time.perf_counter()
+    examples = pr.generate(
+        RULES_N,
+        ev_src,
+        pz_src,
+        block.keys | cb_keys,
+        rl_keys,
+        RULES_SEED,
+        "R",
+        stats,
+        pr.RULES_WEIGHTS,
+    )
+    paths, total = pr.write_shards(examples, out, PRIMER_SHARD)
+    log(f"primer_rules: {total:,} examples in {(time.perf_counter() - t) / 60:.1f} min")
+    per_task, per_source = _task_counts(paths)
+    mf.write(
+        "primer_rules-M",
+        fp,
+        [out],
+        examples=total,
+        shards=len(paths),
+        per_task=per_task,
+        per_source=per_source,
+        contamination_hits=_verify_primer(paths, block, cb_keys),
+        contamination_keys="blocklist + chessbench1k lines",
+        tokens="counted with `ks primer-tokens qwen3.5-2b --set rules-M`",
+        seed=RULES_SEED,
+        weights=pr.RULES_WEIGHTS,
+        puzzle_share=pr.PUZZLE_SHARE,
+        blocklist_drops=stats.blocklist_drops,
+        rl_train_drops=stats.rl_train_drops,
+        skipped_no_item=stats.skipped,
+        evaldb_positions_used=ev_src.used(),
+        puzzle_positions_used=pz_src.used(),
+    )
+
+
+def step_primer_s_t8(log: Log, force: bool = False) -> None:
+    """primer S-t8 (E4): primer-S's shards, plus the T8 examples of M-t8 whose T5 original is in S.
+
+    S is the first 130k examples of M, so S-t8 is nested in M-t8 as S is in M, with T8 at the
+    same ~2% share.
+    """
+    out = PRIMER / "S-t8"
+    m_paths = sorted((PRIMER / "M").glob("shard-*.jsonl.zst"))
+    s_paths = sorted((PRIMER / "S").glob("shard-*.jsonl.zst"))
+    t8_src = PRIMER / "M-t8" / f"shard-{len(m_paths):05d}.jsonl.zst"
+    n = round(pr.T8_SHARE * PRIMER_SIZES["M"])
+    inputs = {
+        "primer_M": mf.output_sha("primer_M"),
+        "primer_S": mf.output_sha("primer_S"),
+        "primer_M-t8": mf.output_sha("primer_M-t8"),
+        "chessbench1k": mf.output_sha("chessbench1k"),
+    }
+    params = {"n": n, "seed": PRIMER_SEED + 8}
+    fp = mf.fingerprint(inputs, params, [step_primer_s_t8])
+    if not force and mf.up_to_date("primer_S-t8", fp, [out]):
+        log("primer_s_t8: up to date")
+        return
+    # The picks t8_examples made for M-t8: indices into M's T5 examples, in M's order.
+    t5 = [(ex["id"], ex["fen"]) for ex in pr.read_shards(m_paths) if ex["task"] == "T5"]
+    picked = sorted(random.Random(PRIMER_SEED + 8).sample(range(len(t5)), n))
+    t8 = list(pr.read_shards([t8_src]))
+    assert len(t8) == n
+    s_ids = {ex["id"] for ex in pr.read_shards(s_paths)}
+    keep = [ex for ex, i in zip(t8, picked, strict=True) if t5[i][0] in s_ids]
+    for ex, i in zip(t8, picked, strict=True):
+        if ex["fen"] != t5[i][1]:
+            raise AssertionError(f"{ex['id']}: T8 example doesn't match its T5 original")
+    # S is M's prefix and the picks are sorted, so S's T8 examples are a prefix of the shard.
+    assert [ex["id"] for ex in keep] == [ex["id"] for ex in t8[: len(keep)]]
+    out.mkdir(parents=True, exist_ok=True)
+    for old in out.glob("shard-*.jsonl.zst"):
+        old.unlink()
+    for p in s_paths:
+        shutil.copyfile(p, out / p.name)
+    t8_path = out / f"shard-{len(s_paths):05d}.jsonl.zst"
+    blob = "".join(json.dumps(ex, ensure_ascii=False) + "\n" for ex in keep)
+    t8_path.write_bytes(zstandard.ZstdCompressor(level=10).compress(blob.encode()))
+    paths = sorted(out.glob("shard-*.jsonl.zst"))
+    per_task, per_source = _task_counts(paths)
+    mf.write(
+        "primer_S-t8",
+        fp,
+        [out],
+        examples=sum(per_task.values()),
+        shards=len(paths),
+        per_task=per_task,
+        per_source=per_source,
+        contains="primer_S",
+        nested_in="primer_M-t8",
+        t8_share=round(len(keep) / sum(per_task.values()), 4),
+        contamination_hits=_verify_primer(paths, bl.Blocklist.load(mf.SETS), _chessbench_keys()),
+        contamination_keys="blocklist + chessbench1k lines",
+        prompt_hash=prompt.prompt_hash(),
+    )
+    log(f"primer_s_t8: {len(keep):,} T8 examples added to primer-S's {len(s_ids):,}")
+
+
 STEPS: dict[str, Callable[[Log, bool], None]] = {
     "puzzles": step_puzzles,
     "evaldb": step_evaldb,
@@ -603,6 +748,8 @@ STEPS: dict[str, Callable[[Log, bool], None]] = {
     "primer": step_primer,
     "primer_t8": step_primer_t8,
     "chessbench": step_chessbench,
+    "primer_rules": step_primer_rules,
+    "primer_s_t8": step_primer_s_t8,
 }
 
 
