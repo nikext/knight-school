@@ -162,6 +162,7 @@ TRAINING_MANIFESTS = [
     "primer_rules-M",
     "primer_S-t8",
     "primer_rules-M-t9",
+    "primer_rules-M-t9-10",
 ]
 
 

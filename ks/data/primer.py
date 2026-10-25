@@ -299,7 +299,9 @@ def t8_from_t5(t5: dict[str, Any], rl_user_text: str, ex_id: str) -> dict[str, A
 # did. A copy of a T1-T4 example asked in the RL prompt's layout (the legal-move line, then the
 # question with the RL instruction's second sentence) and answered in the RL answer tags. Its
 # answer is the T1-T4 answer, so no example ever answers with a move choice.
-T9_SHARE = 0.02  # of rules-M's example count
+# Shares of rules-M's example count per set: 2% as T8 had (format 0.375 at the first checkpoint,
+# ADR-029), then 10% (ADR-030).
+T9_SHARES = {"rules-M-t9": 0.02, "rules-M-t9-10": 0.10}
 T9_INSTRUCTION = (
     "Think it through inside <think></think>, then give\nthe answer inside <answer></answer>."
 )

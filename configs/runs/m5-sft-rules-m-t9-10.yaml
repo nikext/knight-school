@@ -1,0 +1,28 @@
+# E5a rules-only primer SFT with T9 at 10% (ADR-030): m5-sft-rules-m-t9 (T9 at 2%) reached probe
+# format 0.375 at its first checkpoint, so this run trains on rules-M plus 145,500 T9 examples
+# (T1-T4 items in the RL prompt's layout, answered inside <answer></answer>; no move choice
+# anywhere). Same trainer, config and seed as m5-sft-rules-m and m4-sft-primer-m-t8; only the
+# data and the run name change. ~224M tokens (+16% over primer-M + T8's 192.5M): ~8 h, ~$25.
+# No stop on the format (ADR-030): the run finishes whatever the probe says. Then dev500,
+# test2000, probe500 and pass@8 on dev500 (PASS8_BASE=0).
+# Spot handling as in M3 (ADR-020): us-central1-c first, stockouts waited out for up to 12 h.
+id: m5-sft-rules-m-t9-10
+milestone: M5
+description: "E5a: rules-only primer + 10% T9 SFT (full fine-tune), then dev500, test2000, probe500"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-c, europe-west4-a, us-central1-a]
+max_hours: 10
+max_attempts: 6
+stockout_wait_hours: 12
+run_budget_usd: 40
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:7190e0411a2e@sha256:ab42254beb7e24340357ec8e32703bd341f35cb0c93df53638ab22f2fd2b636c
+command: "bash configs/jobs/m4-sft.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/sft.yaml"
+  TRAIN_SETS: "name=m5-sft-rules-m-t9-10 data=gs://knight-school-nt26-knight-school/data/v1/primer/rules-M-t9-10"
+  TEST_SET: "test2000"
+  PASS8_BASE: "0"

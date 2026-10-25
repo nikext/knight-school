@@ -512,6 +512,48 @@ format holds" case.
 - **If the format holds only partly** (50–90% on dev500), the SFT-only number understates the
   model by the format losses. I'll report it as graded, with the parse-failure share next to it.
 
+**T9 at 2% reading (`m5-sft-rules-m-t9`, stopped).** Probe format 1.00 at step 0 and **0.375**
+at the first checkpoint (step 54). All 12 tagged answers were legal. The untagged ones were bare
+moves (`Qxg2#`, `Qh8+`). That is below the predicted ≥ 50% (65%) but well above rules-M alone
+(0.00). ADR-029's rule stopped it (0.77 h, $2.41). The step-54 checkpoint never finished
+copying, so the next run starts over. The user chose T9 at 10% with no third stop (ADR-030).
+
+**T9 at 10% predictions** (written 2026-10-25, before `m5-sft-rules-m-t9-10` launched). 145,500 T9
+copies, ~170 per optimizer step instead of ~35.
+- **Format:** probe format ≥ 50% at the first checkpoint: 80%; ≥ 90% there: 55%. Final dev500
+  format ≥ 90%: 60%; ≥ 50%: 85%.
+- **Rules content:** loss and answer-token accuracy on T1–T4 track `m5-sft-rules-m` where they
+  overlap (~0.38 and ~87% near step 59). The T9 copies repeat answers rules-M already has.
+- **The E5a predictions above stand** for this model, if the format holds. If it ends below 90%,
+  the SFT-only solve rate understates it by about the untagged share, and the GRPO arm starts by
+  learning the tags (ADR-030).
+- **Cost:** ~8 h, $24–28.
+
+**E5b predictions** (written 2026-10-25, before any E5b run and before any E5a or E4 result).
+The arm is primer-M + T8 → GRPO dense under v4 with the prompt's legal-move line dropped. The same
+job evaluates the primer-only model and the base model on test2000 without the list. With-list
+references: base 4.1% (legal 96.4%), primer-M + T8 only 35.7%, primer → GRPO dense ≈ v4 (ent014)
+34.8%.
+- **Base without the list:** solve 1–4% (point 2.5%), legal 55–90% (point 75%). The list was its
+  main source of legal moves.
+- **Primer-M + T8 only, without the list:** format ≥ 90%: 65%. T8 taught the tags under the
+  with-list instruction only, and the no-list instruction words it differently ("exactly one
+  legal move"). Solve 22–34% (point 29%), legal 90–99% (T2 taught legal moves; E0's legal-list F1
+  is 73%).
+- **Primer → GRPO dense without the list:** test2000 28–36% (point 32%). Paired vs ent014 (with
+  the list): −3 (range −7 to +1). "The primer replaces the crutch" (|Δ| < 3 with a CI that
+  includes 0): 45%. Legal ≥ 98% after GRPO: 80%.
+- **Cost:** $10–14 (the two extra test2000 evals add ~$0.3).
+
+**E5d predictions** (written 2026-10-25, before either E5d run). Base → GRPO dense, v4 (= v3 for
+the base start), LoRA rank 8 and 64 against rank 32 (`m4-e2-dense-v3`: dev500 5.2% at step 0,
+24.0% at step 20, 26.4% at step 100), 100 steps, the same seed, data order and schedule.
+- **Step 100 on dev500:** all three ranks within ±3 points of each other: 70% (LoRA Without
+  Regret: RL moves few bits, so low rank is enough). Point predictions: r=8 25.5%, r=64 26.5%.
+- **Speed:** r=8 reaches 20% on dev500 no later than r=32 + 10 steps: 75%. Seconds per step within
+  ±10% of r=32: 80%.
+- **Cost:** $4–6 per run.
+
 ## Hypothesis verdicts
 
 | | Verdict | Evidence |

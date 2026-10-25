@@ -738,16 +738,20 @@ def step_primer_s_t8(log: Log, force: bool = False) -> None:
 
 
 def step_primer_rules_t9(log: Log, force: bool = False) -> None:
-    """primer rules-M-t9 (E5a, ADR-029): rules-M's shards unchanged, plus one shard of T9 copies."""
-    out = PRIMER / "rules-M-t9"
+    """primer rules-M-t9 sets (E5a, ADR-029/030): rules-M's shards plus one shard of T9 copies."""
+    for name, share in pr.T9_SHARES.items():
+        _rules_t9(log, force, name, round(share * RULES_N))
+
+
+def _rules_t9(log: Log, force: bool, name: str, n: int) -> None:
+    out = PRIMER / name
     r_paths = sorted((PRIMER / "rules-M").glob("shard-*.jsonl.zst"))
-    n = round(pr.T9_SHARE * RULES_N)
     seed = RULES_SEED + 9
     params = {"n": n, "seed": seed}
     inputs = {"primer_rules-M": mf.output_sha("primer_rules-M")}
-    fp = mf.fingerprint(inputs, params, [pr.t9_from_rules, pr.user_prompt, step_primer_rules_t9])
-    if not force and mf.up_to_date("primer_rules-M-t9", fp, [out]):
-        log("primer_rules_t9: up to date")
+    fp = mf.fingerprint(inputs, params, [pr.t9_from_rules, pr.user_prompt, _rules_t9])
+    if not force and mf.up_to_date(f"primer_{name}", fp, [out]):
+        log(f"primer_rules_t9: {name} up to date")
         return
     picked = set(random.Random(seed).sample(range(RULES_N), n))
     t9 = [
@@ -769,7 +773,7 @@ def step_primer_rules_t9(log: Log, force: bool = False) -> None:
         src = ex["variant"].split("-")[2]
         t9_tasks[src] = t9_tasks.get(src, 0) + 1
     mf.write(
-        "primer_rules-M-t9",
+        f"primer_{name}",
         fp,
         [out],
         examples=m["examples"] + n,
@@ -782,9 +786,9 @@ def step_primer_rules_t9(log: Log, force: bool = False) -> None:
         contamination_hits=_verify_primer([t9_path], bl.Blocklist.load(mf.SETS), _chessbench_keys())
         + m["contamination_hits"],
         contamination_keys="blocklist + chessbench1k lines",
-        tokens="counted with `ks primer-tokens qwen3.5-2b --set rules-M-t9`",
+        tokens=f"counted with `ks primer-tokens qwen3.5-2b --set {name}`",
     )
-    log(f"primer_rules_t9: {n:,} T9 examples added to rules-M's {m['examples']:,}")
+    log(f"primer_rules_t9: {n:,} T9 examples added to rules-M's {m['examples']:,} in {name}")
 
 
 STEPS: dict[str, Callable[[Log, bool], None]] = {

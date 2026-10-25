@@ -830,3 +830,29 @@ ruled out T8, because T8 answers with a move.
 If T9 also fails, what is left is base self-distillation (2% RL prompts answered with the base
 model's own move, which supervises the base's move choice) or dropping E5a. That is the user's
 call.
+
+### ADR-030: T9 at 10% for rules-M, with no third stop
+**Status:** accepted (2026-10-25, M5; the user chose it after `m5-sft-rules-m-t9`'s first probe)
+**Context:** with T9 at 2% (ADR-029), `m5-sft-rules-m-t9`'s probe scored format 1.00 at step 0
+and **0.375** at the first checkpoint (step 54). The untagged answers were bare moves (`Qxg2#`,
+`Qh8+`), and every tagged answer was legal. ADR-029's rule stopped the run (0.77 h, $2.41). Its
+step-54 checkpoint never finished copying, so there was nothing to resume from. T9 is working,
+but 2% isn't enough. E5a has cost $4.99 in two stopped attempts.
+**Decision:**
+- **rules-M-t9-10** = rules-M + **145,500 T9 copies** (10% of rules-M's count), built by the same
+  step and seed as rules-M-t9 (`ks.data.primer.T9_SHARES`). Run `m5-sft-rules-m-t9-10` uses the
+  same trainer, config and seed. The T9 copies add ~37M tokens on top of rules-M's 187M. The rules
+  content stays token-matched to primer-M. Only the format copies make the run ~16% longer than
+  primer-M + T8's.
+- **No third stop.** If the first probe is still below 50%, the run goes on to the end. GRPO's
+  format reward then restores the tags, as it did from the base model's 96% start. The SFT-only
+  number is reported as graded, with the untagged share next to it. The queued GRPO starts if the
+  SFT's dev500 format is at least 5%, enough tagged samples at T = 1 for a reward signal, instead
+  of the 90% gate first set.
+- **Measured:** 1,600,500 examples, 224.42M tokens (T9: 37.46M), 59.4M answer tokens. Source
+  tasks: T1 29,176, T2 43,760, T3 43,657, T4 28,907. 0 contamination hits.
+- The 2% set stays in the data and in the record (ADR-029). The refactored step rebuilt it with
+  the same sha.
+**Consequences:** E5a's arm is "rules-M + 10% T9". If its SFT format ends below ~90%, GRPO's
+first steps also learn the format. That is a difference from the other primer arms, and the
+write-up names it.

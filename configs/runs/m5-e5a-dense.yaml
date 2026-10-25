@@ -1,4 +1,4 @@
-# E5a GRPO (task M5, ADR-026 §1): the rules-only primer + T9 (m5-sft-rules-m-t9, ADR-029) ->
+# E5a GRPO (task M5, ADR-026 §1): the rules-only primer + 10% T9 (m5-sft-rules-m-t9-10, ADR-030) ->
 # GRPO dense under config v4 (ADR-027: entropy target min(0.2, mean of steps 1-5)), 200 steps,
 # same data, seed and reward as the E2/E3 dense arms. Then test2000, E0 (probe500) and pass@8 on
 # dev500. H4 compares it with E2 dense v3 (= v4 for the base start) and with primer-M -> GRPO
@@ -22,7 +22,7 @@ env:
   KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
   VLLM_USE_FLASHINFER_SAMPLER: "0"
   TRAIN_CONFIG: "configs/train/grpo_dense.yaml"
-  TRAIN_SETS: "name=m5-e5a-dense init_ckpt=gs://knight-school-nt26-knight-school/runs/m5-sft-rules-m-t9/final/merged"
+  TRAIN_SETS: "name=m5-e5a-dense init_ckpt=gs://knight-school-nt26-knight-school/runs/m5-sft-rules-m-t9-10/final/merged"
   TEST_SET: "test2000"
   PROBE: "1"
   PASSK: "1"
