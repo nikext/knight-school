@@ -456,7 +456,7 @@ examples drawn from them (ADR-028). That is ~77 optimizer steps of the same reci
 | E5a | rules-only primer → GRPO dense (v4) | 24–33% (point 28%); Δ vs E2 dense v3 +2 (−2 to +7) | | | |
 | E5b | no legal-move list | | | | |
 | E5c | ~4B model, best recipe | | | | ⏭️ doesn't fit the M5 line (user's choice at the M5 start: E5a, E4, E5b, E5d) |
-| E5d | LoRA r=8 vs r=64 | | | | |
+| E5d | LoRA r=8 vs r=64 | | | | ⏭️ dropped from the queue to finish M5 sooner (user's choice, 2026-10-25); not needed for H3/H4 |
 | M4 ablation (ADR-025) | primer → GRPO dense, entropy target 0.14 instead of 0.2 | 33–38% (point 35.5%); Δ vs primer only −2 to +2.5 | **34.8% [32.6, 36.9]**; vs primer only −0.9 [−2.3, +0.4]; vs `m4-e3-dense` +2.1 [+1.1, +3.2] | $10.21 (4 preemptions) | done |
 
 **M5 plan** (agreed with the user on 2026-10-25): E5a, E4, E5b, E5d in that order, within the
@@ -464,6 +464,10 @@ $110 M5 line (~$75 planned). E5c is skipped. Every GRPO arm runs config v4 (ADR-
 target is min(0.2, the mean of steps 1–5)). For the base start, v4 is the same as v3. For
 primer-M it is ≈ the ent014 ablation, which is therefore the "primer-M → GRPO dense" reference
 for M5.
+
+**Queue cut** (user's choice, 2026-10-25 after a laptop restart): E5d is dropped, and the E4 and
+E5b GRPO runs skip probe500 and pass@8 (no prediction uses them; E5a keeps both). That saves
+~4.5 h of queue and ~$15 of worst case. E5d's predictions below stay as written, unrun.
 
 **E5a predictions** (written 2026-10-25, before `m5-sft-rules-m` launched; no model has trained
 on rules-M yet). Rules-M (ADR-028) is T1–T4 only: 1,455,000 examples, as many tokens as primer-M,

@@ -3,7 +3,7 @@
 # data, seed and reward. The dev curve and every final eval use the no-list prompt (profile
 # qwen3.5-2b-nolist). START_CKPT also evaluates the primer-only model and the base model on
 # test2000 without the list. The with-list references: m4-sft-primer-m-t8 (primer only),
-# m4-e3-dense-ent014 (~v4 GRPO dense), qwen3.5-2b (base). Then E0 and pass@8 on dev500.
+# m4-e3-dense-ent014 (~v4 GRPO dense), qwen3.5-2b (base). No E0 or pass@8 (queue cut, 2026-10-25).
 # Spot handling as in M3 (ADR-020): us-central1-c first, stockouts waited out for up to 12 h.
 id: m5-e5b-dense-nolist
 milestone: M5
@@ -26,5 +26,3 @@ env:
   TRAIN_SETS: "name=m5-e5b-dense-nolist legal_list=false init_ckpt=gs://knight-school-nt26-knight-school/runs/m4-sft-primer-m-t8/final/merged"
   START_CKPT: "gs://knight-school-nt26-knight-school/runs/m4-sft-primer-m-t8/final/merged"
   TEST_SET: "test2000"
-  PROBE: "1"
-  PASSK: "1"
