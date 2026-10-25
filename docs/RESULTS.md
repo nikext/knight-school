@@ -420,12 +420,33 @@ format rates, length, truncated share, prose share, entropy, dead groups and KL
 
 ## E4: primer scaling (test2000, GRPO dense)
 
-| Primer | Tokens | Predicted | Solve rate | Run $ |
-|---|---|---|---|---|
-| none (E2) | 0 | | | |
-| S | ~15M | | | |
-| M (E3) | ~150M | | | |
-| L | ~450M | | | |
+Each primer row has two numbers: the primer-only SFT model and primer → GRPO dense (ADR-026 §2).
+The M row's GRPO number is the ≈ v4 arm (`m4-e3-dense-ent014`, ADR-027).
+
+| Primer | Tokens | Predicted (SFT only / → GRPO) | SFT only | → GRPO dense | Run $ |
+|---|---|---|---|---|---|
+| none (E2) | 0 | — | base 4.1% | 25.8% [23.9, 27.8] (dense v3 = v4) | $9.99 |
+| S + T8 | 19.2M | 12–28% (point 20%) / 24–34% (point 29%) | | | |
+| M + T8 (E3) | 192.5M | done | 35.7% [33.6, 37.9] | 34.8% [32.6, 36.9] | $22.01 + $10.21 |
+| L | ~450M | ⏭️ dropped in the M3 re-plan (new data + the most expensive SFT) | | | |
+
+**E4 predictions** (written 2026-10-25, before `m5-sft-primer-s-t8` launched and before any E5a
+result). Primer-S + T8 is 132,489 examples: the first 130k of primer-M, plus the 2,489 T8
+examples drawn from them (ADR-028). That is ~77 optimizer steps of the same recipe.
+- **Format:** T8 is 1.88% of S (M-t8: 1.96%), ~32 examples per step. Probe format ≥ 50% at the
+  first checkpoint: 80%. Final dev500 format ≥ 95%: 75%.
+- **Primer-S only (test2000):** solve 12–28% (point 20%), move accuracy 30–48%, legal ≥ 97%. A
+  tenth of the imitation data (19k puzzle solutions instead of 195k) buys well under a tenth of
+  the gain, because the easy bins saturate first.
+- **E0 on primer-S:** P1 60–95% (point 80%), P2 3–15% (8%), P3 20–70% (45%), P4 60–85% (75%).
+- **v4's entropy start:** between the base (0.83) and primer-M (0.14). Above 0.2, so v4 runs as v3:
+  55%.
+- **Primer-S → GRPO dense:** 24–34% (point 29%). Unlike primer-M, a weaker start leaves RL
+  room, so **H5 for S** (RL adds ≥ 3 with a CI that excludes 0, paired vs primer-S only): 65%.
+- **H3** (post-RL solve rises with primer size): none 25.8% < S < M 34.8%, each step a paired Δ
+  with a CI that excludes 0: 55%. With three points, "roughly log-linear" can't be tested
+  beyond monotonicity. I'll report it as such.
+- **Cost:** SFT job 1–1.5 h, $3–5. GRPO $8–12.
 
 ## E5: ablations
 
