@@ -491,6 +491,27 @@ line, and no example uses `<answer>` tags.
 - **Health after GRPO:** format ≥ 99%, ~9 tokens per answer, truncation ≤ 1%.
 - **Cost:** SFT 6.5–8 h, $20–26 (point $22). GRPO $8–12.
 
+**E5a SFT, attempt on rules-M alone (`m5-sft-rules-m`, stopped).** The format broke here too.
+The probe scored format 1.00 at step 0 and **0.00** at the first checkpoint (step 59), with no
+`<answer>` tag in any answer: bare moves (`Qxb4`, `Qxa4`, often the base model's own step-0
+picks). The prediction (≥ 50% at the first checkpoint, 70%) failed. So the T5 prompt wasn't
+needed to break the format: 1.46M bare answers to FEN questions did it. Training itself looked
+like primer-M's: 27.3 s per step, 8.1k tok/s, loss 0.38 and answer-token accuracy 86.6% at step
+59 (of 843). The user stopped it after one checkpoint (0.82 h, $2.58). The T9 fallback (ADR-029)
+follows: 2% copies of rules-M items asked in the RL prompt's layout and answered in `<answer>`
+tags. None of them answers with a move choice.
+
+**T9 predictions** (written 2026-10-25, before `m5-sft-rules-m-t9` launched; no model has
+trained on T9 yet). The E5a predictions above stand for the rules-M + T9 model, as the "if the
+format holds" case.
+- **Format:** probe format ≥ 50% at the first checkpoint: 65%; ≥ 90% there: 45%. Final dev500
+  format ≥ 90%: 55%. T8 matched the RL prompt's instruction and answer type exactly. T9 matches the
+  layout and the answer-tag sentence but not the answer type, so the habit has to carry over from
+  "the answer" to "one move". **Stop rule:** probe format < 50% at the first checkpoint → stop
+  and ask (ADR-029).
+- **If the format holds only partly** (50–90% on dev500), the SFT-only number understates the
+  model by the format losses. I'll report it as graded, with the parse-failure share next to it.
+
 ## Hypothesis verdicts
 
 | | Verdict | Evidence |

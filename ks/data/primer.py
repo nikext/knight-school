@@ -295,6 +295,34 @@ def t8_from_t5(t5: dict[str, Any], rl_user_text: str, ex_id: str) -> dict[str, A
     }
 
 
+# T9 (ADR-029): the fallback for rules-M, whose bare answers broke the RL answer format as T5's
+# did. A copy of a T1-T4 example asked in the RL prompt's layout (the legal-move line, then the
+# question with the RL instruction's second sentence) and answered in the RL answer tags. Its
+# answer is the T1-T4 answer, so no example ever answers with a move choice.
+T9_SHARE = 0.02  # of rules-M's example count
+T9_INSTRUCTION = (
+    "Think it through inside <think></think>, then give\nthe answer inside <answer></answer>."
+)
+
+
+def t9_from_rules(ex: dict[str, Any], ex_id: str) -> dict[str, Any]:
+    system, user, answer = ex["messages"]
+    assert ex["task"] in RULES_WEIGHTS, f"{ex['id']}: T9 copies T1-T4 only"
+    question = user["content"].splitlines()[-1]
+    board = kb.board_from_fen(ex["fen"])
+    return {
+        **ex,
+        "id": ex_id,
+        "task": "T9",
+        "variant": f"rl-format-{ex['task']}-{ex['variant']}",
+        "messages": [
+            system,
+            {"role": "user", "content": user_prompt(board, f"{question} {T9_INSTRUCTION}", True)},
+            {"role": "assistant", "content": f"<answer>{answer['content']}</answer>"},
+        ],
+    }
+
+
 Gen = Callable[[Pos, Rng], Item | None]
 VARIANTS: dict[str, list[Gen]] = {
     "T1": [t1_square, t1_pieces],

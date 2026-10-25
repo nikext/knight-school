@@ -1,0 +1,67 @@
+{
+  "name": "primer_rules-M-t9",
+  "data_version": "v1",
+  "outputs": [
+    "data/primer/rules-M-t9"
+  ],
+  "sha256": "b5bb2a5f69955a5d0b4456199449e399d85a2dee6d72f7ea667b36ef47d62b52",
+  "fingerprint": "147995b08072f38e67c86e87bd70d18577ea4959bc69fd6371df9d8027c738eb",
+  "git_sha": "2521c94a7cca-dirty",
+  "built_at": "2026-10-25T10:37:09+00:00",
+  "examples": 1484100,
+  "shards": 31,
+  "per_task": {
+    "T1": 291601,
+    "T2": 437029,
+    "T3": 436288,
+    "T4": 290082,
+    "T9": 29100
+  },
+  "t9_source_tasks": {
+    "T1": 5951,
+    "T2": 8707,
+    "T3": 8736,
+    "T4": 5706
+  },
+  "t9_seed": 2040,
+  "t9_instruction": "Think it through inside <think></think>, then give\nthe answer inside <answer></answer>.",
+  "contains": "primer_rules-M",
+  "contamination_hits": 0,
+  "contamination_keys": "blocklist + chessbench1k lines",
+  "tokens": {
+    "tokenizer": "Qwen/Qwen3.5-2B@15852e8c1636",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "total": 194474470,
+    "answer": 54438527,
+    "examples": 1484100,
+    "per_task": {
+      "T1": {
+        "examples": 291601,
+        "total": 30111675,
+        "answer": 3948382
+      },
+      "T2": {
+        "examples": 437029,
+        "total": 68736442,
+        "answer": 26897414
+      },
+      "T3": {
+        "examples": 436288,
+        "total": 59917539,
+        "answer": 20318913
+      },
+      "T4": {
+        "examples": 290082,
+        "total": 28201721,
+        "answer": 2034877
+      },
+      "T9": {
+        "examples": 29100,
+        "total": 7507093,
+        "answer": 1238941
+      }
+    }
+  }
+}

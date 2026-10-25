@@ -793,3 +793,40 @@ also lists primer-L, which the M3 re-plan dropped.
 - **primer-L stays dropped** (M3 re-plan, BUDGET.md §2). Nothing is generated for it.
 **Consequences:** the E5a SFT costs about what primer-M's did (~$22). The E4 SFT is ~10% of that.
 `ks primer-tokens --set rules-M --set S-t8` records the token counts.
+
+### ADR-029: T9 fallback for rules-M: rules questions in the RL prompt's layout, answered in tags
+**Status:** accepted (2026-10-25, M5; the user chose it after `m5-sft-rules-m` lost the format)
+**Context:** `m5-sft-rules-m` (rules-M, ADR-028) lost the RL answer format as primer-M did. The
+probe scored format 1.00 at step 0 and **0.00** at the first checkpoint (step 59), with no
+answer tag at all. It answered with bare moves, several of them the moves the base model picked
+at step 0 (`Qxb4`, `Qxa4`). So T5's near-identical prompt wasn't needed to break the format:
+1.46M bare answers to FEN questions were enough. The user stopped the run after that one
+checkpoint, as in M4, although the pre-registered rule said two (0.82 h, $2.58). ADR-028 had
+ruled out T8, because T8 answers with a move.
+**Decision:**
+- **T9 = 29,100 examples (2% of rules-M),** each a copy of a rules-M example. They are drawn at
+  random (seed 2040), so T1–T4 come in their own proportions. The position, question and answer
+  stay the same. The user turn is laid out like the RL prompt: the FEN, the side to move, the
+  legal-move line, then the question followed by the RL instruction's second sentence with its
+  object generalised: "Think it through inside <think></think>, then give\nthe answer inside
+  <answer></answer>." (`ks.data.primer.T9_INSTRUCTION`). The answer is the T1–T4 answer inside
+  `<answer>` tags. The originals stay in the data, so each question is seen in both formats.
+- **No answer is a move choice.** T2 and T4 answers list moves (all legal moves, one piece's
+  moves, all captures), as they do in rules-M. With the legal-move line in the prompt, T2 becomes
+  partly a copy task. That's harmless, because T9 is there for the format. When a piece has only
+  one legal move, a T2 answer is that single move in tags (`<answer>g3</answer>`). It has the RL
+  answer's shape, but it says nothing about which move is good.
+- **Measured:** 1,484,100 examples, 194.47M tokens (primer-M + T8: 192.53M), 54.4M answer tokens.
+  The T9 share is 7.5M tokens. Source tasks: T1 5,951, T2 8,707, T3 8,736, T4 5,706. 0
+  contamination hits against the blocklist plus chessbench1k.
+- **Same run otherwise:** `m5-sft-rules-m`'s trainer, config and seed. Image 7190e0411a2e has the
+  same SFT code as 1a92ddf79865 and skips the base model's pass@8 (`PASS8_BASE=0`).
+- **Stop rule:** probe format < 50% at the first checkpoint → stop and ask. Both earlier breaks
+  were stopped after one checkpoint, so the rule now says so up front.
+- **Fingerprints:** adding T9 to `ks/data/primer.py` makes rules-M's manifest fingerprint stale,
+  because the data steps fingerprint the whole module, as T8 did for primer-M. A rebuild
+  reproduced rules-M's sha byte for byte (ADR-028), so `make data` would rebuild it identically.
+**Consequences:** E5a's arm is "rules-M + T9". The rerun costs ~$22 on top of the stopped $2.58.
+If T9 also fails, what is left is base self-distillation (2% RL prompts answered with the base
+model's own move, which supervises the base's move choice) or dropping E5a. That is the user's
+call.

@@ -1,0 +1,29 @@
+# E5a rules-only primer SFT with the T9 fallback (ADR-029): m5-sft-rules-m lost the RL answer
+# format (probe format 0.00 at step 59), so this run trains on rules-M plus 29,100 T9 examples
+# (2%: T1-T4 items asked in the RL prompt's layout, answered inside <answer></answer>; no move
+# choice anywhere). Same trainer, config and seed as m5-sft-rules-m and m4-sft-primer-m-t8; only
+# the data and the run name change. Image 7190e0411a2e: the same SFT code as 1a92ddf79865, plus
+# PASS8_BASE=0 (M4 already measured the base model's pass@8). Then dev500, test2000, probe500
+# and pass@8 on dev500. Estimate: ~7 h, ~$22 (m4-sft-primer-m-t8: 7.03 h, $22.01).
+# Stop rule (ADR-029): probe format < 50% at the first checkpoint -> stop and ask the user.
+# Spot handling as in M3 (ADR-020): us-central1-c first, stockouts waited out for up to 12 h.
+id: m5-sft-rules-m-t9
+milestone: M5
+description: "E5a: rules-only primer + T9 SFT (full fine-tune), then dev500, test2000, probe500"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-c, europe-west4-a, us-central1-a]
+max_hours: 9
+max_attempts: 6
+stockout_wait_hours: 12
+run_budget_usd: 35
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:7190e0411a2e@sha256:ab42254beb7e24340357ec8e32703bd341f35cb0c93df53638ab22f2fd2b636c
+command: "bash configs/jobs/m4-sft.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/sft.yaml"
+  TRAIN_SETS: "name=m5-sft-rules-m-t9 data=gs://knight-school-nt26-knight-school/data/v1/primer/rules-M-t9"
+  TEST_SET: "test2000"
+  PASS8_BASE: "0"

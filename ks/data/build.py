@@ -1,7 +1,7 @@
 """`make data`: the M1 chain, step by step, each skipped when its inputs and code are unchanged.
 
 puzzles -> evaldb -> probe -> blocklist -> rltrain -> timing -> rewards -> primer -> primer_t8 -> chessbench
--> primer_rules -> primer_s_t8 (M5)
+-> primer_rules -> primer_s_t8 -> primer_rules_t9 (M5)
 """
 
 from __future__ import annotations
@@ -737,6 +737,56 @@ def step_primer_s_t8(log: Log, force: bool = False) -> None:
     log(f"primer_s_t8: {len(keep):,} T8 examples added to primer-S's {len(s_ids):,}")
 
 
+def step_primer_rules_t9(log: Log, force: bool = False) -> None:
+    """primer rules-M-t9 (E5a, ADR-029): rules-M's shards unchanged, plus one shard of T9 copies."""
+    out = PRIMER / "rules-M-t9"
+    r_paths = sorted((PRIMER / "rules-M").glob("shard-*.jsonl.zst"))
+    n = round(pr.T9_SHARE * RULES_N)
+    seed = RULES_SEED + 9
+    params = {"n": n, "seed": seed}
+    inputs = {"primer_rules-M": mf.output_sha("primer_rules-M")}
+    fp = mf.fingerprint(inputs, params, [pr.t9_from_rules, pr.user_prompt, step_primer_rules_t9])
+    if not force and mf.up_to_date("primer_rules-M-t9", fp, [out]):
+        log("primer_rules_t9: up to date")
+        return
+    picked = set(random.Random(seed).sample(range(RULES_N), n))
+    t9 = [
+        pr.t9_from_rules(ex, f"R-T9-{j:07d}")
+        for j, ex in enumerate(ex for i, ex in enumerate(pr.read_shards(r_paths)) if i in picked)
+    ]
+    out.mkdir(parents=True, exist_ok=True)
+    for old in out.glob("shard-*.jsonl.zst"):
+        old.unlink()
+    for p in r_paths:
+        shutil.copyfile(p, out / p.name)
+    t9_path = out / f"shard-{len(r_paths):05d}.jsonl.zst"
+    blob = "".join(json.dumps(ex, ensure_ascii=False) + "\n" for ex in t9)
+    t9_path.write_bytes(zstandard.ZstdCompressor(level=10).compress(blob.encode()))
+    m = mf.load("primer_rules-M")
+    assert m is not None
+    t9_tasks: dict[str, int] = {}
+    for ex in t9:
+        src = ex["variant"].split("-")[2]
+        t9_tasks[src] = t9_tasks.get(src, 0) + 1
+    mf.write(
+        "primer_rules-M-t9",
+        fp,
+        [out],
+        examples=m["examples"] + n,
+        shards=len(r_paths) + 1,
+        per_task=dict(sorted({**m["per_task"], "T9": n}.items())),
+        t9_source_tasks=dict(sorted(t9_tasks.items())),
+        t9_seed=seed,
+        t9_instruction=pr.T9_INSTRUCTION,
+        contains="primer_rules-M",
+        contamination_hits=_verify_primer([t9_path], bl.Blocklist.load(mf.SETS), _chessbench_keys())
+        + m["contamination_hits"],
+        contamination_keys="blocklist + chessbench1k lines",
+        tokens="counted with `ks primer-tokens qwen3.5-2b --set rules-M-t9`",
+    )
+    log(f"primer_rules_t9: {n:,} T9 examples added to rules-M's {m['examples']:,}")
+
+
 STEPS: dict[str, Callable[[Log, bool], None]] = {
     "puzzles": step_puzzles,
     "evaldb": step_evaldb,
@@ -750,6 +800,7 @@ STEPS: dict[str, Callable[[Log, bool], None]] = {
     "chessbench": step_chessbench,
     "primer_rules": step_primer_rules,
     "primer_s_t8": step_primer_s_t8,
+    "primer_rules_t9": step_primer_rules_t9,
 }
 
 
