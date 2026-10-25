@@ -5,9 +5,9 @@
     "data/primer/rules-M"
   ],
   "sha256": "a79b0cbc7ed9c33c5650e7f65e0ac0902ec7a32182f1fce147ce37766feb73ff",
-  "fingerprint": "e08396ee97d7ad989fe212cb43d09e270afe6a7a0169a4d5384ca24988b5fea6",
-  "git_sha": "273fdab6623c-dirty",
-  "built_at": "2026-10-25T09:04:39+00:00",
+  "fingerprint": "8bd8b8c1534cf17a1b668e1a7c40b7c38c98f137da7bf15a64f7e32ba0d9b0ef",
+  "git_sha": "7190e0411a2e",
+  "built_at": "2026-10-25T09:35:11+00:00",
   "examples": 1455000,
   "shards": 30,
   "per_task": {
