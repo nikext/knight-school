@@ -112,7 +112,7 @@ at about 10%, and it ended at 24%, most of it gained by step 25. I wrote the no-
 
 ## Cost
 
-**$196.64 of $600 in credits**, of which $190.68 was 61 hours of spot A100 time. That covered 14
+**$197.74 of $600 in credits**, of which $190.68 was 61 hours of spot A100 time. That covered 14
 finished training runs (3 SFT, 11 GRPO), 4 stopped ones and all the evals. The 23 preemptions
 mostly cost a resume from the last checkpoint. A GRPO run cost $8–12, primer-M SFT $22, and the
 full rules-only experiment $44, including two attempts that lost the answer format and one
@@ -149,7 +149,7 @@ puzzle yourself before you look. The code, configs, ledger and every eval file a
   rate from 28.0% to 35.4% (+7.4 points, 95% CI [+5.8, +9.2], n = 2,000), beyond the ~25–30%
   plateau reported by Chess-R1. Showed with a primer-only control that the gain came from the SFT,
   not the RL.
-- Ran 18 training runs on spot GPUs for $196.64 total (of $600 in credits) under a self-built
+- Ran 18 training runs on spot GPUs for $197.74 total (of $600 in credits) under a self-built
   budget gate (ledger, worst-case pre-flight checks, sweep, billing kill switch). Every run is
   reproducible from the repo.
 - Showed that the post-RL score rises with primer size (25.8% → 29.5% → 34.8%, none/S/M), that a

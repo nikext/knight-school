@@ -5,7 +5,7 @@ fixed cloud budget, with every prediction written down before the run and every 
 
 > **A teacher-free chess primer took Qwen3.5-2B from 4.1% to 35.7% on 2,000 held-out Lichess
 > puzzles. GRPO from the base model plateaued at 26–28%, as Chess-R1 found. GRPO on top of the
-> primer added nothing.** The whole project cost **$196.64** of $600 in cloud credits.
+> primer added nothing.** The whole project cost **$197.74** of $600 in cloud credits.
 
 [**Puzzle browser**](https://nikext.github.io/knight-school/): every puzzle, every model's answer ·
 [Results with predictions](docs/RESULTS.md) · [Decisions (ADRs)](docs/DECISIONS.md) ·
@@ -89,9 +89,9 @@ paired Δ whose CI excludes 0). RL added +4.0 points to the small primer and not
 |---|---|---|
 | GPU (spot A100 80GB, 61 h) | $190.68 | 14 finished training runs (3 SFT, 11 GRPO), 4 stopped, plus evals; 23 spot preemptions, mostly absorbed by resuming from checkpoints |
 | Other compute (L4, H100 throughput test, smoke VMs) | $3.58 | |
-| Storage, registry, egress | $2.37 | |
+| Storage, registry, egress | $3.47 | GCS checkpoints to the Nov 10 teardown, registry, model download |
 | Gemini baselines | $0 | pending: they wait for the second credit (2026-11-13) |
-| **Total** | **$196.64 of $600** | ceilings $360 compute + $180 Vertex; nothing on real money |
+| **Total** | **$197.74 of $600** | ceilings $360 compute + $180 Vertex; nothing on real money |
 
 Spot GPUs only, one at a time (quota 1). Every job goes through a gate that refuses it if its worst
 case could break a ceiling or outlive the credit, and it lands in an append-only
