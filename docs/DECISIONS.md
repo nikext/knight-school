@@ -856,3 +856,29 @@ but 2% isn't enough. E5a has cost $4.99 in two stopped attempts.
 **Consequences:** E5a's arm is "rules-M + 10% T9". If its SFT format ends below ~90%, GRPO's
 first steps also learn the format. That is a difference from the other primer arms, and the
 write-up names it.
+
+### ADR-031: M6 release: three merged checkpoints, a browser of all 2,000 test puzzles, no think text
+**Status:** accepted (2026-10-26, M6; the user picked the checkpoints and approved the Pages deploy)
+**Context:** M6 task 2 names "the E3 primer → GRPO dense model". By M5's end the best model is
+primer-M + T8 *without* RL (35.7%), and the best RL arm is primer → GRPO sparse (35.4%). Task 4
+asks for ~200 puzzles with "the base, primer and primer → GRPO outputs, including their `<think>`
+text". Every model answers in ~10 tokens with no think text (non-thinking template, ADR-017), and
+every test2000 answer is already in the committed eval files.
+**Decision:**
+- **Released checkpoints** (user's choice): primer-M + T8 (`m4-sft-primer-m-t8`), primer → GRPO
+  sparse (`m4-e3-sparse`), primer → GRPO dense with entropy target 0.14 (`m4-e3-dense-ent014`, the
+  v4 reference). LoRA was already merged by the training jobs (`final/merged`), so no GPU job ran.
+  Downloaded: 3 × 4.14 GiB, $1.49 egress. Checked locally with transformers 5.17: greedy answers
+  equal the graded vLLM answers on 118 of 120 sampled test2000 positions (the 2 others are near ties).
+- **Browser data is all 2,000 test2000 puzzles**, not ~200: with ~10-token answers the file is
+  848 kB (198 kB gzipped). `ks browser-data` builds it from the eval files ($0) and checks each
+  model's recomputed solve rate against its report. CI fails if the committed file is stale.
+- **Browser models:** base, base → GRPO sparse (E2 v3), primer-M + T8, primer → GRPO sparse (E3),
+  and Stockfish 1 node as a reference. Both RL rows use the sparse reward, so they differ only in
+  their start point. No think text is shown, because none exists; the About page says so.
+- **Stack:** Vite + React + react-chessboard (MIT) + chess.js (BSD-2), versions pinned to
+  releases ≥ 2 weeks old. chessground was not used: it is GPL-3.0. npm 10.9.8 crashes on
+  @vitejs/plugin-react's optional peers, so `site/.npmrc` sets `legacy-peer-deps`.
+- **HF dataset** leaves out chessbench1k: its license is still unverified (DATA.md §1).
+**Consequences:** the "reasoning before and after RL" angle of the browser becomes "which move each
+model picked". The cards and README name primer-M alone as the best model.
