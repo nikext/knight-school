@@ -14,15 +14,7 @@ merged PR whose description lists what was verified, the numbers, and the
 | M2 | Eval harness, container, model choice, baselines (E0, E1) | [M2](tasks/M2-evals-baselines.md) | 15 | 50 | ✅ done | PR #3 · spent $4.85 compute, $0 vertex · main model Qwen3.5-2B, non-thinking (ADR-011, ADR-017) · E1 base 4.1% solve, 96.4% legal · Stockfish 1 node 68.6% · Gemini rows pending until 2026-11-13 |
 | M3 | GRPO pipeline, RL on base (E2), re-plan | [M3](tasks/M3-grpo.md) | 70 | 0 | ✅ done | PR #4 · spent $50.15 compute, $0 vertex · config v2 frozen (ADR-021, adaptive entropy) · E2 test2000: dense v2 27.2%, sparse v2 23.5%, dense v1 23.8% (base 4.1%) · post-answer rambling flaw found, v3 proposed |
 | M4 | Primer SFT → GRPO, the main result (E3) | [M4](tasks/M4-primer.md) | 100 | 0 | ✅ done | PR #5 · spent $75.92 compute, $0 vertex · config v3 (ADR-022), T8 fallback (ADR-024) · test2000: primer-M+T8 only 35.7%, primer → dense 32.6%, primer → sparse 35.4%, E2 v3 dense 25.8% / sparse 28.0% · H1 holds, H2 falsified, H5 fails (ADR-026, entropy ablation ADR-025) |
-| M5 | Scaling and ablations (E4, E5) | [M5](tasks/M5-scaling-ablations.md) | 110 | 110* | 🟨 in progress | branch `m5-scaling-ablations` · plan: E5a, E4, E5b (E5c, E5d ⏭️) · config v4 (ADR-027) · rules-M needed T9 at 10% (ADR-028–030) |
-
-**Next up (M5, 2026-10-25):** the user approved one queue of every remaining M5 run:
-`m5-sft-rules-m-t9-10` → `m5-e5a-dense` → `m5-sft-primer-s-t8` → `m5-e4-dense` →
-`m5-e5b-dense-nolist`. E5d (`m5-e5d-r8`, `m5-e5d-r64`) was dropped after a laptop restart to
-finish sooner, and E4/E5b skip probe500 and pass@8 (user's choice). All predictions are committed
-in RESULTS.md.
-Then: evaluate each arm with paired CIs (`ks compare`), the E4 figure, the H3/H4 verdicts, the cost
-summary, and the PR.
+| M5 | Scaling and ablations (E4, E5) | [M5](tasks/M5-scaling-ablations.md) | 110 | 110* | ✅ done | PR #6 · spent $64.13 compute, $0 vertex · config v4 (ADR-027), rules-M + T9 at 10% (ADR-028–030) · test2000: primer-S only 25.5% → GRPO 29.5%; rules-only → GRPO 26.2% (E2 25.8%); no list: primer → GRPO 1.9% · H3 holds (monotone), H4 fails, H5 holds for S · E5c, E5d ⏭️ (user's choice) |
 | M6 | Release and showcase | [M6](tasks/M6-release.md) | 9 | 4 | ⬜ todo | |
 | | contingency (user approval only) | | 50 | 15 | | |
 | | **ceiling** | | **360** | **180** | | |
@@ -48,7 +40,7 @@ could still run after **2026-11-10 00:00Z**. Gemini may only spend from
 
 \* Only if the Vertex credit covers Vertex AI custom training (checked in M0).
 
-Spent to date: compute $55.10 · vertex $0.00 (as of M3, 2026-10-23; update from `make costs` in each PR).
+Spent to date: compute $195.15 · vertex $0.00 (as of M5, 2026-10-26; update from `make costs` in each PR).
 
 ---
 

@@ -16,6 +16,9 @@ bootstrap CIs. Arm-vs-arm differences use a paired bootstrap. Model:
 | primer-M + T8 (`m4-sft-primer-m-t8`) | 97.6% [94.4, 100.0] | 14.4% [8.8, 20.8] | 92.0% [87.2, 96.0] | 80.0% [72.8, 86.4] | P1 80–99% (point 93%), P2 20–75% (45%), P3 25–85% (55%), P4 85–100% (95%) (E3 predictions) |
 | primer-M + T8 → GRPO dense (`m4-e3-dense`) | 97.6% [94.4, 100.0] | 7.2% [3.2, 12.0] | 91.2% [85.6, 96.0] | 80.0% [72.8, 86.4] | within ±10 points of the primer-M row on each task (E3 predictions) |
 | primer-M + T8 → GRPO sparse (`m4-e3-sparse`, job `m4-e3-sparse-e0`) | 98.4% [96.0, 100.0] | 12.8% [7.2, 19.2] | 90.4% [84.8, 95.2] | 80.0% [72.8, 86.4] | not predicted (E0 on sparse added for M4's Done-when) |
+| primer-S + T8 (`m5-sft-primer-s-t8`) | 55.2% [46.4, 64.0] | 6.4% [2.4, 11.2] | 12.0% [6.4, 17.6] | 57.6% [48.8, 66.4] | P1 60–95% (80%), P2 3–15% (8%), P3 20–70% (45%), P4 60–85% (75%) (E4 predictions) |
+| rules-M + 10% T9 (`m5-sft-rules-m-t9-10`, E5a) | 99.2% [97.6, 100.0] | 11.2% [6.4, 16.8] | 94.4% [90.4, 98.4] | 88.8% [83.2, 93.6] | P1 90–99% (97%), P2 10–40% (20%), P3 85–97% (92%), P4 75–95% (85%) (E5a predictions) |
+| rules-M + 10% T9 → GRPO dense (`m5-e5a-dense`) | 99.2% [97.6, 100.0] | 9.6% [4.8, 15.2] | 95.2% [91.2, 98.4] | 88.0% [81.6, 93.6] | not predicted |
 
 Base row: `m2-screen-a100-r4`, `results/eval/probe500/qwen3.5-2b.md`. **It
 mostly measures copying of the format hint, not knowledge.** Qwen3.5-2B
@@ -369,6 +372,9 @@ $11.11, $2.68 of it in the three short attempts.
 | primer → GRPO dense | 26.6% | 37.6% | 42.8% | 36.2% |
 | primer → GRPO sparse | 28.4% | 40.5% | 47.0% | 36.2% |
 | primer → GRPO dense, entropy target 0.14 (ADR-025) | 28.0% | 39.3% | 45.0% | 36.4% |
+| primer-S + T8 (M5) | 18.1% | 25.8% | 31.8% | 25.0% |
+| rules-M + 10% T9 (E5a, M5) | 2.0% | 5.2% | 7.6% | 3.8% |
+| rules → GRPO dense (E5a, M5) | 27.6% | 29.4% | 30.2% | 28.0% |
 
 GRPO on the primer model kept or slightly lowered pass@1 and cut pass@8 by 4–9 points. That is
 sharpening without discovery (Shen et al.), and here the sharpening doesn't reach greedy accuracy
@@ -416,7 +422,7 @@ Figures (E2): dev500 solve rate vs dollars spent for all three runs
 (`results/figures/e2_dev_vs_usd.png`), and training metrics per step: move-match rate, legal and
 format rates, length, truncated share, prose share, entropy, dead groups and KL
 (`results/figures/e2_components.png`). M4 adds the E3 arms and a per-bin figure
-(`results/figures/e3_bins.png`).
+(`results/figures/e3_bins.png`). M5 adds the E4 scaling figure (`results/figures/e4_scaling.png`).
 
 ## E4: primer scaling (test2000, GRPO dense)
 
@@ -426,7 +432,7 @@ The M row's GRPO number is the ≈ v4 arm (`m4-e3-dense-ent014`, ADR-027).
 | Primer | Tokens | Predicted (SFT only / → GRPO) | SFT only | → GRPO dense | Run $ |
 |---|---|---|---|---|---|
 | none (E2) | 0 | — | base 4.1% | 25.8% [23.9, 27.8] (dense v3 = v4) | $9.99 |
-| S + T8 | 19.2M | 12–28% (point 20%) / 24–34% (point 29%) | | | |
+| S + T8 | 19.2M | 12–28% (point 20%) / 24–34% (point 29%) | 25.5% [23.6, 27.5] | **29.5% [27.6, 31.6]** | $3.61 + $8.90 |
 | M + T8 (E3) | 192.5M | done | 35.7% [33.6, 37.9] | 34.8% [32.6, 36.9] | $22.01 + $10.21 |
 | L | ~450M | ⏭️ dropped in the M3 re-plan (new data + the most expensive SFT) | | | |
 
@@ -448,13 +454,49 @@ examples drawn from them (ADR-028). That is ~77 optimizer steps of the same reci
   beyond monotonicity. I'll report it as such.
 - **Cost:** SFT job 1–1.5 h, $3–5. GRPO $8–12.
 
+**E4 reading (`m5-sft-primer-s-t8`, `m5-e4-dense`).** Primer-S + T8 alone scored **25.5%
+[23.6, 27.5]** on test2000, and primer-S → GRPO dense **29.5% [27.6, 31.6]**. Paired:
+
+| Comparison | Δ (points) |
+|---|---|
+| primer-S → GRPO vs primer-S only (H5 for S) | **+4.0 [+2.5, +5.5]** |
+| primer-S → GRPO vs none (E2 dense v3) | +3.8 [+2.5, +5.1] |
+| primer-M → GRPO (ent014) vs primer-S → GRPO | +5.2 [+3.7, +6.7] |
+| primer-S only vs E2 dense v3 | −0.3 [−1.8, +1.2] |
+| primer-M only vs primer-S only | +10.2 [+8.5, +11.9] |
+
+Figure: `results/figures/e4_scaling.png` (`ks scaling-figure`), solve rate vs primer tokens on a
+log axis, primer only and → GRPO, with the no-primer arm in its own panel.
+
+Checked against the predictions:
+- Format: probe format 1.00 at both checkpoints (steps 53, 77) and dev500 format 100%. ✓
+- Primer-S only: 25.5%, inside 12–28%, above the point (20%). ✓ Move accuracy 41.9% (30–48%) ✓,
+  legal 100% ✓. A tenth of the data reached about the E2 GRPO level on its own, more than I
+  expected. The easy bins saturate first (400–599: 85.6%, primer-M only 92.2%).
+- E0 on primer-S: P1 55.2% (60–95%) ✗ just under, P2 6.4% ✓, P3 12.0% (20–70%) ✗, P4 57.6% (60–85%)
+  ✗ just under. At ~77 optimizer steps the rules tasks are far from learned; the puzzle skill
+  (T5/T8) moved faster than the board knowledge.
+- v4's entropy start: 0.25 (steps 1–5), above 0.2, so the target stayed 0.2 and the run was v3. ✓
+- Primer-S → GRPO dense: 29.5%, inside 24–34% and at the point (29%). ✓
+- **H5 for S:** +4.0 [+2.5, +5.5], ≥ 3 with a CI that excludes 0. ✓ (I gave it 65%.) Unlike
+  primer-M, the weaker start left RL room to add. Rating at 50% solve rose from 971 to 1068.
+- **H3:** none 25.8% < S 29.5% < M 34.8%, and each step is a paired Δ whose CI excludes 0. ✓ (55%.)
+  Three points only test monotonicity; S → M is +5.2 points for 10× the tokens. The SFT-only
+  curve is steeper (+10.2 for S → M), so the post-RL curve is flatter than the primer-only one:
+  RL closes some of the gap from below and none from above.
+- Health: format ≥ 99.7%, ~8.5 tokens per answer, truncation 0. Zero-spread groups rose from 23%
+  (steps 1–20) to 82% (steps 180–200).
+- Cost: SFT 1.15 h, $3.61 ✓; GRPO 2.84 h, $8.90 ✓.
+
 ## E5: ablations
 
 | ID | Arm | Predicted | Result | Run $ | Status |
 |---|---|---|---|---|---|
-| E5a | rules-only primer (SFT only) | 3–12% (point 6%) if the format holds | | | |
-| E5a | rules-only primer → GRPO dense (v4) | 24–33% (point 28%); Δ vs E2 dense v3 +2 (−2 to +7) | | | |
-| E5b | no legal-move list | | | | |
+| E5a | rules-only primer (SFT only) | 3–12% (point 6%) if the format holds | 2.9% [2.1, 3.6]; vs base −1.2 [−2.3, −0.1] | $30.02 (+ $4.99 in two stopped attempts) | done |
+| E5a | rules-only primer → GRPO dense (v4) | 24–33% (point 28%); Δ vs E2 dense v3 +2 (−2 to +7) | **26.2% [24.3, 28.1]**; vs E2 dense v3 +0.4 [−1.0, +1.8]; vs primer-M → GRPO (ent014) −8.6 [−10.2, −6.9] | $9.38 | done |
+| E5b | base, no legal-move list | 1–4% (point 2.5%), legal 55–90% | 0.1% [0.0, 0.1], legal 8.9% | (in E5b's job) | done |
+| E5b | primer-M + T8 only, no list | 22–34% (point 29%) | 1.7% [1.1, 2.2], legal 71.1%; vs with the list −34.1 [−36.1, −31.9] | (in E5b's job) | done |
+| E5b | primer-M + T8 → GRPO dense (v4), no list | 28–36% (point 32%); Δ vs ent014 −3 (−7 to +1) | **1.9% [1.4, 2.5]**, legal 87.8%; vs its start +0.2 [−0.5, +1.0]; vs ent014 −32.9 [−34.9, −30.8] | $7.22 (1 preemption) | done |
 | E5c | ~4B model, best recipe | | | | ⏭️ doesn't fit the M5 line (user's choice at the M5 start: E5a, E4, E5b, E5d) |
 | E5d | LoRA r=8 vs r=64 | | | | ⏭️ dropped from the queue to finish M5 sooner (user's choice, 2026-10-25); not needed for H3/H4 |
 | M4 ablation (ADR-025) | primer → GRPO dense, entropy target 0.14 instead of 0.2 | 33–38% (point 35.5%); Δ vs primer only −2 to +2.5 | **34.8% [32.6, 36.9]**; vs primer only −0.9 [−2.3, +0.4]; vs `m4-e3-dense` +2.1 [+1.1, +3.2] | $10.21 (4 preemptions) | done |
@@ -549,6 +591,66 @@ references: base 4.1% (legal 96.4%), primer-M + T8 only 35.7%, primer → GRPO d
   includes 0): 45%. Legal ≥ 98% after GRPO: 80%.
 - **Cost:** $10–14 (the two extra test2000 evals add ~$0.3).
 
+**T9 at 10% reading (`m5-sft-rules-m-t9-10`).** The format held: probe format 1.00 at every
+checkpoint (steps 52–699) and dev500 format 100%. ✓ on all three format predictions. Loss and
+answer-token accuracy tracked `m5-sft-rules-m` (0.407 and 85.9% at step 52, vs 0.38 and 86.6% at
+step 59) ✓. **But the probe's legal rate drifted down**, from 1.00 at step 0 to 0.75 at step 699,
+and the final model's dev500 legal rate *with the list in the prompt* is 69.6% (base 96.4%).
+Rules-M never asks for a move from the list, and T9 asks for list subsets ("legal moves of the
+piece on g2"), so the model unlearned "pick one move from this list". Cost **$30.02** over 9.6 h
+(predicted $24–28 ✗): attempt 1 was preempted at step 292 while saving that checkpoint, so steps
+232–292 ran twice, and the retry was refused by the $40 run budget until `max_hours` went from 10
+to 7.5 (user-approved).
+
+**E5a reading (`m5-e5a-dense`).** Rules-only SFT on its own scored **2.9% [2.1, 3.6]** on
+test2000, slightly *below* the base model (−1.2 [−2.3, −0.1]), with move accuracy 15.6% and legal
+68.7%. After GRPO dense, **26.2% [24.3, 28.1]**: +0.4 [−1.0, +1.8] over GRPO from the base model,
+and −8.6 [−10.2, −6.9] under primer-M → GRPO. Checked against the predictions:
+- SFT only: solve 2.9% (3–12%) ✗ just below; move accuracy 15.6% (15–28%) ✓ at the edge; legal
+  68.7% (≥ 97%) ✗, see the T9 reading.
+- E0: all four inside their ranges (P1 99.2%, P2 11.2%, P3 94.4%, P4 88.8%) ✓. The rules were
+  learned, at primer-M's level or above, and GRPO didn't erase them (99.2 / 9.6 / 95.2 / 88.0%).
+- v4's entropy start: 0.255, so the target stayed 0.2 (v3). ✓
+- → GRPO dense: inside 24–33% ✓, Δ +0.4 inside −2 to +7 ✓ (point +2). **H4's bar (≥ 30.3%) is
+  not met** (I gave it 25%). "Rules-only ≈ no primer" (Δ < 3 or a CI that includes 0): ✓ (55%).
+- pass@8 on dev500: SFT only 7.6% (5–15%) ✓; after GRPO 30.2% (30–42%) ✓ at the edge, only 2.2
+  points above its greedy 28.0%. The policy is nearly deterministic: zero-spread groups averaged
+  77% over steps 180–200, and KL to the start reached 10.3 (primer-M → GRPO ent014: 0.16). RL
+  re-learned move choice from a start that had unlearned it, rather than refining one.
+- Health: format 100% and ~10 tokens per answer on test2000, truncation 0 ✓. dev500 dipped at
+  steps 30–50 (format 0.52–0.84) while the entropy bonus was ramping (coefficient 0.54 over steps
+  21–60), then recovered from step 60.
+- Cost: GRPO $9.38 ✓ ($8–12). E5a in total, with the two stopped SFT attempts: $44.39.
+
+So knowing the board (squares 99%, FEN after a move 94%, check 89%) bought nothing on puzzles,
+with or without RL on top. The primer's gain comes from its move-choice tasks (T5 + T8), not from
+the rules tasks.
+
+**E5b reading (`m5-e5b-dense-nolist`).** Without the "Legal moves:" line, every model collapsed:
+the base to **0.1%** (legal 8.9%), primer-M + T8 only to **1.7% [1.1, 2.2]** (legal 71.1%, format
+91.4%), and primer → GRPO dense to **1.9% [1.4, 2.5]** (legal 87.8%), +0.2 [−0.5, +1.0] over its
+start. Every solve-rate prediction failed by a wide margin:
+- Base: 0.1% (1–4%) ✗, legal 8.9% (55–90%) ✗. Without the list the base model almost never names
+  a legal move.
+- Primer only: format 91.4% (≥ 90%, 65%) ✓; solve 1.7% (22–34%) ✗; legal 71.1% (90–99%) ✗.
+- → GRPO: 1.9% (28–36%) ✗; vs ent014 −32.9 (−7 to +1) ✗; "the primer replaces the crutch" ✗;
+  legal ≥ 98% ✗ (87.8%).
+- Training: dense reward rose (0.24 → 0.33) almost entirely through legality (0.64 → 0.85 at
+  T = 1). Move accuracy on test2000 went from 11.4% to 14.3%; solving didn't move. Zero-spread
+  groups stayed low (4% → 30%), so the reward had spread to learn from. 200 steps taught legal
+  moves, not tactics.
+- Cost: $7.22, one preemption (0.80 h, $2.51; resumed from step 100). Predicted $10–14.
+
+My prediction assumed T2 ("legal moves of the piece on X") had taught legal-move generation, so
+the list was a convenience. It wasn't. **Caveat:** primer-M's move-choice task (T5, 30% of it)
+shows the list in every prompt (`ks/data/primer.py`, `user_prompt(..., legal=True)`), and so do T8
+and all of RL. E5b therefore removes, at eval and RL time, a list the primer was trained to read.
+It shows that the primer's 35.7% depends on the list, not that a primer trained without it would
+fail. That would need a list-free primer (T5 without the list), which M5 didn't run. For the
+write-up: the measured skill is "pick the tactic from 30-odd listed moves". Primer-M's T2 taught
+legal-move lists only partly (E0 legal-list F1 73%, exact 14%), and that isn't enough to name
+legal moves from the FEN alone.
+
 **E5d predictions** (written 2026-10-25, before either E5d run). Base → GRPO dense, v4 (= v3 for
 the base start), LoRA rank 8 and 64 against rank 32 (`m4-e2-dense-v3`: dev500 5.2% at step 0,
 24.0% at step 20, 26.4% at step 100), 100 steps, the same seed, data order and schedule.
@@ -564,13 +666,13 @@ the base start), LoRA rank 8 and 64 against rank 32 (`m4-e2-dense-v3`: dev500 5.
 |---|---|---|
 | H1 | **holds** | Primer → GRPO beats GRPO from the base on test2000 under both rewards: dense +6.8 [+5.2, +8.4] vs E2 dense v3, sparse +7.4 [+5.8, +9.2] vs E2 sparse v3 (one seed per arm). The gain is the primer's: primer only is +9.9 [+8.2, +11.8] vs E2 dense v3. |
 | H2 | **falsified as stated** | Sparse reward on the primer model stays within noise of its start: −0.2 [−1.6, +1.1] vs primer only. Sparse reward does learn from the *base* model under v3 (4.1% → 28.0%), unlike Chess-R1's 3B, so the "sparse can't learn" premise fails here for the base, not the primer. |
-| H3 | | |
-| H4 | | |
-| H5 | **fails** | Primer only ≈ primer → GRPO for all three RL runs: dense −3.1 [−4.5, −1.6], sparse −0.2 [−1.6, +1.1], dense with the entropy target at the primer's own entropy −0.9 [−2.3, +0.4] (ADR-025). The dense arm's loss was the base-tuned entropy floor; without it RL keeps the primer's score but adds nothing, and pass@8 falls (51.4% → 42.8–47.0%). |
+| H3 | **holds (monotone)** | Post-RL test2000 rises with primer size: none 25.8% < S 29.5% < M 34.8%, paired steps +3.8 [+2.5, +5.1] and +5.2 [+3.7, +6.7]. Three sizes (L dropped) test monotonicity only, not a log-linear slope. Primer-only rises faster (S 25.5% → M 35.7%), so RL narrows the gap between sizes (`results/figures/e4_scaling.png`). |
+| H4 | **fails** | Rules-only primer (rules-M + 10% T9, as many tokens as primer-M, no move choice) → GRPO dense: 26.2%, +0.4 [−1.0, +1.8] vs GRPO from the base model, far from the bar (≥ 30.3%, half of primer-M's +9.0). The rules were learned (E0 P1 99%, P3 94%) but didn't help; on its own the rules model is below the base (−1.2 [−2.3, −0.1]) because it unlearned picking from the list. |
+| H5 | **fails for primer-M, holds for primer-S** | primer-S → GRPO dense +4.0 [+2.5, +5.5] vs primer-S only (M5, E4). For primer-M, primer only ≈ primer → GRPO for all three RL runs: dense −3.1 [−4.5, −1.6], sparse −0.2 [−1.6, +1.1], dense with the entropy target at the primer's own entropy −0.9 [−2.3, +0.4] (ADR-025). The dense arm's loss was the base-tuned entropy floor; without it RL keeps the primer's score but adds nothing, and pass@8 falls (51.4% → 42.8–47.0%). |
 
 ## Cost summary
 
 | Pool | Ceiling | Spent | Biggest line items |
 |---|---|---|---|
-| compute | 360 | $131.02 (to M4) | M4 $75.92: SFT primer-M + T8 $22.01 (+ $4.16 stopped primer-M-only run), E3 dense $9.64, E3 sparse $11.11, entropy ablation $10.21, E2 dense v3 $10.19, E2 sparse v3 $8.48, E0 sparse $0.11; M3 $50.15 |
+| compute | 360 | $195.15 (to M5) | M5 $64.13: E5a rules SFT $30.02 (+ $4.99 in two stopped attempts), E5a GRPO $9.38, primer-S SFT $3.61, E4 GRPO $8.90, E5b $7.22; M4 $75.92: SFT primer-M + T8 $22.01 (+ $4.16 stopped primer-M-only run), E3 dense $9.64, E3 sparse $11.11, entropy ablation $10.21, E2 dense v3 $10.19, E2 sparse v3 $8.48, E0 sparse $0.11; M3 $50.15 |
 | vertex | 180 | $0 | none; the Premium Support credit was drawn for Compute Engine instead (BUDGET §1, 2026-10-24) |

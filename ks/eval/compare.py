@@ -157,3 +157,90 @@ def bins_figure(results: dict[str, dict[str, Any]], path: Any, ref: str = "e2_de
     fig.savefig(path, dpi=160)
     plt.close(fig)
     return path
+
+
+def scaling_figure(
+    none: tuple[dict[str, Any], dict[str, Any]],
+    points: list[tuple[str, float, dict[str, Any], dict[str, Any]]],
+    path: Any,
+) -> Any:
+    """E4: test2000 solve rate vs primer tokens (log x), primer only and primer → GRPO dense, with
+    95% CIs. `none` is (base zero-shot, base → GRPO dense), drawn in its own panel at "no primer"
+    since log x has no 0. `points` are (name, tokens, primer only, primer → GRPO)."""
+    import matplotlib  # type: ignore[import-not-found]
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt  # type: ignore[import-not-found]
+
+    from ks.train.report import GRID, INK, SERIES, SURFACE, _style
+
+    def ci(r: dict[str, Any]) -> tuple[float, float, float]:
+        s = r["summary"]["solve"]
+        return 100 * s["value"], 100 * (s["value"] - s["lo"]), 100 * (s["hi"] - s["value"])
+
+    fig, (ax0, ax1) = plt.subplots(
+        1,
+        2,
+        figsize=(7.5, 4.0),
+        sharey=True,
+        gridspec_kw={"width_ratios": [1, 4], "wspace": 0.06},
+        facecolor=SURFACE,
+    )
+    for ax in (ax0, ax1):
+        _style(ax)
+        ax.grid(axis="y", color=GRID, lw=0.8)
+        ax.set_axisbelow(True)
+    ax1.spines["left"].set_visible(False)
+    ax1.tick_params(axis="y", length=0)
+
+    series = (
+        ("primer only (SFT)", SERIES[2], [p[2] for p in points], "--"),
+        ("→ GRPO dense", SERIES[1], [p[3] for p in points], "-"),
+    )
+    xs = [p[1] for p in points]
+    ends = [ci(s[2][-1])[0] for s in series]
+    for k, ((label, c, runs, ls), base) in enumerate(zip(series, none, strict=True)):
+        dodge = (-1, 1)[k]  # the two series share x; offset them so the CIs don't overlap
+        y, lo, hi = ci(base)
+        ax0.errorbar(
+            [0.08 * dodge], [y], yerr=[[lo], [hi]], color=c, marker="o", ms=7, capsize=3, lw=2
+        )
+        ys = [ci(r) for r in runs]
+        ax1.errorbar(
+            [x * 1.04**dodge for x in xs],
+            [v[0] for v in ys],
+            yerr=[[v[1] for v in ys], [v[2] for v in ys]],
+            color=c,
+            ls=ls,
+            marker="o",
+            ms=7,
+            capsize=3,
+            lw=2,
+            label=label,
+        )
+        above = ends[k] >= ends[1 - k]
+        ax1.annotate(
+            f"{ys[-1][0]:.1f}%",
+            (xs[-1] * 1.04**dodge, ys[-1][0]),
+            xytext=(10, 7 if above else -7),
+            textcoords="offset points",
+            va="center",
+            color=INK,
+            fontsize=8,
+        )
+    ax0.set_xticks([0], ["none\n(base)"])
+    ax0.set_xlim(-0.6, 0.6)
+    ax0.set_ylabel("test2000 solve rate (%)", color=INK, fontsize=9)
+    ax0.set_ylim(0, None)
+    ax1.set_xscale("log")
+    ax1.set_xlim(min(xs) / 2, max(xs) * 2.5)
+    ax1.set_xticks(xs, [f"{p[0]}\n{p[1] / 1e6:.0f}M" for p in points])
+    ax1.minorticks_off()
+    ax1.set_xlabel("primer tokens (log scale)", color=INK, fontsize=9)
+    ax1.legend(frameon=False, fontsize=8, labelcolor=INK, loc="lower right")
+    fig.suptitle(
+        "E4: solve rate vs primer size, with 95% CIs", color=INK, fontsize=10, x=0.08, ha="left"
+    )
+    fig.savefig(path, dpi=160, bbox_inches="tight", facecolor=SURFACE)
+    plt.close(fig)
+    return path
