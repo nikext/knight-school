@@ -299,7 +299,7 @@ def stage(user: str, stage_dir: Path = STAGE) -> list[Path]:
 
 
 def upload(user: str, token: str, stage_dir: Path = STAGE, private: bool = False) -> list[str]:
-    from huggingface_hub import HfApi
+    from huggingface_hub import HfApi  # type: ignore[import-not-found]
 
     api = HfApi(token=token)
     urls = []
