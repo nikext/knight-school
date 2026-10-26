@@ -332,6 +332,28 @@ def browser_data() -> None:
     typer.echo(str(browser.write()))
 
 
+@app.command("hf-stage")
+def hf_stage(user: Annotated[str, typer.Option(help="Hugging Face user or org.")]) -> None:
+    """M6: model cards next to the downloaded weights, and the dataset folder (no upload, $0)."""
+    from ks import release
+
+    for d in release.stage(user):
+        typer.echo(str(d))
+
+
+@app.command("hf-upload")
+def hf_upload(
+    user: Annotated[str, typer.Option(help="Hugging Face user or org.")],
+    private: bool = False,
+) -> None:
+    """M6: push the staged models and dataset to Hugging Face (outward-facing: ask the user first)."""
+    from ks import release
+
+    token = _env("HF_TOKEN")["HF_TOKEN"]
+    for url in release.upload(user, token, private=private):
+        typer.echo(url)
+
+
 @app.command("primer-tokens")
 def primer_tokens(
     model: Annotated[str, typer.Argument(help="Profile of the chosen main model.")],
