@@ -674,5 +674,8 @@ the base start), LoRA rank 8 and 64 against rank 32 (`m4-e2-dense-v3`: dev500 5.
 
 | Pool | Ceiling | Spent | Biggest line items |
 |---|---|---|---|
-| compute | 360 | $195.15 (to M5) | M5 $64.13: E5a rules SFT $30.02 (+ $4.99 in two stopped attempts), E5a GRPO $9.38, primer-S SFT $3.61, E4 GRPO $8.90, E5b $7.22; M4 $75.92: SFT primer-M + T8 $22.01 (+ $4.16 stopped primer-M-only run), E3 dense $9.64, E3 sparse $11.11, entropy ablation $10.21, E2 dense v3 $10.19, E2 sparse v3 $8.48, E0 sparse $0.11; M3 $50.15 |
+| compute | 360 | $197.74 (to M6 part 1) | M5 $64.13: E5a rules SFT $30.02 (+ $4.99 in two stopped attempts), E5a GRPO $9.38, primer-S SFT $3.61, E4 GRPO $8.90, E5b $7.22; M4 $75.92: SFT primer-M + T8 $22.01 (+ $4.16 stopped primer-M-only run), E3 dense $9.64, E3 sparse $11.11, entropy ablation $10.21, E2 dense v3 $10.19, E2 sparse v3 $8.48, E0 sparse $0.11; M3 $50.15; M6 $2.59 so far (model download egress $1.49, GCS checkpoint storage $1.10) |
 | vertex | 180 | $0 | none; the Premium Support credit was drawn for Compute Engine instead (BUDGET §1, 2026-10-24) |
+
+**Final cost line (2026-10-26, before the Gemini rows): $197.74 of $600 in credits** ($360 compute
+ceiling + $180 Vertex ceiling); $190.68 of it is 61 h of spot A100 time.

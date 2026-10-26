@@ -15,9 +15,11 @@ merged PR whose description lists what was verified, the numbers, and the
 | M3 | GRPO pipeline, RL on base (E2), re-plan | [M3](tasks/M3-grpo.md) | 70 | 0 | ✅ done | PR #4 · spent $50.15 compute, $0 vertex · config v2 frozen (ADR-021, adaptive entropy) · E2 test2000: dense v2 27.2%, sparse v2 23.5%, dense v1 23.8% (base 4.1%) · post-answer rambling flaw found, v3 proposed |
 | M4 | Primer SFT → GRPO, the main result (E3) | [M4](tasks/M4-primer.md) | 100 | 0 | ✅ done | PR #5 · spent $75.92 compute, $0 vertex · config v3 (ADR-022), T8 fallback (ADR-024) · test2000: primer-M+T8 only 35.7%, primer → dense 32.6%, primer → sparse 35.4%, E2 v3 dense 25.8% / sparse 28.0% · H1 holds, H2 falsified, H5 fails (ADR-026, entropy ablation ADR-025) |
 | M5 | Scaling and ablations (E4, E5) | [M5](tasks/M5-scaling-ablations.md) | 110 | 110* | ✅ done | PR #6 · spent $64.13 compute, $0 vertex · config v4 (ADR-027), rules-M + T9 at 10% (ADR-028–030) · test2000: primer-S only 25.5% → GRPO 29.5%; rules-only → GRPO 26.2% (E2 25.8%); no list: primer → GRPO 1.9% · H3 holds (monotone), H4 fails, H5 holds for S · E5c, E5d ⏭️ (user's choice) |
-| M6 | Release and showcase | [M6](tasks/M6-release.md) | 9 | 4 | ⬜ todo | |
+| M6 | Release and showcase | [M6](tasks/M6-release.md) | 9 | 4 | 🟨 in progress | PR #7 (part 1) · spent $2.59 compute so far (egress $1.49, storage $1.10) · puzzle browser on GitHub Pages, README, BLOG draft, CV bullets, HF cards staged, teardown step 1 (68 GB of resume checkpoints deleted) |
 | | contingency (user approval only) | | 50 | 15 | | |
 | | **ceiling** | | **360** | **180** | | |
+
+**M6 next up** (after PR #7): (1) the user adds a write `HF_TOKEN` to `.env` and names the HF account, then `uv run ks hf-stage --user <u>` and, after a yes, `uv run ks hf-upload --user <u>`; add the HF links to README.md and the About page. (2) Teardown step 2, **by 2026-11-10**: delete `gs://knight-school-nt26-knight-school/runs/` and `data/` (after the HF upload) and the last registry image `train:7190e0411a2e`; keep the budgets and kill switch. (3) The user reads Billing → Reports for the final reconcile and decides whether to delete the project. (4) Portfolio entry in portfolio2 (user: after HF and Pages). (5) From 2026-11-13: E1 Gemini rows (scope test → pilot → batch, vertex pool).
 
 Legend: ⬜ todo · 🟨 in progress · ✅ done · ⏭️ skipped (say why)
 
@@ -40,7 +42,7 @@ could still run after **2026-11-10 00:00Z**. Gemini may only spend from
 
 \* Only if the Vertex credit covers Vertex AI custom training (checked in M0).
 
-Spent to date: compute $195.15 · vertex $0.00 (as of M5, 2026-10-26; update from `make costs` in each PR).
+Spent to date: compute $197.74 · vertex $0.00 (as of M6 part 1, 2026-10-26; update from `make costs` in each PR).
 
 ---
 

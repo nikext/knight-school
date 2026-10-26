@@ -131,6 +131,11 @@ format ($4.99, ADR-029/030) and lost 60 steps to a preemption mid-save ($30.02 f
 SFT), GRPO $9.38. E5b $7.22 with one preemption (estimate $12). E5c and E5d were not run (user's
 choice). Spot capacity: us-central1-c stocked out on 5 of the queue's 6 VM launches; europe-west4-a took them.
 
+**M6 part 1 (2026-10-26):** $2.59 of $9. Downloading the three released checkpoints (3 × 4.14 GiB
+at $0.12/GiB egress) cost $1.49. GCS storage for runs/ had never been booked: up to 133 GB from
+2026-10-22, 65 GB after the 68 GB of resume checkpoints were deleted, booked through 2026-11-10 as
+$1.10. No GPU job: the training jobs had already merged LoRA into `final/merged`.
+
 **M3 update (2026-10-22, ADR-020/021):** $23.43 spent, of which ~$6.4 went to preemptions and
 stockouts (E2 sparse under v1 reached step 20 for $6.13). Config v2 adds one dense run (~$8).
 M3 is now expected at ~$40–48 of its $70: dense v2 and sparse v2 at ~$8–9 each plus preemption

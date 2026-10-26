@@ -193,3 +193,9 @@ machine against the console pricing calculator.
   optimizer states. Keep the final models in Hugging Face and the eval
   outputs in the repo. Keep the budgets and kill switch until the project is
   deleted. Whether to delete the dedicated project is the user's call.
+- **Done 2026-10-26 (M6 part 1, user-approved):** deleted `runs/*/ckpt/` (68.2 GB of resume
+  checkpoints), `scratch/`, the Cloud Build source tarballs in `gs://knight-school-nt26_cloudbuild`,
+  and the registry images `train:91af7e44bf9f` and `train:1a92ddf79865`. **Left, to delete by
+  2026-11-10:** `runs/` (merged weights and run logs, ~64 GB) and `data/` once the HF upload is done,
+  and `train:7190e0411a2e`. The kill switch's function buckets (`gcf-v2-*`) and `gcf-artifacts`
+  stay with it.
