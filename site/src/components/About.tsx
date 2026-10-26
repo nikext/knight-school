@@ -2,6 +2,7 @@ import { MODEL_COLOR, pct } from "../lib";
 import type { Dataset } from "../types";
 
 const REPO = "https://github.com/nikext/knight-school";
+const HF = "https://huggingface.co/nikext";
 
 export default function About({ data }: { data: Dataset }) {
   return (
@@ -59,6 +60,13 @@ export default function About({ data }: { data: Dataset }) {
           stratified by rating. Board: <a href="https://github.com/Clariity/react-chessboard">react-chessboard</a> (MIT) with{" "}
           <a href="https://github.com/jhlywa/chess.js">chess.js</a> (BSD-2). Code, configs, every eval file and the cost ledger are in{" "}
           <a href={REPO}>the repository</a>.
+        </p>
+        <p>
+          The models are on Hugging Face (Apache-2.0):{" "}
+          <a href={`${HF}/knight-school-qwen3.5-2b-primer-m`}>primer-M</a>,{" "}
+          <a href={`${HF}/knight-school-qwen3.5-2b-primer-m-grpo-sparse`}>primer → GRPO sparse</a> and{" "}
+          <a href={`${HF}/knight-school-qwen3.5-2b-primer-m-grpo-dense`}>primer → GRPO dense</a>, with the eval sets and RL positions in the{" "}
+          <a href={`${HF.replace("huggingface.co/", "huggingface.co/datasets/")}/knight-school-chess-puzzles`}>dataset</a> (CC0).
         </p>
       </section>
     </main>

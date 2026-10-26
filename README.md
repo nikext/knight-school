@@ -9,7 +9,8 @@ fixed cloud budget, with every prediction written down before the run and every 
 
 [**Puzzle browser**](https://nikext.github.io/knight-school/): every puzzle, every model's answer ·
 [Results with predictions](docs/RESULTS.md) · [Decisions (ADRs)](docs/DECISIONS.md) ·
-[Blog draft](docs/BLOG.md) · Models and data on Hugging Face (links below)
+[Blog draft](docs/BLOG.md) · [Models](https://huggingface.co/nikext/knight-school-qwen3.5-2b-primer-m) and
+[dataset](https://huggingface.co/datasets/nikext/knight-school-chess-puzzles) on Hugging Face
 
 ## The question
 
@@ -100,10 +101,17 @@ rules are in [docs/BUDGET.md](docs/BUDGET.md).
 
 ## Release
 
-- Models (Apache-2.0, merged weights): primer-M, primer-M → GRPO sparse, primer-M → GRPO dense, on
-  Hugging Face (links added on release).
-- Dataset (CC0): test2000, dev500, probe500, the 66k RL positions with Stockfish scores for every
-  legal move, and a primer sample. The full primer is regenerated with `make data`.
+- Models on Hugging Face (Apache-2.0, merged bf16 weights, cards with the eval tables and the exact
+  prompt):
+  - [knight-school-qwen3.5-2b-primer-m](https://huggingface.co/nikext/knight-school-qwen3.5-2b-primer-m):
+    primer-M + T8, SFT only, the best model (35.7%)
+  - [knight-school-qwen3.5-2b-primer-m-grpo-sparse](https://huggingface.co/nikext/knight-school-qwen3.5-2b-primer-m-grpo-sparse):
+    primer → GRPO, sparse reward (35.4%)
+  - [knight-school-qwen3.5-2b-primer-m-grpo-dense](https://huggingface.co/nikext/knight-school-qwen3.5-2b-primer-m-grpo-dense):
+    primer → GRPO, dense reward, entropy target 0.14 (34.8%)
+- Dataset (CC0), [knight-school-chess-puzzles](https://huggingface.co/datasets/nikext/knight-school-chess-puzzles):
+  test2000, dev500, probe500, the 66k RL positions with Stockfish scores for every legal move, and
+  a primer sample. The full primer is regenerated with `make data`.
 - [Puzzle browser](https://nikext.github.io/knight-school/) (`site/`): all 2,000 test puzzles with
   each model's answer, filters by rating, theme and outcome, and a solve-it-yourself mode.
 

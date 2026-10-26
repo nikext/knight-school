@@ -138,7 +138,8 @@ it forced a worst-case number and an expiry check before every launch.
 The [puzzle browser](https://nikext.github.io/knight-school/) shows all 2,000 test puzzles with
 every model's answer. You can filter to "the primer solved it, RL from the base didn't" or try a
 puzzle yourself before you look. The code, configs, ledger and every eval file are on
-[GitHub](https://github.com/nikext/knight-school), and the models and data are on Hugging Face.
+[GitHub](https://github.com/nikext/knight-school), and the [models](https://huggingface.co/nikext)
+and [data](https://huggingface.co/datasets/nikext/knight-school-chess-puzzles) are on Hugging Face.
 
 ---
 
