@@ -32,6 +32,9 @@ PIECE_ORDER = [chess.KING, chess.QUEEN, chess.ROOK, chess.BISHOP, chess.KNIGHT, 
 
 # Share of examples per task (by example count; M2 records tokens per task).
 WEIGHTS = {"T1": 0.10, "T2": 0.15, "T3": 0.15, "T4": 0.10, "T5": 0.30, "T6": 0.10, "T7": 0.10}
+# primer rules-M (E5a, ADR-028): T1-T4 only, in the proportions they have in primer-M. No answer
+# is ever a move choice.
+RULES_WEIGHTS = {"T1": 0.20, "T2": 0.30, "T3": 0.30, "T4": 0.20}
 # T1-T5 draw half their positions from primer_pool puzzles, half from the eval DB.
 # T6 and T7 need an engine score and PV, so they use the eval DB only.
 PUZZLE_SHARE = 0.5
@@ -292,6 +295,36 @@ def t8_from_t5(t5: dict[str, Any], rl_user_text: str, ex_id: str) -> dict[str, A
     }
 
 
+# T9 (ADR-029): the fallback for rules-M, whose bare answers broke the RL answer format as T5's
+# did. A copy of a T1-T4 example asked in the RL prompt's layout (the legal-move line, then the
+# question with the RL instruction's second sentence) and answered in the RL answer tags. Its
+# answer is the T1-T4 answer, so no example ever answers with a move choice.
+# Shares of rules-M's example count per set: 2% as T8 had (format 0.375 at the first checkpoint,
+# ADR-029), then 10% (ADR-030).
+T9_SHARES = {"rules-M-t9": 0.02, "rules-M-t9-10": 0.10}
+T9_INSTRUCTION = (
+    "Think it through inside <think></think>, then give\nthe answer inside <answer></answer>."
+)
+
+
+def t9_from_rules(ex: dict[str, Any], ex_id: str) -> dict[str, Any]:
+    system, user, answer = ex["messages"]
+    assert ex["task"] in RULES_WEIGHTS, f"{ex['id']}: T9 copies T1-T4 only"
+    question = user["content"].splitlines()[-1]
+    board = kb.board_from_fen(ex["fen"])
+    return {
+        **ex,
+        "id": ex_id,
+        "task": "T9",
+        "variant": f"rl-format-{ex['task']}-{ex['variant']}",
+        "messages": [
+            system,
+            {"role": "user", "content": user_prompt(board, f"{question} {T9_INSTRUCTION}", True)},
+            {"role": "assistant", "content": f"<answer>{answer['content']}</answer>"},
+        ],
+    }
+
+
 Gen = Callable[[Pos, Rng], Item | None]
 VARIANTS: dict[str, list[Gen]] = {
     "T1": [t1_square, t1_pieces],
@@ -382,6 +415,7 @@ def generate(
     seed: int,
     prefix: str,
     stats: GenStats,
+    weights: dict[str, float] = WEIGHTS,
 ) -> Iterator[dict[str, Any]]:
     """n examples in a seeded task order. Each source position is used at most once.
 
@@ -390,10 +424,10 @@ def generate(
     separable, RESEARCH.md H5); a fresh position is drawn instead.
     """
     rng = random.Random(seed)
-    tasks, weights = list(WEIGHTS), list(WEIGHTS.values())
+    tasks, shares = list(weights), list(weights.values())
     i = 0
     while i < n:
-        task = rng.choices(tasks, weights)[0]
+        task = rng.choices(tasks, shares)[0]
         gen = rng.choice(VARIANTS[task])
         use_puzzle = task not in EVALDB_ONLY and rng.random() < PUZZLE_SHARE
         src = puzzle if use_puzzle else evaldb

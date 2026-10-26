@@ -1,0 +1,28 @@
+# E4 primer-S SFT (task M5, ADR-028): Qwen3.5-2B full fine-tune on primer S-t8 (the first 130k
+# examples of primer-M plus their 2,489 T8 examples, 19.2M tokens; nested in M-t8). Same trainer,
+# config and seed as m4-sft-primer-m-t8; only the data and the run name change (~77 optimizer
+# steps instead of 768). Then dev500 (format check), test2000 (primer-S on its own, ADR-026 §2),
+# probe500 (E0) and pass@8 on dev500. PASS8_BASE=0: M4 already measured the base model's pass@8.
+# Estimate: ~45 min of training + boot, one 30-min checkpoint and the evals, ~1.3 h, $3-5.
+# Stop rule (RESULTS.md, E4 predictions): probe format < 50% at two checkpoints in a row -> stop.
+# Spot handling as in M3 (ADR-020): us-central1-c first, stockouts waited out for up to 12 h.
+id: m5-sft-primer-s-t8
+milestone: M5
+description: "E4: primer-S + T8 SFT (full fine-tune), then dev500, test2000, probe500"
+machine: a2-ultragpu-1g
+gpus: 1
+zones: [us-central1-c, europe-west4-a, us-central1-a]
+max_hours: 2.5
+max_attempts: 6
+stockout_wait_hours: 12
+run_budget_usd: 12
+boot_disk_gb: 200
+image: us-central1-docker.pkg.dev/knight-school-nt26/knight-school/train:7190e0411a2e@sha256:ab42254beb7e24340357ec8e32703bd341f35cb0c93df53638ab22f2fd2b636c
+command: "bash configs/jobs/m4-sft.sh"
+env:
+  KS_PRICE_PER_HOUR: "3.070"  # us-central1 spot A100 + 200 GB boot disk
+  VLLM_USE_FLASHINFER_SAMPLER: "0"
+  TRAIN_CONFIG: "configs/train/sft.yaml"
+  TRAIN_SETS: "name=m5-sft-primer-s-t8 data=gs://knight-school-nt26-knight-school/data/v1/primer/S-t8"
+  TEST_SET: "test2000"
+  PASS8_BASE: "0"

@@ -722,3 +722,137 @@ ablation of the entropy target (ADR-025). test2000 solve, with paired deltas:
   python-chess rules and Stockfish/puzzle moves, no LLM-written traces) lifts Qwen3.5-2B from 26%
   to 36% on 2,000 held-out Lichess puzzles, ten points above GRPO alone. GRPO on top of the primer
   adds nothing: it keeps the gain at best and narrows the model's sampling."
+
+### ADR-027: GRPO config v4: the entropy target comes from the start, min(0.2, steps 1–5)
+**Status:** accepted (2026-10-25, M5; the user chose this rule at the start of M5, as ADR-026 §3
+asked). Supersedes ADR-022's frozen config for M5 arms.
+**Context:** v3's adaptive entropy bonus has a fixed target of 0.2, fitted on the base model,
+whose rollouts start at a token entropy of 0.80–0.88 (E2 v3, steps 1–5). The primer-M start sits
+at 0.13–0.15. The controller then raised the bonus every step, and GRPO dense lost 3.1 points
+against primer only (ADR-025). With the target at 0.14, the loss went to −0.9, within noise. M5's
+starts (rules-only SFT, primer-S SFT, primer-M without the legal-move list) have entropies that
+nobody has measured yet.
+**Decision:** **v4 = v3 + `entropy_start_steps: 5`** (`configs/train/grpo.yaml`).
+- Steps 1–5 run with no entropy bonus: the target is −1, which no entropy reaches, so the
+  coefficient stays at its initial 0. After step 5 the target becomes **min(0.2, the mean
+  entropy of steps 1–5)** and stays fixed. The entropy is the controller's own: the token-weighted
+  mean over the step's 512 completions (TRL's `_last_world_entropy`). The logged `entropy` is a
+  mean of per-micro-batch means instead. With M4's short completions the two agree to within
+  0.001–0.006, at steps 190 and 200 of five runs (each run's `entropy_ctrl_state.json` against
+  its steps.csv). With long, varied completions they can differ by much more: 1.58 vs 1.28 in the
+  laptop smoke. steps.csv now logs both (`entropy_ctrl` is the controller's).
+- **Why cap at 0.2:** a target above the start's entropy is what failed in ADR-025. A target at a
+  high start's entropy (0.85 for the base) would block the sharpening RL needs. v1 collapsed to
+  0.06 with no bonus. v2 and v3 held 0.2 and learned.
+- **For a start above 0.2, v4 is v3.** In v3, steps 1–5 also apply no bonus when the entropy is
+  above the target (E2 v3: coefficient 0.0 throughout steps 1–5), and from step 6 the target is
+  0.2 in both. So the E2 arms are v4 runs as they stand.
+- **For primer-M, `m4-e3-dense-ent014` is the v4-equivalent arm.** v4 would set the target at
+  ≈0.14 (steps 1–5 of `m4-e3-dense`: 0.143). ent014 used 0.14 from step 1, with a small bonus in
+  steps 2–4. M5 compares its primer arms with it and says that it is "≈ v4", not v4.
+- **Bookkeeping:** the state (window, target) goes into every checkpoint as
+  `ks_entropy_target.json`, so a resume keeps the target, or continues a partial window. run.json
+  records `entropy_start`, and steps.csv gets an `entropy_target` column.
+- **Tested:** unit tests for the rule (`tests/test_train_entropy.py`). A laptop smoke run
+  (Qwen3.5-0.8B) fills the window, checkpoints in the middle of it, and resumes.
+**Consequences:** every M5 GRPO arm runs v4. No v3 arm is re-run. The write-up calls the M5
+arms "v4" and the E2/E3 arms "v3 (= v4 for the base start)".
+
+### ADR-028: M5 primer sets: rules-M for E5a, S-t8 for E4, chessbench1k filtered out
+**Status:** accepted (2026-10-25, M5)
+**Context:** E5a needs a rules-only primer "matched to M's tokens" (DATA.md §7). E4 needs primer-S,
+but primer-S on its own has the T5 format break that primer-M had: `m4-sft-primer-m` lost the RL
+answer format by step 53, after ~92k examples, and S has 130k. Task M5 §1 also asks every new
+set to drop positions on chessbench1k lines, which aren't in the blocklist (EVALS.md §1). It
+also lists primer-L, which the M3 re-plan dropped.
+**Decision:**
+- **rules-M** (`data/primer/rules-M`, `manifests/primer_rules-M.json`, step `primer_rules`):
+  T1–T4 with their primer-M weights renormalised (20/30/30/20%). It uses the same generator and
+  frozen formats (`ks.data.primer`). As for T1–T4 in primer-M, half the positions come from
+  `primer_pool` puzzles and half from the eval DB, and each position is used once (seed 2031).
+  **Size: 1,455,000 examples**, which is primer-M's 186.47M tokens divided by 128.15, the mean
+  tokens of primer-M's T1–T4 examples. "Matched to M's tokens" is read as total tokens, so the
+  SFT compute is matched (SFT pays for every token). T1–T4 answers are long (move lists, FENs),
+  so rules-M carries about twice primer-M's answer tokens. **Measured** (Qwen3.5-2B tokenizer):
+  186.97M tokens (primer-M 186.47M), 53.2M of them answer tokens (primer-M 28.1M). T2 and T3 hold
+  89% of the answer tokens. 727,151 positions came from puzzles and 727,849 from the eval DB.
+  1,021 items were dropped and redrawn: 552 for the blocklist or chessbench1k, 469 for rl_train.
+- **No T8 for rules-M.** T8 answers the RL prompt with the T5 move, which would bring move
+  imitation back into the one arm meant to have none. If the format breaks (RESULTS.md, E5a stop
+  rule), the fix must carry no move choice, for example RL-format prompts answered with the base
+  model's own greedy move. That needs the user's yes.
+- **S-t8** (`data/primer/S-t8`, step `primer_s_t8`): primer-S's three shards unchanged, plus the
+  **2,489** T8 examples of M-t8 whose T5 original lies in S. That is 1.88% of 132,489 (M-t8:
+  1.96%). The step recomputes `t8_examples`' picks, checks each T8 example's FEN against its T5
+  original, and checks that S's T8 examples are a prefix of M-t8's T8 shard. So S-t8 ⊂ M-t8 as
+  S ⊂ M, and E4's two points differ in size only.
+- **chessbench1k:** rules-M drops every item that shows or reveals a position on a chessbench1k
+  line, as it drops blocklisted ones. Both manifests count hits against the blocklist plus
+  chessbench1k (`contamination_keys`). S-t8 is clean by construction, since chessbench1k was
+  built to exclude anything touching primer-M, and the check confirms it.
+- **primer-L stays dropped** (M3 re-plan, BUDGET.md §2). Nothing is generated for it.
+**Consequences:** the E5a SFT costs about what primer-M's did (~$22). The E4 SFT is ~10% of that.
+`ks primer-tokens --set rules-M --set S-t8` records the token counts.
+
+### ADR-029: T9 fallback for rules-M: rules questions in the RL prompt's layout, answered in tags
+**Status:** accepted (2026-10-25, M5; the user chose it after `m5-sft-rules-m` lost the format)
+**Context:** `m5-sft-rules-m` (rules-M, ADR-028) lost the RL answer format as primer-M did. The
+probe scored format 1.00 at step 0 and **0.00** at the first checkpoint (step 59), with no
+answer tag at all. It answered with bare moves, several of them the moves the base model picked
+at step 0 (`Qxb4`, `Qxa4`). So T5's near-identical prompt wasn't needed to break the format:
+1.46M bare answers to FEN questions were enough. The user stopped the run after that one
+checkpoint, as in M4, although the pre-registered rule said two (0.82 h, $2.58). ADR-028 had
+ruled out T8, because T8 answers with a move.
+**Decision:**
+- **T9 = 29,100 examples (2% of rules-M),** each a copy of a rules-M example. They are drawn at
+  random (seed 2040), so T1–T4 come in their own proportions. The position, question and answer
+  stay the same. The user turn is laid out like the RL prompt: the FEN, the side to move, the
+  legal-move line, then the question followed by the RL instruction's second sentence with its
+  object generalised: "Think it through inside <think></think>, then give\nthe answer inside
+  <answer></answer>." (`ks.data.primer.T9_INSTRUCTION`). The answer is the T1–T4 answer inside
+  `<answer>` tags. The originals stay in the data, so each question is seen in both formats.
+- **No answer is a move choice.** T2 and T4 answers list moves (all legal moves, one piece's
+  moves, all captures), as they do in rules-M. With the legal-move line in the prompt, T2 becomes
+  partly a copy task. That's harmless, because T9 is there for the format. When a piece has only
+  one legal move, a T2 answer is that single move in tags (`<answer>g3</answer>`). It has the RL
+  answer's shape, but it says nothing about which move is good.
+- **Measured:** 1,484,100 examples, 194.47M tokens (primer-M + T8: 192.53M), 54.4M answer tokens.
+  The T9 share is 7.5M tokens. Source tasks: T1 5,951, T2 8,707, T3 8,736, T4 5,706. 0
+  contamination hits against the blocklist plus chessbench1k.
+- **Same run otherwise:** `m5-sft-rules-m`'s trainer, config and seed. Image 7190e0411a2e has the
+  same SFT code as 1a92ddf79865 and skips the base model's pass@8 (`PASS8_BASE=0`).
+- **Stop rule:** probe format < 50% at the first checkpoint → stop and ask. Both earlier breaks
+  were stopped after one checkpoint, so the rule now says so up front.
+- **Fingerprints:** adding T9 to `ks/data/primer.py` makes rules-M's manifest fingerprint stale,
+  because the data steps fingerprint the whole module, as T8 did for primer-M. A rebuild
+  reproduced rules-M's sha byte for byte (ADR-028), so `make data` would rebuild it identically.
+**Consequences:** E5a's arm is "rules-M + T9". The rerun costs ~$22 on top of the stopped $2.58.
+If T9 also fails, what is left is base self-distillation (2% RL prompts answered with the base
+model's own move, which supervises the base's move choice) or dropping E5a. That is the user's
+call.
+
+### ADR-030: T9 at 10% for rules-M, with no third stop
+**Status:** accepted (2026-10-25, M5; the user chose it after `m5-sft-rules-m-t9`'s first probe)
+**Context:** with T9 at 2% (ADR-029), `m5-sft-rules-m-t9`'s probe scored format 1.00 at step 0
+and **0.375** at the first checkpoint (step 54). The untagged answers were bare moves (`Qxg2#`,
+`Qh8+`), and every tagged answer was legal. ADR-029's rule stopped the run (0.77 h, $2.41). Its
+step-54 checkpoint never finished copying, so there was nothing to resume from. T9 is working,
+but 2% isn't enough. E5a has cost $4.99 in two stopped attempts.
+**Decision:**
+- **rules-M-t9-10** = rules-M + **145,500 T9 copies** (10% of rules-M's count), built by the same
+  step and seed as rules-M-t9 (`ks.data.primer.T9_SHARES`). Run `m5-sft-rules-m-t9-10` uses the
+  same trainer, config and seed. The T9 copies add ~37M tokens on top of rules-M's 187M. The rules
+  content stays token-matched to primer-M. Only the format copies make the run ~16% longer than
+  primer-M + T8's.
+- **No third stop.** If the first probe is still below 50%, the run goes on to the end. GRPO's
+  format reward then restores the tags, as it did from the base model's 96% start. The SFT-only
+  number is reported as graded, with the untagged share next to it. The queued GRPO starts if the
+  SFT's dev500 format is at least 5%, enough tagged samples at T = 1 for a reward signal, instead
+  of the 90% gate first set.
+- **Measured:** 1,600,500 examples, 224.42M tokens (T9: 37.46M), 59.4M answer tokens. Source
+  tasks: T1 29,176, T2 43,760, T3 43,657, T4 28,907. 0 contamination hits.
+- The 2% set stays in the data and in the record (ADR-029). The refactored step rebuilt it with
+  the same sha.
+**Consequences:** E5a's arm is "rules-M + 10% T9". If its SFT format ends below ~90%, GRPO's
+first steps also learn the format. That is a difference from the other primer arms, and the
+write-up names it.

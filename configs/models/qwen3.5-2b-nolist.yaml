@@ -1,0 +1,14 @@
+# E5b (RESEARCH.md §4): qwen3.5-2b with the prompt's "Legal moves:" line dropped. Everything else,
+# the weights included, is the qwen3.5-2b profile; the prompt hash changes.
+name: qwen3.5-2b-nolist
+backend: vllm
+description: Qwen3.5-2B, language model only, prompt-level <think>, no legal-move list (E5b)
+license: apache-2.0
+hf_repo: Qwen/Qwen3.5-2B
+revision: 15852e8c16360a2fea060d615a32b45270f8a8fc
+language_model_only: true
+max_model_len: 2560
+chat_template_kwargs: {enable_thinking: false}
+think: tags
+template_closes_think: true  # the template pre-fills <think>\n\n</think>\n\n (ADR-017)
+legal_list: false

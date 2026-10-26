@@ -1,0 +1,69 @@
+{
+  "name": "primer_rules-M",
+  "data_version": "v1",
+  "outputs": [
+    "data/primer/rules-M"
+  ],
+  "sha256": "a79b0cbc7ed9c33c5650e7f65e0ac0902ec7a32182f1fce147ce37766feb73ff",
+  "fingerprint": "8bd8b8c1534cf17a1b668e1a7c40b7c38c98f137da7bf15a64f7e32ba0d9b0ef",
+  "git_sha": "7190e0411a2e",
+  "built_at": "2026-10-25T09:35:11+00:00",
+  "examples": 1455000,
+  "shards": 30,
+  "per_task": {
+    "T1": 291601,
+    "T2": 437029,
+    "T3": 436288,
+    "T4": 290082
+  },
+  "per_source": {
+    "puzzle": 727151,
+    "evaldb": 727849
+  },
+  "contamination_hits": 0,
+  "contamination_keys": "blocklist + chessbench1k lines",
+  "tokens": {
+    "tokenizer": "Qwen/Qwen3.5-2B@15852e8c1636",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "total": 186967377,
+    "answer": 53199586,
+    "examples": 1455000,
+    "per_task": {
+      "T1": {
+        "examples": 291601,
+        "total": 30111675,
+        "answer": 3948382
+      },
+      "T2": {
+        "examples": 437029,
+        "total": 68736442,
+        "answer": 26897414
+      },
+      "T3": {
+        "examples": 436288,
+        "total": 59917539,
+        "answer": 20318913
+      },
+      "T4": {
+        "examples": 290082,
+        "total": 28201721,
+        "answer": 2034877
+      }
+    }
+  },
+  "seed": 2031,
+  "weights": {
+    "T1": 0.2,
+    "T2": 0.3,
+    "T3": 0.3,
+    "T4": 0.2
+  },
+  "puzzle_share": 0.5,
+  "blocklist_drops": 552,
+  "rl_train_drops": 469,
+  "skipped_no_item": 0,
+  "evaldb_positions_used": 733682,
+  "puzzle_positions_used": 727988
+}

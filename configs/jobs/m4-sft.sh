@@ -4,7 +4,8 @@
 #   2. eval the final model on dev500 (the format check, TRAINING.md §5), then on $TEST_SET;
 #   3. E0 (probe500) on it, and pass@8 on dev500 for it and for the base model.
 # Env: TRAIN_CONFIG, TRAIN_SETS ("key=value ..." passed as --set), MODEL (profile), TEST_SET
-# (default test2000; none skips it). A retry pulls the earlier attempts' /out and skips finished
+# (default test2000; none skips it), PASS8_BASE (default 1; 0 skips the base model's pass@8, which
+# M4 already measured). A retry pulls the earlier attempts' /out and skips finished
 # steps, as m3-grpo.sh does. SIGTERM (preemption) is forwarded to the trainer, which exits 143
 # after leaving a marker; this script then exits 143.
 set -u
@@ -66,5 +67,7 @@ fi
 step probe "$OUT/probe.log" ks eval "$MODEL" --set probe500 --ckpt "$ckpt" --run "$KS_RUN_ID" --out "$OUT/eval"
 # pass@k on dev500, 8 samples at T = 1 (task M4 §7): the primer model, and the base model for reference
 step pass8 "$OUT/pass8.log" ks eval "$MODEL" --set dev500 --n 8 --ckpt "$ckpt" --run "$KS_RUN_ID-pass8" --out "$OUT/eval"
-step pass8-base "$OUT/pass8-base.log" ks eval "$MODEL" --set dev500 --n 8 --run "$MODEL-pass8" --out "$OUT/eval"
+if [[ "${PASS8_BASE:-1}" == 1 ]]; then
+  step pass8-base "$OUT/pass8-base.log" ks eval "$MODEL" --set dev500 --n 8 --run "$MODEL-pass8" --out "$OUT/eval"
+fi
 echo "[job] $(date -u +%FT%TZ) done"

@@ -7,8 +7,8 @@ pools:
   compute:
     credit: "Google Developer Program premium benefit (CREDIT_TYPE_ANNUAL)"
     scope: "all of Google Cloud Platform and Google Maps APIs (list pricing)"
-    remaining_usd: 423.38          # shared with the user's other projects
-    checked_on: 2026-10-24T20:30:00Z
+    remaining_usd: 421.11          # shared with the user's other projects
+    checked_on: 2026-10-25T08:40:00Z
     expires: 2026-11-12            # gate: jobs must end 48 h before (ADR-013)
     ceiling: 360                   # min(360, 0.9 x 440.94 = 396.85)
   vertex:
@@ -16,8 +16,8 @@ pools:
     # 2026-10-21 -> 24 this credit fell $123.53 with $0 vertex spend, while our GPU spend was
     # $121.00 and the compute credit fell only $17.56: it is being drawn for Compute Engine first.
     scope: "'certain usage'; covers Compute Engine (observed 2026-10-24); Gemini assumed"
-    remaining_usd: 85.73
-    checked_on: 2026-10-24T20:30:00Z
+    remaining_usd: 76.28
+    checked_on: 2026-10-25T08:40:00Z
     expires: 2027-04-08
     usable_from: 2026-11-13        # Gemini waits until the compute credit is gone (ADR-013)
     covers_custom_training: false  # assumed; the vertex M5 line is dead

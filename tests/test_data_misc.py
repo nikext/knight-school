@@ -153,7 +153,17 @@ def test_manifest_skip_logic(tmp_path, monkeypatch):
 
 # --- committed artefacts (CI) -------------------------------------------------------------
 
-TRAINING_MANIFESTS = ["rl_train_candidates", "rl_train", "primer_S", "primer_M"]
+TRAINING_MANIFESTS = [
+    "rl_train_candidates",
+    "rl_train",
+    "primer_S",
+    "primer_M",
+    "primer_M-t8",
+    "primer_rules-M",
+    "primer_S-t8",
+    "primer_rules-M-t9",
+    "primer_rules-M-t9-10",
+]
 
 
 def _manifests() -> dict[str, dict]:

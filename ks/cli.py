@@ -296,14 +296,46 @@ def bins_figure(
     typer.echo(str(cmp.bins_figure(results, FIGURES / f"{name}_bins.png", ref)))
 
 
+@app.command("scaling-figure")
+def scaling_figure(
+    base: Annotated[Path, typer.Option(help="The base model's zero-shot result.")],
+    base_rl: Annotated[Path, typer.Option(help="Base → GRPO dense.")],
+    point: Annotated[
+        list[str], typer.Option(help="name:tokens:primer-only path:primer → GRPO path")
+    ],
+    name: Annotated[str, typer.Option(help="Writes results/figures/<name>_scaling.png.")] = "e4",
+) -> None:
+    """E4: solve rate vs primer tokens, primer only and primer → GRPO, with 95% CIs ($0)."""
+    from ks.eval import compare as cmp
+    from ks.eval import report
+    from ks.train.report import FIGURES
+
+    points = []
+    for p in point:
+        parts = p.split(":")
+        if len(parts) != 4:
+            raise typer.BadParameter(f"--point wants name:tokens:sft:rl, got {p!r}")
+        n, tok, sft, rl = parts
+        points.append((n, float(tok), report.read(Path(sft)), report.read(Path(rl))))
+    FIGURES.mkdir(parents=True, exist_ok=True)
+    out = cmp.scaling_figure(
+        (report.read(base), report.read(base_rl)), points, FIGURES / f"{name}_scaling.png"
+    )
+    typer.echo(str(out))
+
+
 @app.command("primer-tokens")
 def primer_tokens(
     model: Annotated[str, typer.Argument(help="Profile of the chosen main model.")],
+    sets: Annotated[
+        list[str] | None,
+        typer.Option("--set", help="Primer dirs under data/primer/; default S, M."),
+    ] = None,
 ) -> None:
-    """Count primer S/M tokens with the model's tokenizer and record them in the manifests."""
+    """Count primer tokens with the model's tokenizer and record them in the manifests."""
     from ks.data.tokens import count, write_manifests
 
-    counts = count(model)
+    counts = count(model, tuple(sets or ("S", "M")))
     write_manifests(counts)
     for name, c in counts.items():
         typer.echo(

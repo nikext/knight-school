@@ -4,8 +4,11 @@
 # with zero reward spread from step 40), so v2 adds adaptive entropy control; nothing else that
 # shapes learning changed. Revised again (v3, ADR-022): under v2 nothing stopped generation after
 # </answer>, and post-answer rambling to the cap took over m3-e2-sparse-v2 from step 150, so v3
-# stops every rollout at the first </answer>. Arms set `base: grpo.yaml` and may change only the
-# factor under test (ks.train.config.ARM_KEYS; enforced by a test).
+# stops every rollout at the first </answer>. v4 (ADR-027, M5): the entropy target comes from
+# the start, min(0.2, mean entropy of steps 1-5), because the base-tuned 0.2 pushed a sharp primer
+# start away from itself (ADR-025); for a start above 0.2 (every E2 arm) v4 runs as v3. Arms set
+# `base: grpo.yaml` and may change only the factor under test (ks.train.config.ARM_KEYS; enforced
+# by a test).
 name: grpo
 model: qwen3.5-2b
 task_reward: dense
@@ -33,6 +36,7 @@ stop_at_answer: true     # v3 (ADR-022): stop at the first </answer>; the tokens
 entropy_adaptive: true   # v2 (ADR-021): Skywork-OR1 adaptive entropy bonus, as in TRL 1.16
 entropy_target: 0.2      # v1 was still healthy here (steps 15-17: short answers, ~9% dead groups)
 entropy_coef_delta: 0.02 # v1 fell from 0.2 to 0.06 in 6 steps; TRL's 0.005 would reach only 0.03
+entropy_start_steps: 5   # v4 (ADR-027): no bonus in steps 1-5, then target = min(0.2, their mean)
 steps: 200
 
 eval_set: dev500

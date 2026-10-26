@@ -4,7 +4,8 @@
 #   2. eval the final merged model on $TEST_SET (default test2000);
 #   3. optionally E0 (probe500) on it (PROBE=1).
 # Env: TRAIN_CONFIG, TRAIN_SETS ("key=value ..." passed as --set), MODEL (profile), TEST_SET,
-# TEST_LIMIT, PROBE, PASSK (dev500 pass@8); TEST_SET=none skips the eval (throughput runs). A retry pulls the earlier
+# TEST_LIMIT, PROBE, PASSK (dev500 pass@8), START_CKPT (E5b: also evaluate this start model and
+# the base model on $TEST_SET under $MODEL's prompt); TEST_SET=none skips the eval (throughput runs). A retry pulls the earlier
 # attempts' /out and skips finished steps, as m2-screen.sh does. SIGTERM (preemption) is
 # forwarded to the trainer, which exits 143 after leaving a marker; this script then exits 143.
 set -u
@@ -67,5 +68,10 @@ if [[ "${PROBE:-0}" == 1 ]]; then
 fi
 if [[ "${PASSK:-0}" == 1 ]]; then  # pass@k on dev500: 8 samples at T = 1 (task M4 §7)
   step pass8 "$OUT/pass8.log" ks eval "$MODEL" --set dev500 --n 8 --ckpt "$ckpt" --run "$KS_RUN_ID-pass8" --out "$OUT/eval"
+fi
+if [[ -n "${START_CKPT:-}" && "$TEST_SET" != none ]]; then  # E5b: the start and the base under this prompt
+  step eval-start "$OUT/eval-start.log" \
+    ks eval "$MODEL" --set "$TEST_SET" --ckpt "$START_CKPT" --run "$KS_RUN_ID-start" --out "$OUT/eval"
+  step eval-base "$OUT/eval-base.log" ks eval "$MODEL" --set "$TEST_SET" --run "$MODEL" --out "$OUT/eval"
 fi
 echo "[job] $(date -u +%FT%TZ) done"

@@ -1,16 +1,16 @@
 # Budget: the rules for spending money
 
 The user has two Google Cloud credits (first read from Billing → Credits on
-2026-10-21, details in ADR-013; last re-read 2026-10-24). This project must never cost them real money.
+2026-10-21, details in ADR-013; last re-read 2026-10-25). This project must never cost them real money.
 This file is the contract, `costs/caps.yaml` is its machine-readable form,
 and `ks.cloud` enforces it in code.
 
 ## 1. Numbers
 
-| Pool | Credit | Left (2026-10-24) | Expires | Ceiling | Usable |
+| Pool | Credit | Left (2026-10-25) | Expires | Ceiling | Usable |
 |---|---|---|---|---|---|
-| `compute` | Google Developer Program annual: all of Google Cloud | $423.38 | **2026-11-12** | **$360** | now → jobs must **end by 2026-11-10 00:00Z** |
-| `vertex` | Marketing – GDP Premium Support 4: "certain usage", covers Compute Engine (seen 2026-10-24), Gemini assumed | $85.73 | 2027-04-08 | **$180** | from **2026-11-13** (except the M0 smoke call) |
+| `compute` | Google Developer Program annual: all of Google Cloud | $421.11 | **2026-11-12** | **$360** | now → jobs must **end by 2026-11-10 00:00Z** |
+| `vertex` | Marketing – GDP Premium Support 4: "certain usage", covers Compute Engine (seen 2026-10-24), Gemini assumed | $76.28 | 2027-04-08 | **$180** | from **2026-11-13** (except the M0 smoke call) |
 
 Each ceiling is `min(planned ceiling, 0.9 × remaining)`. The 10% reserve
 absorbs billing lag, storage, egress and rounding, and nothing is ever planned
@@ -124,6 +124,12 @@ dropped**: it needs new data plus the most expensive SFT, so E4 becomes a 3-poin
 (none, S, M). **E5c is decided at the start of M5** with the measured SFT cost. It fits only
 if the user moves the M3/M4 underruns to M5. No allocation changes for now. Calendar: the
 core plan is ~55 GPU-hours, one job at a time, before 2026-11-10.
+
+**M5 measured (2026-10-26):** $64.13 of $110. E4 primer-S $12.51 (SFT 1.15 h $3.61, GRPO $8.90;
+estimate $15). E5a $44.39 (estimate $33–43): the rules SFT needed two stopped attempts for the
+format ($4.99, ADR-029/030) and lost 60 steps to a preemption mid-save ($30.02 for the finished
+SFT), GRPO $9.38. E5b $7.22 with one preemption (estimate $12). E5c and E5d were not run (user's
+choice). Spot capacity: us-central1-c stocked out on 5 of the queue's 6 VM launches; europe-west4-a took them.
 
 **M3 update (2026-10-22, ADR-020/021):** $23.43 spent, of which ~$6.4 went to preemptions and
 stockouts (E2 sparse under v1 reached step 20 for $6.13). Config v2 adds one dense run (~$8).

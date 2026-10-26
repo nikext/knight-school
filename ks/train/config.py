@@ -68,6 +68,9 @@ class GrpoConfig(BaseModel):
     entropy_adaptive: bool = False
     entropy_target: float = 0.2
     entropy_coef_delta: float = 0.005
+    # v4 (ADR-027): with N > 0 there is no bonus for the first N steps; then the target becomes
+    # min(entropy_target, their mean entropy). A start above the target runs as with a fixed one.
+    entropy_start_steps: int = 0
     steps: int = 200
 
     eval_set: str = "dev500"
