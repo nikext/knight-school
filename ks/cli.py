@@ -324,6 +324,14 @@ def scaling_figure(
     typer.echo(str(out))
 
 
+@app.command("browser-data")
+def browser_data() -> None:
+    """M6: the puzzle browser's data (site/public/data/puzzles.json) from saved test2000 results ($0)."""
+    from ks.eval import browser
+
+    typer.echo(str(browser.write()))
+
+
 @app.command("primer-tokens")
 def primer_tokens(
     model: Annotated[str, typer.Argument(help="Profile of the chosen main model.")],

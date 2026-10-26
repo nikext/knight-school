@@ -25,3 +25,21 @@ jobs:
         run: uv run pytest
       - name: shell syntax
         run: for f in infra/*.sh infra/killswitch/*.sh; do bash -n "$f"; done
+      - name: puzzle browser data is up to date
+        run: uv run ks browser-data && git diff --exit-code site/public/data/
+
+  site:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
